@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="600" height="400" viewBox="0 0 600 400">
+  <title>Dashboard</title>
+  <desc>A test of common SVG features</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a90d9"/>
+      <stop offset="100%" stop-color="#a8d0f0"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff6b6b"/>
+      <stop offset="100%" stop-color="#ffd93d"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="400" fill="url(#sky)"/>
+  <g stroke="#ddd" stroke-width="1">
+    <line x1="50" y1="300" x2="550" y2="300"/>
+    <line x1="50" y1="250" x2="550" y2="250"/>
+    <line x1="50" y1="200" x2="550" y2="200"/>
+    <line x1="50" y1="150" x2="550" y2="150"/>
+  </g>
+
+  <text id="title" x="50" y="60" font-size="28" font-family="sans-serif" fill="#4a90d9">Dashboard</text>
+
+  <g transform="translate(80,320)">
+    <rect x="0" y="-60" width="40" height="60" fill="url(#bar)" rx="4"/>
+    <rect x="60" y="-90" width="40" height="90" fill="url(#bar)" rx="4"/>
+    <rect x="120" y="-45" width="40" height="45" fill="url(#bar)" rx="4"/>
+    <rect x="180" y="-110" width="40" height="110" fill="url(#bar)" rx="4"/>
+    <rect x="240" y="-75" width="40" height="75" fill="url(#bar)" rx="4"/>
+  </g>
+
+  <circle cx="480" cy="120" r="50" fill="#ff6b6b" opacity="0.85"/>
+  <path d="M480 70 A50 50 0 1 1 479 70 Z" fill="#ffd93d" opacity="0.6"/>
+
+  <g transform="translate(420,250) rotate(-15)">
+    <rect x="0" y="0" width="120" height="60" fill="white" stroke="#4a90d9" stroke-width="2" rx="8"/>
+    <text x="60" y="36" font-size="14" font-weight="bold" fill="#222" text-anchor="middle">Sales</text>
+  </g>
+
+  <polygon points="550,60 570,100 530,100" fill="#2ecc71"/>
+  <ellipse cx="100" cy="360" rx="30" ry="12" fill="#34495e"/>
+</svg>

@@ -1,0 +1,1 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect x="1e400" y="10" width="50" height="50" fill="red"/><rect x="NaN" y="10" width="50" height="50" fill="blue"/><circle cx="200" cy="150" r="1e30" fill="green"/><path d="M0,0 A1e400,1e400 0 1 0 10,10 Z" fill="black"/></svg>

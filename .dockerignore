@@ -1,0 +1,11 @@
+*.o
+svg2img
+test/*.png
+fuzz/fuzz_run
+fuzz/one
+fuzz/one_fast
+fuzz/one_g
+fuzz/one_ni
+*.d
+__pycache__
+*.pyc
