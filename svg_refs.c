@@ -106,6 +106,12 @@ static void resolve_clip_refs(Node* n, IdMap* ids) {
         free(n->clip_ref);
         n->clip_ref = NULL;
     }
+    if (n->mask_ref) {
+        Node* m = idmap_get(ids, n->mask_ref);
+        if (m && m->type == NODE_MASKDEF) n->mask = m;
+        free(n->mask_ref);
+        n->mask_ref = NULL;
+    }
     for (int i = 0; i < n->nkids; i++) resolve_clip_refs(n->kids[i], ids);
 }
 

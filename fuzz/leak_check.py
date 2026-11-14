@@ -61,6 +61,14 @@ CASES = [
                                 '</defs>'
                                 '<rect width="20" height="20" fill="url(#p)"'
                                 ' stroke="url(#p)" stroke-width="2"/>'), None),
+    # A mask allocates a full-region canvas plus an alpha mask per use.
+    ("mask_luminance", svg('<defs>'
+                           '<linearGradient id="g"><stop offset="0" stop-color="white"/>'
+                           '<stop offset="1" stop-color="black"/></linearGradient>'
+                           '<mask id="m" maskContentUnits="objectBoundingBox">'
+                           '<rect width="1" height="1" fill="url(#g)"/></mask>'
+                           '</defs>'
+                           '<rect width="20" height="20" fill="red" mask="url(#m)"/>'), None),
 ]
 
 

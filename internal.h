@@ -240,7 +240,8 @@ enum {
     NODE_SYMBOL = 6,      /* <symbol>: never drawn directly, only via <use> */
     NODE_TRANSPARENT = 7, /* unsupported element: no rendering, but its known
                            * children are still traversed */
-    NODE_PATTERNDEF = 8  /* <pattern>: tile definition, never painted directly */
+    NODE_PATTERNDEF = 8, /* <pattern>: tile definition, never painted directly */
+    NODE_MASKDEF = 9     /* <mask>: luminance mask, never painted directly */
 };
 
 struct Node {
@@ -305,6 +306,13 @@ struct Node {
     float symbol_vb[4];     /* symbol viewBox (x,y,w,h) */
     int   symbol_vb_valid;
     int   symbol_par_none, symbol_par_slice, symbol_par_xa, symbol_par_ya;
+
+    /* <mask>: luminance mask (SVG 1.1 §14.4) */
+    Node* mask;               /* resolved <mask> definition, borrowed */
+    char* mask_ref;
+    int   mask_units;         /* UNITS_USER / UNITS_BBOX */
+    int   mask_content_units;
+    float mask_x, mask_y, mask_w, mask_h;
 
     /* <pattern>: tile definition (SVG 1.1 §13.3) */
     int   pat_units;          /* UNITS_USER / UNITS_BBOX */

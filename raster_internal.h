@@ -76,6 +76,8 @@ void render_text(Canvas* c, Node* n, Mat world, float opacity,
 Mask* make_clip_mask(const Node* clipdef, Mat world, const float* obj_bbox,
                      int W, int H, int aa);
 Mask* make_rect_mask(const Node* n, Mat w, int W, int H, int aa);
+Mask* make_mask_from_node(const Node* mn, Mat world, const float* bbox,
+                          int W, int H, int aa);
 int node_bbox_world(Node* n, Mat full_w, float out[4]);
 
 #endif

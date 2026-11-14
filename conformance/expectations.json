@@ -2760,6 +2760,85 @@
           ]
         }
       ]
+    },
+    {
+      "name": "mask_luminance",
+      "area": "masking",
+      "note": "A mask multiplies the element by luminance \u00d7 alpha: white keeps the red, black removes it.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 10,
+          "y": 10,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 40,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 60,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 90,
+          "y": 90,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "mask_gradient_bbox",
+      "area": "masking",
+      "note": "maskContentUnits=\"objectBoundingBox\" with a gradient: alpha falls from opaque at x=0 to clear at x=100 (luminance \u00d7 alpha).",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 0,
+          "y": 50,
+          "min": 240
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "min": 100,
+          "max": 150
+        },
+        {
+          "kind": "alpha",
+          "x": 99,
+          "y": 50,
+          "max": 20
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            126
+          ],
+          "tol": 20
+        }
+      ]
     }
   ],
   "external_intentional": [

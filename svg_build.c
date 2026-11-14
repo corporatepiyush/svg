@@ -329,6 +329,8 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         if (!n) goto oom;
     } else if (!strcmp(name, "pattern")) {
         n = build_pattern(ctx, xn);
+    } else if (!strcmp(name, "mask")) {
+        n = build_mask(ctx, xn);
     } else if (!strcmp(name, "clipPath")) {
         n = svg_node_new(NODE_CLIPDEF);
         if (!n) goto oom;
@@ -444,6 +446,13 @@ oom:
     if (clip && strncmp(clip, "url(#", 5) == 0) {
         const char* e = strchr(clip + 5, ')');
         if (e) n->clip_ref = svg_strndup(clip + 5, (size_t)(e - (clip + 5)));
+    }
+    const char* mk = xml_attr(xn, "mask");
+    if (style_get_decl(xml_attr(xn, "style"), "mask", style_val, sizeof style_val))
+        mk = style_val;
+    if (mk && strncmp(mk, "url(#", 5) == 0) {
+        const char* e = strchr(mk + 5, ')');
+        if (e) n->mask_ref = svg_strndup(mk + 5, (size_t)(e - (mk + 5)));
     }
 
     if (n->type == NODE_GRADDEF) {

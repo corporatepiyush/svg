@@ -7,6 +7,7 @@ typedef struct {
     const svg2img_limits* lim;   /* NULL = defaults */
     int layers;                  /* opacity layers opened so far */
     int clips;                   /* nested clip masks opened so far */
+    int masks;                   /* <mask> buffers opened so far */
 } RenderState;
 
 /* ------------------------------------------------------------------ */
@@ -184,7 +185,8 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
      * so a symbol left in the tree paints nothing. */
     if (!n || n->hidden_subtree || n->type == NODE_SYMBOL ||
         n->type == NODE_IGNORE || n->type == NODE_PATTERNDEF ||
-        n->type == NODE_GRADDEF || n->type == NODE_CLIPDEF) return;
+        n->type == NODE_GRADDEF || n->type == NODE_CLIPDEF ||
+        n->type == NODE_MASKDEF) return;
     /* visibility:hidden suppresses this element's own painting but is
      * inherited per element, so a descendant that sets visibility:visible is
      * still drawn: traversal continues, only the painting is skipped.  The
@@ -230,6 +232,24 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
             if (clipped_away) { mask_free(own); return; }
             mask_free(own);
             own = cm;
+        }
+    }
+    if (n->mask && (!rs->lim || rs->masks < rs->lim->max_layers)) {
+        rs->masks++;
+        Mask* mm = make_mask_from_node(n->mask, w, has_bb ? bb : NULL,
+                                       c->w, c->h, aa);
+        rs->masks--;
+        if (mm) {
+            if (mm->empty) { mask_free(mm); mask_free(own); return; }
+            if (!own) {
+                own = mm;
+            } else {
+                Mask* both = mask_intersect(own, mm);
+                mask_free(mm);
+                mask_free(own);
+                if (!both) return;
+                own = both;
+            }
         }
     }
     Mask* eff = own ? own : clip;
@@ -282,6 +302,7 @@ void render_subtree(Canvas* c, const Node* n, Mat world, int aa) {
     st.lim = NULL;
     st.layers = 0;
     st.clips = 0;
+    st.masks = 0;
     for (int i = 0; i < n->nkids; i++)
         render_node(c, n->kids[i], world, 1.0f, NULL, aa, &st);
 }
@@ -295,5 +316,6 @@ void render_document(Canvas* c, Node* root, Mat view_tm,
     st.lim = lim;
     st.layers = 0;
     st.clips = 0;
+    st.masks = 0;
     render_node(c, root, view_tm, 1.0f, NULL, aa, &st);
 }
