@@ -36,7 +36,8 @@ is the contract between the library and its callers.
 - Markers: `<marker>` with `markerUnits`, `refX`/`refY`, `orient`,
   `markerWidth`/`markerHeight` and `marker-start`/`mid`/`end`.
 - Images: `<image>` with embedded `data:image/png` and `data:image/svg+xml`
-  URIs.  External file references are not loaded (see below).
+  URIs, and external PNG and baseline JPEG files (see below).  `feImage` takes
+  the same references.
 - Filters: `<filter>` with `filterUnits`, `primitiveUnits`,
   `color-interpolation-filters`, `x`/`y`/`width`/`height`, href chaining, and
   all 24 `fe*` primitives — `feBlend`, `feColorMatrix`,
@@ -77,9 +78,13 @@ is the contract between the library and its callers.
   that the specification defines on premultiplied values do so here.
   `feConvolveMatrix` always premultiplies (it ignores `preserveAlpha`).  The
   filter output is clipped to the filter region.
-- External image files: `<image href="file.png">` and JPEG/PNG files are not
-  loaded.  The library API receives a document, not a base path, so a relative
-  reference cannot be resolved safely; only embedded data URIs are decoded.
+- External image files need a base path: `svg2img_options.base_path` resolves
+  a relative reference, and `svg2img_convert_file` defaults it to the input
+  document's own directory.  `svg2img_convert` (a document in memory) has no
+  default, so a relative reference is skipped unless the caller sets one.
+  Progressive, arithmetic-coded and 12-bit JPEG are not supported (baseline
+  sequential, Huffman, 8-bit only).  JPEG chroma is upsampled nearest-neighbour
+  rather than with a triangle filter.
 - Real font files and text shaping.  Text uses the built-in bitmap font.
 - Full `<use>` shadow-tree styling beyond the implemented inheritance rules.
 

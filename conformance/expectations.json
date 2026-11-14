@@ -2465,15 +2465,15 @@
     {
       "name": "switch_requiredfeatures",
       "area": "structure",
-      "note": "switch renders only the first child whose requiredFeatures are all supported: Filter is not implemented, Shape is, so the green child wins.",
+      "note": "requiredFeatures selects the first child whose features are all supported: Filter is implemented, so the red child wins over the green one and the unconditioned third child.",
       "checks": [
         {
           "kind": "rgba",
           "x": 20,
           "y": 20,
           "rgba": [
-            0,
             255,
+            0,
             0,
             255
           ]
@@ -3968,7 +3968,113 @@
           "min": 5
         }
       ]
+    },
+    {
+      "name": "image_external_file",
+      "area": "images",
+      "note": "An external PNG resolves against the document's directory: a 2x2 RGBA image scaled into a 40x40 box shows its four pixels as quadrants.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 5,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 25,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 25,
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "image_external_jpeg",
+      "area": "images",
+      "note": "An external baseline JPEG is decoded by the built-in decoder (4:2:0, chroma co-sited), so the quadrants are approximate but clearly separated.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0
+          ],
+          "tol": 40
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 5,
+          "rgba": [
+            0,
+            255,
+            0
+          ],
+          "tol": 40
+        },
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 25,
+          "rgba": [
+            0,
+            0,
+            255
+          ],
+          "tol": 40
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 25,
+          "rgba": [
+            255,
+            255,
+            255
+          ],
+          "tol": 40
+        }
+      ]
     }
   ],
-  "external_intentional": []
+  "external_intentional": [],
+  "external_unverifiable": [
+    "image_external_file",
+    "image_external_jpeg"
+  ]
 }

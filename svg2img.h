@@ -71,6 +71,10 @@ typedef struct {
      * "all defaults", so existing callers need no change.  Added at the end
      * of the struct; recompilation required (the struct grew). */
     svg2img_limits limits;
+    /* Base directory for resolving relative <image> references.  NULL (the
+     * default) disables external file loading.  A relative base path is
+     * resolved against the process working directory. */
+    const char* base_path;
 } svg2img_options;
 
 /* Fill *out* with the built-in default limits.  Never fails. */

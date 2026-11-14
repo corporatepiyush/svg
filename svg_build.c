@@ -42,7 +42,7 @@ static int feature_supported(const char* uri) {
         "SVG", "SVG-static", "Core", "BasicStructure", "Structure",
         "Shape", "BasicShape", "Text", "BasicText", "Gradient", "Pattern",
         "Clip", "BasicClip", "BasicPaint", "Color", "Linking",
-        "Image", "Marker", "Mask", "Style", "CSS", NULL
+        "Image", "Marker", "Mask", "Style", "CSS", "Filter", NULL
     };
     if (!uri) return 1;
     if (!strcmp(uri, "org.w3c.svg") || !strcmp(uri, "org.w3c.svg.static"))
@@ -353,7 +353,21 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n->img_h = len_attr(ctx, xn, "height", 1, 0.0f);
         const char* ih = xml_attr(xn, "href");
         if (!ih) ih = xml_attr(xn, "xlink:href");
-        if (ih) n->image_href = svg_strdup(ih);
+        if (ih) {
+            n->image_href = svg_strdup(ih);
+            /* External raster files are decoded once, here: the renderer only
+             * sees a document, so a relative reference can only be resolved
+             * against the base path the caller supplied. */
+            if (strncmp(ih, "data:", 5) && ctx->base_path && *ctx->base_path) {
+                unsigned char* px = NULL;
+                int iw = 0, ihh = 0;
+                if (image_load_any(ih, ctx->base_path, 0, &px, &iw, &ihh)) {
+                    n->img_px = px;
+                    n->img_iw = iw;
+                    n->img_ih = ihh;
+                }
+            }
+        }
     } else if (!strcmp(name, "clipPath")) {
         n = svg_node_new(NODE_CLIPDEF);
         if (!n) goto oom;

@@ -321,6 +321,8 @@ typedef struct FilterPrim {
 
     /* feImage */
     char* href;
+    unsigned char* px;       /* preloaded raster file, or NULL */
+    int   pw, ph;
 
     /* feMerge: the inputs of its feMergeNode children, in order */
     char* merge_in[8];
@@ -413,6 +415,8 @@ struct Node {
     /* <image>: href and placement (SVG 1.1 §5.6.4 / 12.2) */
     char*  image_href;
     float  img_x, img_y, img_w, img_h;
+    unsigned char* img_px;    /* preloaded file image (PNG/JPEG), or NULL */
+    int    img_iw, img_ih;
 
     /* <marker>: vertex marker (SVG 1.1 §11.6) */
     Node* marker_start, * marker_mid, * marker_end;
@@ -533,6 +537,7 @@ typedef struct Ctx {
     int         limit_hit;       /* a hard limit was exceeded            */
     CssRule*    rules;           /* <style> rules, in document order     */
     int         nrules, caprules;
+    const char* base_path;       /* for relative <image> references, or NULL */
 } Ctx;
 
 Style  style_default(void);
@@ -549,9 +554,14 @@ int   color_parse(const char* s, Color* out);
 float length_parse(const char* s, float vw, float vh, float em, int axis, float def);
 float path_length(const Path* p);
 
-/* image_png.c */
+/* image_png.c / image_jpeg.c */
 unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
                                int* out_w, int* out_h);
+unsigned char* jpeg_decode_rgba(const unsigned char* d, size_t n,
+                                int* out_w, int* out_h);
+/* image_load.c: data URIs and (with a base path) external files. */
+int   image_load_any(const char* href, const char* base_path, int aa,
+                     unsigned char** out, int* out_w, int* out_h);
 
 /* ------------------------------------------------------------------ */
 /* Render tree building (svg_*.c)                                      */

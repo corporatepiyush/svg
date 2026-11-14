@@ -364,6 +364,7 @@ static FilterPrim* parse_prim(Ctx* ctx, const XMLNode* xn, int bbox_units) {
 
 static void prim_free(FilterPrim* p) {
     if (!p) return;
+    free(p->px);
     free(p->in);
     free(p->in2);
     free(p->result);
@@ -379,6 +380,7 @@ void filter_prims_free(FilterPrim* p, int n) {
         free(p[i].in2);
         free(p[i].result);
         free(p[i].href);
+        free(p[i].px);
         for (int k = 0; k < p[i].nmerge; k++) free(p[i].merge_in[k]);
     }
     free(p);
@@ -434,6 +436,16 @@ Node* build_filter(Ctx* ctx, const XMLNode* xn) {
         if (strncmp(c->name, "fe", 2)) continue;
         FilterPrim* p = parse_prim(ctx, c, bbox_units);
         if (!p) continue;
+        if (p->type == FE_IMAGE && p->href && strncmp(p->href, "data:", 5) &&
+            ctx->base_path && *ctx->base_path) {
+            unsigned char* px = NULL;
+            int iw = 0, ih = 0;
+            if (image_load_any(p->href, ctx->base_path, 0, &px, &iw, &ih)) {
+                p->px = px;
+                p->pw = iw;
+                p->ph = ih;
+            }
+        }
         FilterPrim* np = (FilterPrim*)svg_realloc(
             n->prims, (size_t)(n->nprims + 1) * sizeof(FilterPrim));
         if (!np) { prim_free(p); continue; }

@@ -20,7 +20,7 @@ SRCS = \
 	raster_gradient.c raster_pattern.c \
 	raster_fill.c \
 	raster_stroke.c \
-	raster_shape.c image_png.c \
+	raster_shape.c image_png.c image_jpeg.c image_load.c \
 	raster_clip.c \
 	raster_text.c \
 	raster_node.c raster_image.c raster_filter.c raster_filter_gen.c \

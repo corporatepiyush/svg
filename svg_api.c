@@ -158,6 +158,7 @@ Node* svg_parse(const char* data, size_t len, const svg2img_options* opts,
     ctx.lim = &lim;
     ctx.nodes = 0;
     ctx.limit_hit = 0;
+    ctx.base_path = o.base_path;
     ctx.rules = NULL;
     ctx.nrules = ctx.caprules = 0;
     css_collect(&ctx, root);
@@ -244,7 +245,26 @@ int svg2img_convert_file(const char* in_path, const char* out_path,
     fclose(f);
     buf[rd] = 0;
 
-    int r = svg2img_convert(buf, rd, out_path, opts);
+    /* When the caller did not give a base path, use the document's own
+     * directory: that is what makes a relative <image href="..."> resolve
+     * the way an author expects when rendering a file. */
+    char dirbuf[2048];
+    svg2img_options local;
+    const svg2img_options* use = opts;
+    if (opts) local = *opts; else memset(&local, 0, sizeof(local));
+    if (!use || !use->base_path) {
+        const char* slash = strrchr(in_path, '/');
+        if (slash) {
+            size_t n = (size_t)(slash - in_path);
+            if (n == 0) n = 1;
+            if (n >= sizeof dirbuf) n = sizeof dirbuf - 1;
+            memcpy(dirbuf, in_path, n);
+            dirbuf[n] = 0;
+            local.base_path = dirbuf;
+        }
+        use = &local;
+    }
+    int r = svg2img_convert(buf, rd, out_path, use);
     free(buf);
     return r;
 }

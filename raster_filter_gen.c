@@ -230,16 +230,22 @@ static FBuf* fe_image(FilterCtx* fc, const FilterPrim* p) {
     FBuf* out = fe_new(fc, fc->src.w, fc->src.h);
     if (!out) return NULL;
     if (!p->href) return out;
-    unsigned char* raw = NULL;
-    int sw = 0, sh = 0;
-    if (!image_decode_href(p->href, fc->aa, &raw, &sw, &sh)) return out;
+    unsigned char* raw = p->px;
+    int sw = p->pw, sh = p->ph;
+    int owned = 0;
+    if (!raw) {
+        /* Data URIs are decoded on demand; file images were decoded at build
+         * time (the filter has no base path of its own). */
+        if (!image_load_any(p->href, NULL, fc->aa, &raw, &sw, &sh)) return out;
+        owned = 1;
+    }
     int dx = (int)floorf(fe_len(fc, p->num[0], 0) + 0.5f);
     int dy = (int)floorf(fe_len(fc, p->num[1], 1) + 0.5f);
     int dw = (int)floorf(fe_len(fc, p->num[2], 0) + 0.5f);
     int dh = (int)floorf(fe_len(fc, p->num[3], 1) + 0.5f);
     if (dw <= 0 || dh <= 0) { dw = out->w - dx; dh = out->h - dy; }
     if (dw > 0 && dh > 0) image_blit_fbuf(out, dx, dy, dw, dh, raw, sw, sh);
-    free(raw);
+    if (owned) free(raw);
     if (fc->linear) fe_srgb_to_linear(out);
     /* feImage writes only the placed rectangle; feTile tiles that. */
     fc->last_sx = dx;

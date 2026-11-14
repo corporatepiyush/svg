@@ -110,9 +110,14 @@ def main(argv=None):
     # are documented in fuzz/README.md; verifying them externally would always
     # "fail", which is noise rather than signal.
     intentional = set(spec.get("external_intentional", []))
+    # Cases the harness cannot render faithfully: the headless renderer is
+    # given the SVG as an <img>, and a browser blocks external references in
+    # SVG-as-image mode, so a file-backed image would look empty to it.
+    unverifiable = set(spec.get("external_unverifiable", []))
     cases = [c for c in spec["cases"]
              if (not args.only or c["name"].startswith(args.only))
-             and c["name"] not in intentional]
+             and c["name"] not in intentional
+             and c["name"] not in unverifiable]
     if args.limit:
         cases = cases[:args.limit]
 

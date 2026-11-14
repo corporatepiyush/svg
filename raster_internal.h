@@ -127,8 +127,7 @@ FBuf* fe_run(FilterCtx* fc, const FilterPrim* p);
 FBuf* fe_run_generic(FilterCtx* fc, const FilterPrim* p);
 size_t fb_bytes(int w, int h);
 void  fe_release(FilterCtx* fc, FBuf* b);
-int   image_decode_href(const char* href, int aa, unsigned char** out,
-                        int* out_w, int* out_h);
+
 void  image_blit_rgba8(Canvas* dst, int dx, int dy, int dw, int dh,
                        const unsigned char* src, int sw, int sh);
 void  image_blit_fbuf(FBuf* dst, int dx, int dy, int dw, int dh,

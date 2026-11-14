@@ -151,6 +151,38 @@ class Backend:
         raise NotImplementedError
 
 
+def copy_local_refs(svg_path, outdir):
+    """Copy files the document references so a relative href resolves.
+
+    The renderer is pointed at a copy of the SVG in a temporary directory, so
+    a sibling file (`<image href="x.png">`, a CSS `url(...)`) would otherwise
+    be missing and the reference would silently render nothing.
+    """
+    import re
+
+    try:
+        with open(svg_path, "r", encoding="utf-8", errors="replace") as f:
+            text = f.read(2 * 1024 * 1024)
+    except OSError:
+        return
+    base = os.path.dirname(os.path.abspath(svg_path))
+    seen = set()
+    for m in re.finditer(r'(?:href|src)\s*=\s*"([^"]+)"', text):
+        ref = m.group(1).strip()
+        if not ref or ref.startswith(("data:", "http:", "https:", "#")):
+            continue
+        ref = ref.split("#")[0].split("?")[0]
+        if not ref or ref in seen:
+            continue
+        seen.add(ref)
+        src = os.path.normpath(os.path.join(base, ref))
+        if not os.path.isfile(src):
+            continue
+        dst = os.path.join(outdir, os.path.basename(ref))
+        if not os.path.exists(dst):
+            shutil.copyfile(src, dst)
+
+
 class ChromeBackend(Backend):
     """Chromium / Chrome / Brave / Edge headless screenshot."""
 
@@ -194,6 +226,7 @@ class ChromeBackend(Backend):
         local = os.path.join(outdir, os.path.basename(svg_path))
         if not os.path.exists(local):
             shutil.copyfile(svg_path, local)
+            copy_local_refs(svg_path, outdir)
         html = os.path.join(outdir, name + ".html")
         out = os.path.join(outdir, name + ".chrome.png")
         # Pin the viewport: <img> at its intrinsic size, no margins, no scroll
