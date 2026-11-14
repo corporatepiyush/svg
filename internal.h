@@ -401,12 +401,15 @@ typedef struct Style {
 /* Evaluation context passed down the DOM while building the tree. */
 typedef struct IdMap IdMap;
 
+typedef struct CssRule CssRule;
 typedef struct Ctx {
     float       vw, vh, em;
     IdMap*      ids;
     const svg2img_limits* lim;   /* resolved limits for this conversion */
     int         nodes;           /* nodes built so far (max_nodes)       */
     int         limit_hit;       /* a hard limit was exceeded            */
+    CssRule*    rules;           /* <style> rules, in document order     */
+    int         nrules, caprules;
 } Ctx;
 
 Style  style_default(void);

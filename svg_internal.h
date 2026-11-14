@@ -9,6 +9,13 @@
  * C stack.  A configurable limit may be lower but never higher. */
 #define SVG2IMG_MAX_DEPTH 1024
 
+struct CssRule {
+    char* sel;          /* selector list, as written */
+    char* decls;        /* normal declarations: "k:v;k:v" */
+    char* decls_imp;    /* !important declarations */
+    int   spec;         /* (ids, classes, types) packed for ordering */
+};
+
 typedef struct { char* key; Node* val; } IdEntry;
 struct IdMap { IdEntry* e; int n, cap; };
 
@@ -43,6 +50,11 @@ int   node_add_child(Node* parent, Node* child);
 Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth);
 
 int   svg_parse_viewbox(const char* s, float* x, float* y, float* w, float* h);
+
+void  css_collect(Ctx* ctx, const XMLNode* root);
+void  css_apply(Ctx* ctx, const XMLNode* xn, Style* st);
+void  css_apply_important(Ctx* ctx, const XMLNode* xn, Style* st);
+void  css_free(Ctx* ctx);
 
 void  compute_viewport(const XMLNode* svg, const svg2img_options* opts,
                        int* W, int* H, Mat* tm, const svg2img_limits* lim,

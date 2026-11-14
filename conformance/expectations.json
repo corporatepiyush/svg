@@ -1370,16 +1370,16 @@
     {
       "name": "style_element",
       "area": "style",
-      "note": "a <style> element is opaque text and must not affect rendering",
+      "note": "a <style> rule beats a presentation attribute: the class rule sets red, overriding fill=\"#0000ff\" (CSS cascade, SVG 1.1 6.3).",
       "checks": [
         {
           "kind": "rgba",
           "x": 50,
           "y": 50,
           "rgba": [
-            0,
-            0,
             255,
+            0,
+            0,
             255
           ]
         }
@@ -2952,9 +2952,58 @@
           "max": 8
         }
       ]
+    },
+    {
+      "name": "css_style_element",
+      "area": "style",
+      "note": "class beats type, id beats class, a descendant selector applies, and !important beats an inline presentation attribute.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 60,
+          "y": 20,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 70,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 60,
+          "y": 70,
+          "rgba": [
+            255,
+            255,
+            0,
+            255
+          ]
+        }
+      ]
     }
   ],
-  "external_intentional": [
-    "style_element"
-  ]
+  "external_intentional": []
 }

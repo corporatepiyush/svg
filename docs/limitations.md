@@ -21,8 +21,20 @@ is the contract between the library and its callers.
 - Viewport: root and nested `<svg>` `x`/`y`/`width`/`height`/`viewBox` and
   `preserveAspectRatio` (meet/slice, all nine alignments).
 - Units: user units, `px`, `pt`, `pc`, `in`, `cm`, `mm`, `em`, `ex`, `%`.
-- Styling: presentation attributes and inline `style="..."` declarations.
-  Inline style is applied last and overrides presentation attributes.
+- Styling: presentation attributes, inline `style="..."` declarations, and a
+  CSS subset in `<style>`: type, class, id and universal selectors, descendant
+  and child combinators, comma-separated selector lists, and `!important`.
+  The cascade follows SVG 1.1 §6.3 (presentation attributes < author rules <
+  inline style < `!important` author rules).  At-rules, pseudo-classes,
+  attribute selectors and media queries are not supported.
+- Structure: `<switch>` with `requiredFeatures`, `requiredExtensions` and
+  `systemLanguage`; `overflow` on nested viewports.
+- Paint servers: `linearGradient`, `radialGradient` and `pattern`
+  (`patternUnits`, `patternContentUnits`, `patternTransform`, viewBox).
+- Clipping and masking: `clipPath` and `<mask>` (luminance × alpha,
+  `maskUnits`, `maskContentUnits`).
+- Markers: `<marker>` with `markerUnits`, `refX`/`refY`, `orient`,
+  `markerWidth`/`markerHeight` and `marker-start`/`mid`/`end`.
 - Colour: `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`,
   `hsl()`, `hsla()`, `transparent`, `currentColor`, 147 named colours.
 - Stroke: caps, joins, miter limit, dash arrays/offsets.
@@ -31,14 +43,14 @@ is the contract between the library and its callers.
 
 ## Unsupported / ignored
 
-- `<style>` elements and all CSS syntax.  Their contents are opaque text and
-  never affect rendering.
-- CSS selectors, at-rules, specificity, cascade, `!important`.
-- Geometry properties through `style=` (`x`, `y`, `width`, `height`, `r`,
-  `d`, `points`, `transform`).  Use XML attributes.
-- `<image>`, `<filter>`, `<pattern>`, `<mask>`, `<marker>`, animation,
-  `<foreignObject>`, `textPath`, `tspan` positioning, `dx`/`dy`,
-  `textLength`, `dominant-baseline`, `writing-mode`.
+- CSS at-rules, pseudo-classes, attribute selectors, media queries and
+  `!important` in inline `style` (author `!important` is honoured).
+- Geometry properties through CSS (`x`, `y`, `width`, `height`, `r`, `d`,
+  `points`, `transform`).  Use XML attributes.
+- `<image>`, `<filter>` (all 24 `fe*` primitives), `<foreignObject>`,
+  `textPath`, `tspan` positioning, `dx`/`dy`, `textLength`, `lengthAdjust`,
+  `dominant-baseline`, `writing-mode`, and SMIL animation.  `<script>` is not
+  executed (correct for a rasteriser).
 - Real font files and text shaping.  Text uses the built-in bitmap font.
 - Full `<use>` shadow-tree styling beyond the implemented inheritance rules.
 

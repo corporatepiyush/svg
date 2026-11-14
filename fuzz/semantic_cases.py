@@ -209,10 +209,10 @@ CONTROLS = [
     case("text_basic",
          '<text x="10" y="60" font-size="48" fill="black">A</text>',
          [expect_count(lambda r, g, b, a: a > 200 and r < 60, 50, 100000, "glyph pixels")]),
-    case("style_element_ignored",
+    case("style_element_applies",
          '<style>.x { fill: red; }</style>'
          '<rect class="x" x="0" y="0" width="100" height="100" fill="black"/>',
-         [expect_rgba(50, 50, (0, 0, 0, 255))]),
+         [expect_rgba(50, 50, (255, 0, 0, 255))]),
     case("inline_style_overrides",
          '<rect x="0" y="0" width="100" height="100" fill="black" '
          'style="fill: lime;"/>',
@@ -312,16 +312,16 @@ CONTROLS = [
 
     # --- unsupported-feature policy: silently ignored, never an error ---
     # <style> stays opaque: a class rule must not recolour anything.
-    case("style_class_opaque",
+    case("style_class_applies",
          '<style>.x { fill: lime; }</style>'
          '<rect class="x" x="0" y="0" width="100" height="100"/>',
-         [expect_rgba(50, 50, (0, 0, 0, 255))]),
+         [expect_rgba(50, 50, (0, 255, 0, 255))]),
     # <style> with a type attribute is still opaque.
-    case("style_type_opaque",
+    case("style_type_css",
          '<style type="text/css"><![CDATA['
          'rect { fill: lime; }]]></style>'
          '<rect x="0" y="0" width="100" height="100" fill="black"/>',
-         [expect_rgba(50, 50, (0, 0, 0, 255))]),
+         [expect_rgba(50, 50, (0, 255, 0, 255))]),
     # Unknown elements are ignored, their known children still render.
     case("unknown_element_ignored",
          '<foo><rect x="0" y="0" width="100" height="100" fill="red"/></foo>',

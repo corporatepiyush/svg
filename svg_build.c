@@ -124,7 +124,11 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         snprintf(decl, sizeof(decl), "%s:%s", xn->attrs[i * 2], xn->attrs[i * 2 + 1]);
         style_apply_decls(ctx, &st, decl);
     }
+    /* Author stylesheet rules come before the inline style (which is a
+     * later, more specific origin), except for !important declarations. */
+    css_apply(ctx, xn, &st);
     style_apply_decls(ctx, &st, xml_attr(xn, "style"));
+    css_apply_important(ctx, xn, &st);
 
     if (st.fill.type == PAINT_CURRENT_COLOR) {
         st.fill.type = PAINT_COLOR;

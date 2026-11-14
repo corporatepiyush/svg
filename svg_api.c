@@ -131,10 +131,14 @@ Node* svg_parse(const char* data, size_t len, const svg2img_options* opts,
     ctx.lim = &lim;
     ctx.nodes = 0;
     ctx.limit_hit = 0;
+    ctx.rules = NULL;
+    ctx.nrules = ctx.caprules = 0;
+    css_collect(&ctx, root);
 
     Style parent = style_default();
     Node* root_node = build_node(&ctx, root, &parent, 0);
     style_free(&parent);
+    css_free(&ctx);
 
     if (root_node) {
         if (svg_resolve(root_node, &ids, &lim)) ctx.limit_hit = 1;

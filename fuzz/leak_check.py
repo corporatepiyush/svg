@@ -76,6 +76,11 @@ CASES = [
                         '<path d="M2,2 L18,2 L18,18" fill="none" stroke="black"'
                         ' marker-start="url(#m)" marker-mid="url(#m)"'
                         ' marker-end="url(#m)"/>'), None),
+    # Stylesheet rules (selector, normal and !important declaration lists)
+    # are owned by the Ctx and must all be released.
+    ("css_rules", svg('<style>.a { fill: red; } #b { stroke: blue !important; }'
+                      ' g rect { fill: lime; }</style>'
+                      '<g><rect class="a" width="10" height="10"/></g>'), None),
 ]
 
 
