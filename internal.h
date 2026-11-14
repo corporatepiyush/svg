@@ -230,6 +230,17 @@ typedef struct {
     float  letterspacing;
     int    bold, italic, anchor;
     Paint  fill;
+    /* Text layout (SVG 1.1 §10) */
+    float  textlen;          /* textLength in user units, <= 0 = unset */
+    int    length_kind;      /* 0 = spacing, 1 = spacingAndGlyphs */
+    int    writing;          /* 0 = horizontal, 1 = vertical (tb) */
+    float  baseline;         /* dominant-baseline offset, em fractions */
+    float* rot;              /* per-glyph rotation, degrees */
+    int    nrot;
+    char*  path;             /* textPath data, or NULL */
+    Path*  refpath;          /* textPath href="#id", resolved to geometry */
+    char*  path_ref;         /* textPath href="#id", resolved later */
+    float  start_offset;     /* textPath startOffset */
 } TextChunk;
 
 /* ------------------------------------------------------------------ */
@@ -502,6 +513,12 @@ typedef struct Style {
     char* marker_mid;
     char* marker_end;
     char* filter;          /* filter: url(#id) -> id, or NULL                */
+    float textlen;         /* textLength (not inherited)                     */
+    int   length_kind;     /* lengthAdjust: 0 spacing, 1 spacingAndGlyphs    */
+    int   writing;         /* writing-mode: 0 horizontal, 1 vertical         */
+    float baseline;        /* dominant-baseline, em fractions                */
+    float* rot;            /* glyph rotation list (not inherited)            */
+    int   nrot;
 } Style;
 
 /* Evaluation context passed down the DOM while building the tree. */

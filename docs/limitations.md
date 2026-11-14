@@ -50,7 +50,10 @@ is the contract between the library and its callers.
   `hsl()`, `hsla()`, `transparent`, `currentColor`, 147 named colours.
 - Stroke: caps, joins, miter limit, dash arrays/offsets.
 - Text: built-in 5×7 bitmap font, bold/italic, anchors, letter-spacing,
-  `<tspan>` `x`/`y`/`dx`/`dy` and per-run fill.
+  `<tspan>` `x`/`y`/`dx`/`dy` and per-run fill, `rotate` (one angle per
+  glyph), `textLength`/`lengthAdjust`, `writing-mode="tb"`, `dominant-baseline`
+  (as an em offset), `tref`, `textPath` (`href` or `path`, `startOffset`) and
+  `altGlyph` (rendered as its fallback text).
 - Output: RGBA8 PNG, 1×–8× supersampling, optional background.
 
 ## Unsupported / ignored
@@ -59,10 +62,14 @@ is the contract between the library and its callers.
   `!important` in inline `style` (author `!important` is honoured).
 - Geometry properties through CSS (`x`, `y`, `width`, `height`, `r`, `d`,
   `points`, `transform`).  Use XML attributes.
-- `<foreignObject>`, `<view>`, `textPath`, `tref`,
-  `textLength`/`lengthAdjust`, `dominant-baseline`, `writing-mode`, `rotate`
-  on text, `altGlyph*`, and SMIL animation.  `<script>` is not executed
-  (correct for a rasteriser).
+- `<foreignObject>`, `<view>`, SMIL animation, and `<script>` (which is not
+  executed, correctly for a rasteriser).
+- Text details: no font selection or shaping, so `font-family`, `font-stretch`
+  and `font-variant` are ignored and every glyph comes from the built-in
+  5×7 font; `textLength` distributes spacing per glyph rather than per
+  character cluster; `dominant-baseline` is approximated as an em offset; and
+  a `textPath` distance is not calibrated by the referenced path's
+  `pathLength`.
 - Filter details: a primitive's own `x`/`y`/`width`/`height` subregion is
   honoured only by `feImage`; other primitives use the whole filter region.
   `feTurbulence` uses a value-noise approximation rather than the reference

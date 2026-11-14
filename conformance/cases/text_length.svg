@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="60" viewBox="0 0 140 60">
+  <text x="5" y="20" font-size="14" fill="#000000">ABCDEFGH</text>
+  <text x="5" y="40" font-size="14" fill="#0000ff" textLength="120"
+        lengthAdjust="spacing">ABCDEFGH</text>
+</svg>

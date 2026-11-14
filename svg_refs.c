@@ -216,6 +216,18 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
                 d->fill.stops = NULL;
                 d->fill.nstops = 0;
                 d->fill.ref = sc->fill.ref ? svg_strdup(sc->fill.ref) : NULL;
+                d->rot = NULL;
+                d->nrot = 0;
+                if (sc->rot && sc->nrot > 0) {
+                    d->rot = (float*)svg_malloc((size_t)sc->nrot * sizeof(float));
+                    if (d->rot) {
+                        memcpy(d->rot, sc->rot, (size_t)sc->nrot * sizeof(float));
+                        d->nrot = sc->nrot;
+                    }
+                }
+                d->path = sc->path ? svg_strdup(sc->path) : NULL;
+                d->path_ref = sc->path_ref ? svg_strdup(sc->path_ref) : NULL;
+                d->refpath = sc->refpath ? path_copy(sc->refpath) : NULL;
                 if (sc->fill.stops && sc->fill.nstops > 0) {
                     d->fill.stops = (Stop*)svg_malloc(
                         (size_t)sc->fill.nstops * sizeof(Stop));
@@ -514,12 +526,33 @@ static void resolve_pattern_hrefs_once(Node* n, IdMap* ids) {
     for (int i = 0; i < n->nkids; i++) resolve_pattern_hrefs_once(n->kids[i], ids);
 }
 
+/* textPath may reference a <path> by id; the referenced geometry is copied
+ * because a chunk owns its path and frees it with the tree. */
+static void resolve_text_paths(Node* n, IdMap* ids) {
+    if (!n) return;
+    if (n->chunks) {
+        for (int i = 0; i < n->nchunks; i++) {
+            TextChunk* ch = &n->chunks[i];
+            if (!ch->path_ref) continue;
+            Node* ref = idmap_get(ids, ch->path_ref);
+            if (ref && ref->type == NODE_SHAPE && ref->path && ref->path->n > 0) {
+                path_free(ch->refpath);
+                ch->refpath = path_copy(ref->path);
+            }
+            free(ch->path_ref);
+            ch->path_ref = NULL;
+        }
+    }
+    for (int i = 0; i < n->nkids; i++) resolve_text_paths(n->kids[i], ids);
+}
+
 int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
     if (!n) return 0;
     for (int pass = 0; pass < 8 && pattern_hrefs_pending(n); pass++)
         resolve_pattern_hrefs_once(n, ids);
     resolve_gradient_hrefs(n, ids, 64);
     resolve_paint_refs(n, ids);
+    resolve_text_paths(n, ids);
     resolve_clip_refs(n, ids);
 
     UseCtx uc;

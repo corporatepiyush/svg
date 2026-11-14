@@ -85,6 +85,13 @@ CASES = [
     ("tspan_chunks", svg('<text x="5" y="20" font-size="10">AB'
                          '<tspan x="40" fill="red">CD</tspan>'
                          '<tspan dx="3" dy="-2" fill="blue">EF</tspan></text>'), None),
+    # Text runs own their string, paint copies, rotation list and path.
+    ("text_layout", svg('<defs><path id="p" d="M0,0 L20,0"/></defs>'
+                        '<text id="t" x="0" y="0" font-size="8">X</text>'
+                        '<text x="2" y="10" font-size="8" rotate="0 10">AB'
+                        '<tspan dx="2">CD</tspan>'
+                        '<textPath href="#p" startOffset="5%">EF</textPath>'
+                        '<tref href="#t"/></text>'), None),
     # Filter chains allocate one buffer per primitive and release them all.
     ("filters_all", svg('<defs><filter id="f">'
                         '<feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"/>'

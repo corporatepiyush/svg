@@ -22,6 +22,13 @@ Style style_default(void) {
     s.color = (Color){0, 0, 0, 1};
     s.fontsize = 16.0f;
     s.marker_start = s.marker_mid = s.marker_end = NULL;
+    s.filter = NULL;
+    s.textlen = 0.0f;
+    s.length_kind = 0;
+    s.writing = 0;
+    s.baseline = 0.0f;
+    s.rot = NULL;
+    s.nrot = 0;
     return s;
 }
 
@@ -43,6 +50,16 @@ void style_copy(Style* dst, const Style* src) {
     dst->marker_end   = src->marker_end   ? svg_strdup(src->marker_end)   : NULL;
     free(dst->filter);
     dst->filter = src->filter ? svg_strdup(src->filter) : NULL;
+    free(dst->rot);
+    dst->rot = NULL;
+    dst->nrot = 0;
+    if (src->rot && src->nrot > 0) {
+        dst->rot = (float*)svg_malloc((size_t)src->nrot * sizeof(float));
+        if (dst->rot) {
+            memcpy(dst->rot, src->rot, (size_t)src->nrot * sizeof(float));
+            dst->nrot = src->nrot;
+        }
+    }
     if (src->dash && src->ndash > 0) {
         dst->dash = (float*)svg_malloc((size_t)src->ndash * sizeof(float));
         if (dst->dash) {
@@ -80,6 +97,7 @@ void style_free(Style* s) {
     free(s->marker_mid);   s->marker_mid = NULL;
     free(s->marker_end);   s->marker_end = NULL;
     free(s->filter);       s->filter = NULL;
+    free(s->rot);          s->rot = NULL; s->nrot = 0;
 }
 static void for_each_decl(const char* decls,
                           void (*fn)(void* ud, const char* k, const char* v),
@@ -276,6 +294,25 @@ static void apply_one(void* ud, const char* k, const char* v) {
             const char* e = strchr(v + 5, ')');
             if (e) *slot = svg_strndup(v + 5, (size_t)(e - (v + 5)));
         }
+    } else if (!strcmp(k, "textLength")) {
+        float f = length_parse(v, ctx->vw, ctx->vh, ctx->em, 2, 0.0f);
+        st->textlen = f > 0.0f ? f : 0.0f;
+    } else if (!strcmp(k, "lengthAdjust")) {
+        st->length_kind = !strcmp(v, "spacingAndGlyphs") ? 1 : 0;
+    } else if (!strcmp(k, "writing-mode")) {
+        st->writing = (!strcmp(v, "tb") || !strcmp(v, "vertical-rl") ||
+                       !strcmp(v, "vertical-lr")) ? 1 : 0;
+    } else if (!strcmp(k, "dominant-baseline") || !strcmp(k, "alignment-baseline")) {
+        /* Only the vertical shift is modelled; the alignment is per-glyph in
+         * a real font engine, so the value is approximated as an em offset. */
+        if (!strcmp(v, "central") || !strcmp(v, "middle")) st->baseline = 0.5f;
+        else if (!strcmp(v, "hanging")) st->baseline = 0.8f;
+        else if (!strcmp(v, "text-before-edge")) st->baseline = 0.8f;
+        else if (!strcmp(v, "text-after-edge")) st->baseline = 0.0f;
+        else if (v[0] == '-' || (v[0] >= '0' && v[0] <= '9')) {
+            float f = length_parse(v, ctx->vw, ctx->vh, ctx->em, 1, 0.0f);
+            st->baseline = ctx->em > 0.0f ? f / ctx->em : 0.0f;
+        } else st->baseline = 0.0f;
     } else if (!strcmp(k, "filter")) {
         free(st->filter);
         st->filter = NULL;

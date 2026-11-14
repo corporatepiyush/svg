@@ -1,6 +1,24 @@
 /* svg_api.c - Public entry points and render-tree teardown. */
 #include "svg_internal.h"
 
+/* Release the positioned text runs owned by a node.  Shared by both teardown
+ * paths so a discarded subtree cannot leak them. */
+static void text_chunks_free(Node* n) {
+    if (!n || !n->chunks) return;
+    for (int i = 0; i < n->nchunks; i++) {
+        free(n->chunks[i].text);
+        free(n->chunks[i].fill.stops);
+        free(n->chunks[i].fill.ref);
+        free(n->chunks[i].rot);
+        path_free(n->chunks[i].refpath);
+        free(n->chunks[i].path);
+        free(n->chunks[i].path_ref);
+    }
+    free(n->chunks);
+    n->chunks = NULL;
+    n->nchunks = 0;
+}
+
 void svg_free(Node* n) {
     if (!n) return;
     for (int i = 0; i < n->nkids; i++) svg_free(n->kids[i]);
@@ -11,12 +29,7 @@ void svg_free(Node* n) {
     free(n->stroke.stops);
     free(n->stroke.ref);
     free(n->dash);
-    for (int i = 0; i < n->nchunks; i++) {
-        free(n->chunks[i].text);
-        free(n->chunks[i].fill.stops);
-        free(n->chunks[i].fill.ref);
-    }
-    free(n->chunks);
+    text_chunks_free(n);
     free(n->text);
     free(n->id);
     free(n->clip_ref);
@@ -46,6 +59,7 @@ void svg_free_detached(Node* n, IdMap* ids) {
     free(n->dash); free(n->text); free(n->id); free(n->clip_ref);
     free(n->mask_ref);
     free(n->image_href);
+    text_chunks_free(n);
     free(n->marker_start_ref);
     free(n->marker_mid_ref);
     free(n->marker_end_ref); free(n->use_ref);

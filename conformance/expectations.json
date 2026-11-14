@@ -3754,6 +3754,220 @@
           "max": 8
         }
       ]
+    },
+    {
+      "name": "text_tref",
+      "area": "text",
+      "note": "tref inserts the character data of the referenced text element: the referenced run and a directly written run produce the same ink.",
+      "checks": [
+        {
+          "kind": "compare_ink",
+          "a": [
+            8,
+            8,
+            32,
+            20
+          ],
+          "b": [
+            58,
+            8,
+            32,
+            20
+          ],
+          "min_ratio": 0.7
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            8,
+            8,
+            32,
+            20
+          ],
+          "rgba": [
+            0,
+            0,
+            0
+          ],
+          "tol": 40,
+          "min": 20
+        }
+      ]
+    },
+    {
+      "name": "text_text_path",
+      "area": "text",
+      "note": "textPath lays the glyphs along the referenced path, each rotated to the tangent: five glyphs start 10% along a curve that spans x=10..150, so the ink stays in the first half of the canvas.",
+      "checks": [
+        {
+          "kind": "bbox",
+          "bbox": [
+            12,
+            16,
+            66,
+            37
+          ],
+          "tol": 10
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            0,
+            0,
+            160,
+            60
+          ],
+          "rgba": [
+            0,
+            0,
+            170
+          ],
+          "tol": 60,
+          "min": 30
+        }
+      ]
+    },
+    {
+      "name": "text_rotate",
+      "area": "text",
+      "note": "rotate lists one angle per glyph: I at 0 degrees stays upright, the next at 30 and the last at 60 lean further clockwise, so the ink block grows downward to the right.",
+      "checks": [
+        {
+          "kind": "bbox",
+          "bbox": [
+            52,
+            30,
+            94,
+            52
+          ],
+          "tol": 8
+        },
+        {
+          "kind": "alpha_range",
+          "rect": [
+            52,
+            20,
+            40,
+            8
+          ],
+          "amax_max": 0
+        }
+      ]
+    },
+    {
+      "name": "text_length",
+      "area": "text",
+      "note": "textLength=\"120\" with lengthAdjust=\"spacing\" stretches the advance so the run is 120 units wide, wider than the unstretched 8-glyph run.",
+      "checks": [
+        {
+          "kind": "bbox_width",
+          "min": 108
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            100,
+            30,
+            25,
+            12
+          ],
+          "rgba": [
+            0,
+            0,
+            255
+          ],
+          "tol": 40,
+          "min": 1
+        }
+      ]
+    },
+    {
+      "name": "text_writing_mode",
+      "area": "text",
+      "note": "writing-mode=\"tb\" advances downward and rotates the glyphs, so the run is a narrow vertical column at x=20 while the horizontal run stays on one baseline.",
+      "checks": [
+        {
+          "kind": "color_count",
+          "rect": [
+            16,
+            10,
+            10,
+            40
+          ],
+          "rgba": [
+            0,
+            0,
+            0
+          ],
+          "tol": 40,
+          "min": 20
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            54,
+            0,
+            26,
+            14
+          ],
+          "rgba": [
+            0,
+            170,
+            0
+          ],
+          "tol": 40,
+          "min": 10
+        }
+      ]
+    },
+    {
+      "name": "text_dominant_baseline",
+      "area": "text",
+      "note": "dominant-baseline=\"central\" moves the alphabetic baseline down by half an em, so the centred run sits lower on the canvas than the default run at the same y.",
+      "checks": [
+        {
+          "kind": "color_count",
+          "rect": [
+            8,
+            31,
+            52,
+            6
+          ],
+          "rgba": [
+            0,
+            0,
+            0
+          ],
+          "tol": 40,
+          "min": 5
+        },
+        {
+          "kind": "alpha_range",
+          "rect": [
+            8,
+            15,
+            52,
+            6
+          ],
+          "amax_max": 0
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            68,
+            15,
+            40,
+            8
+          ],
+          "rgba": [
+            255,
+            0,
+            255
+          ],
+          "tol": 40,
+          "min": 5
+        }
+      ]
     }
   ],
   "external_intentional": []
