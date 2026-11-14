@@ -35,6 +35,8 @@ is the contract between the library and its callers.
   `maskUnits`, `maskContentUnits`).
 - Markers: `<marker>` with `markerUnits`, `refX`/`refY`, `orient`,
   `markerWidth`/`markerHeight` and `marker-start`/`mid`/`end`.
+- Images: `<image>` with embedded `data:image/png` and `data:image/svg+xml`
+  URIs.  External file references are not loaded (see below).
 - Colour: `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`,
   `hsl()`, `hsla()`, `transparent`, `currentColor`, 147 named colours.
 - Stroke: caps, joins, miter limit, dash arrays/offsets.
@@ -47,10 +49,13 @@ is the contract between the library and its callers.
   `!important` in inline `style` (author `!important` is honoured).
 - Geometry properties through CSS (`x`, `y`, `width`, `height`, `r`, `d`,
   `points`, `transform`).  Use XML attributes.
-- `<image>`, `<filter>` (all 24 `fe*` primitives), `<foreignObject>`,
+- `<filter>` (all 24 `fe*` primitives), `<foreignObject>`, `<view>`,
   `textPath`, `tspan` positioning, `dx`/`dy`, `textLength`, `lengthAdjust`,
-  `dominant-baseline`, `writing-mode`, and SMIL animation.  `<script>` is not
-  executed (correct for a rasteriser).
+  `dominant-baseline`, `writing-mode`, `tref`, `altGlyph*`, and SMIL
+  animation.  `<script>` is not executed (correct for a rasteriser).
+- External image files: `<image href="file.png">` and JPEG/PNG files are not
+  loaded.  The library API receives a document, not a base path, so a relative
+  reference cannot be resolved safely; only embedded data URIs are decoded.
 - Real font files and text shaping.  Text uses the built-in bitmap font.
 - Full `<use>` shadow-tree styling beyond the implemented inheritance rules.
 

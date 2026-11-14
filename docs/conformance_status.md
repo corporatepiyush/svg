@@ -11,7 +11,7 @@ Appendix M. Test suite: the W3C SVG 1.1 test suite (525 accepted tests).
 
 | measure | result |
 |---|---|
-| Elements instantiated | **18 / 80** (23%) |
+| Elements instantiated | **25 / 80** (31%) |
 | Presentation attributes honoured | **24 / 59** (41%) |
 | Official W3C tests matching Chrome | **261 / 512 comparable** (51%) |
 | Text-only tests (not comparable) | 13 |
@@ -81,23 +81,23 @@ Two readings matter:
 
 | chapter | elements | implemented |
 |---|---:|---|
-| 5 Document structure | 10 | 6 — `svg g defs symbol use a`; `desc`/`title` are correctly non-rendering |
-| 6 Styling | 1 | 0 — `<style>`; inline `style=` is supported |
-| 8 Paths | 1 | 1 |
+| 5 Document structure | 10 | 7 — `svg g defs symbol use a switch`; `desc`/`title`/`metadata` correctly non-rendering |
+| 6 Styling | 1 | 1 — `<style>` with type/class/id/descendant/child selectors, `!important` |
+| 8 Paths | 1 | 1 — all commands, `pathLength` |
 | 9 Basic shapes | 6 | 6 |
-| 10 Text | 8 | 1 — `text` only |
-| 11 Painting (markers) | 1 | 0 |
+| 10 Text | 8 | 2 — `text` and `tspan` (`x`/`y`/`dx`/`dy`, per-run fill); `tref`, `textPath`, `altGlyph*` missing |
+| 11 Painting (markers) | 1 | 1 — `marker` with start/mid/end, `orient`, `markerUnits` |
 | 12 Color | 1 | 0 — `color-profile` |
-| 13 Gradients and patterns | 4 | 3 — `linearGradient`, `radialGradient`, `stop`; `pattern` missing |
-| 14 Clipping and masking | 2 | 1 — `mask` missing |
+| 13 Gradients and patterns | 4 | 4 — `linearGradient`, `radialGradient`, `stop`, `pattern` |
+| 14 Clipping and masking | 2 | 2 — `clipPath`, `mask` |
 | 15 Filter effects | 25 | 0 |
 | 16 Interactivity | 1 | 0 — `cursor` |
-| 17 Linking | 2 | 0 — `image`, `view` |
+| 17 Linking | 2 | 1 — `image` (data URIs), `view` missing |
 | 18 Scripting | 1 | 0 (by design) |
 | 19 Animation | 6 | 0 |
-| 20 Fonts | 10 | 0 |
+| 20 Fonts | 10 | 0 — bitmap font only |
 | 21 Metadata | 1 | 0 (by design) |
-| **total** | **80** | **18** |
+| **total** | **80** | **25** |
 
 ## Attribute coverage
 
@@ -118,32 +118,24 @@ Two readings matter:
 
 ## What is still pending, in order of size
 
-1. **Filter effects (chapter 15, 25 elements, 39 tests at 10%).** `<filter>`
-   and all 24 `fe*` primitives, plus the `filter` property and
-   `color-interpolation-filters`. Nothing is implemented.
-2. **Animation (chapter 19, 6 elements, 73 tests at 36%).** SMIL is absent. A
-   static rasteriser renders the base value; tests whose first frame depends on
-   an animation fail.
-3. **Text and fonts (chapters 10 and 20, 18 elements, 79 tests).** No
-   `tspan`, `tref`, `textPath`, `altGlyph*`, `glyphRef`; no `dx`, `dy`,
-   `rotate`, `textLength`, `lengthAdjust`, `writing-mode`,
-   `dominant-baseline`; no font files, shaping, or font selection. The current
-   text is a 5×7 bitmap font.
-4. **Patterns and masks (chapters 13 and 14, 2 elements).** `<pattern>` with
-   `patternUnits`, `patternContentUnits`, `patternTransform`; `<mask>` with
-   `maskUnits`, `maskContentUnits`, the `mask` property, `enable-background`.
-5. **Markers (chapter 11).** `<marker>`, `marker-start`, `marker-mid`,
-   `marker-end`, `refX`, `refY`, `markerUnits`, `orient`.
-6. **Images and views (chapter 17).** `<image>` (raster and SVG-in-SVG) and
-   `<view>`.
-7. **Styling (chapter 6).** `<style>`, `class`, selectors, at-rules,
-   specificity, cascade, `!important`.
-8. **Document structure long tail.** `<switch>` with `requiredFeatures`,
-   `requiredExtensions`, `systemLanguage`; `overflow` on nested viewports.
-9. **Interactivity and metadata.** `cursor`, `pointer-events`,
-   `color-interpolation`, `color-rendering`, `shape-rendering`,
-   `text-rendering`, `image-rendering` — hints that do not affect geometry, and
-   `<script>` (correctly not executed).
+1. **Filter effects (chapter 15, 25 elements, 39 tests).** `<filter>` and all
+   24 `fe*` primitives, plus the `filter` property and
+   `color-interpolation-filters`. Nothing is implemented; this is the largest
+   remaining block.
+2. **Real fonts (chapter 20, 10 elements, 17 tests).** Text uses the built-in
+   5×7 bitmap font. There is no font-file parsing, no shaping, no font
+   selection, and no `font-family` matching. `font-size`, `font-weight`,
+   `font-style`, `letter-spacing` and `text-anchor` are honoured.
+3. **Text layout remainder.** `tref`, `textPath`, `altGlyph`/`altGlyphDef`/
+   `altGlyphItem`, `glyphRef`, per-glyph `rotate`, `textLength`/
+   `lengthAdjust`, `writing-mode`, `dominant-baseline`, `alignment-baseline`.
+   `tspan` `x`/`y`/`dx`/`dy` and per-run fill are implemented.
+4. **External images.** `data:image/png` and `data:image/svg+xml` work;
+   references to files (the common case in the W3C suite) need a base path and
+   a JPEG decoder, and are skipped today.
+5. **Long tail.** `<view>`, `color-profile`, `cursor`, and the rendering-hint
+   properties (`shape-rendering`, `text-rendering`, `color-rendering`,
+   `image-rendering`, `color-interpolation`) — these do not change geometry.
 
 ## What this measurement changed
 
