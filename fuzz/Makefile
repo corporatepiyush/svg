@@ -27,10 +27,11 @@ SRC     := $(ROOT)/xml_parse.c $(ROOT)/xml_dom.c \
            $(ROOT)/path_parse.c $(ROOT)/path_util.c \
            $(ROOT)/color.c $(ROOT)/length.c \
            $(ROOT)/svg_idmap.c $(ROOT)/svg_transform.c $(ROOT)/svg_geometry.c \
-           $(ROOT)/svg_gradient.c $(ROOT)/svg_text.c $(ROOT)/svg_style.c \
+           $(ROOT)/svg_gradient.c $(ROOT)/svg_pattern.c $(ROOT)/svg_text.c $(ROOT)/svg_style.c \
+           $(ROOT)/svg_mask.c $(ROOT)/svg_marker.c $(ROOT)/svg_css.c \
            $(ROOT)/svg_build.c $(ROOT)/svg_refs.c $(ROOT)/svg_viewport.c \
            $(ROOT)/svg_api.c $(ROOT)/svg_alloc.c \
-           $(ROOT)/raster_util.c $(ROOT)/raster_canvas.c $(ROOT)/raster_blend.c $(ROOT)/raster_mask.c $(ROOT)/raster_gradient.c $(ROOT)/raster_fill.c $(ROOT)/raster_stroke.c $(ROOT)/raster_shape.c $(ROOT)/raster_clip.c $(ROOT)/raster_text.c $(ROOT)/raster_node.c \
+           $(ROOT)/raster_util.c $(ROOT)/raster_canvas.c $(ROOT)/raster_blend.c $(ROOT)/raster_mask.c $(ROOT)/raster_gradient.c $(ROOT)/raster_pattern.c $(ROOT)/raster_fill.c $(ROOT)/raster_stroke.c $(ROOT)/raster_shape.c $(ROOT)/raster_clip.c $(ROOT)/raster_text.c $(ROOT)/raster_node.c $(ROOT)/raster_image.c $(ROOT)/image_png.c \
            $(ROOT)/png_deflate.c $(ROOT)/png_write.c $(ROOT)/font.c
 INC     := -I$(ROOT)
 LIBS    := -lm
