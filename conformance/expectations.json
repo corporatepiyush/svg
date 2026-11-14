@@ -1679,7 +1679,7 @@
     {
       "name": "stroke_join_miter",
       "area": "stroke",
-      "note": "miter join on a wide angle: ink on both legs, none past the vertex",
+      "note": "miter join: ratio 1/sin(33.69deg)=1.80 is below miterlimit 10, so the spike is drawn with its apex at y=14.6; it must be present just below the vertex and must not run away past y=10. Sub-pixel coverage at the extreme tip differs from 2D-AA renderers.",
       "checks": [
         {
           "kind": "rgba",
@@ -1693,9 +1693,18 @@
           ]
         },
         {
+          "kind": "ink",
+          "x": 46,
+          "y": 16,
+          "w": 9,
+          "h": 3,
+          "min": 8,
+          "rgb_max": 60
+        },
+        {
           "kind": "alpha",
           "x": 50,
-          "y": 14,
+          "y": 10,
           "max": 8
         }
       ]
@@ -2446,5 +2455,8 @@
         }
       ]
     }
+  ],
+  "external_intentional": [
+    "style_element"
   ]
 }
