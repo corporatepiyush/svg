@@ -1,10 +1,12 @@
-/* raster_text.c - Bitmap-font text rendering.
+/* raster_text.c - Text rendering.
  *
  * Text is a list of positioned runs (a <text> or <tspan> fragment).  Each run
  * is laid out glyph by glyph, honouring letter-spacing, textLength, per-glyph
  * rotation, writing-mode, dominant-baseline and textPath, then converted to
- * one quad per lit pixel of the 5x7 font.  The quads go through the normal
- * path pipeline, so gradients, clips, opacity and filters all work on text.
+ * geometry: either the built-in 5x7 bitmap (one quad per lit pixel) or, when
+ * the caller supplied a font file, the glyph's TrueType outline flattened to
+ * polylines.  The result goes through the normal path pipeline, so gradients,
+ * clips, opacity and filters all work on text.
  */
 #include "raster_internal.h"
 
@@ -12,8 +14,116 @@ static float adv_of(float fontsize, float letterspacing) {
     return 6.0f * (fontsize / 7.0f) + letterspacing;
 }
 
-/* Point at `dist` along a flattened path, plus the tangent angle.  Returns 0
- * when the distance is past the end. */
+/* ------------------------------------------------------------------ */
+/* Geometry accumulator                                                */
+/* ------------------------------------------------------------------ */
+
+typedef struct {
+    SubPath* s;
+    int n, cap;
+} PB;
+
+static int pb_reserve(PB* pb) {
+    if (pb->n == pb->cap) {
+        int cap = pb->cap ? pb->cap * 2 : 16;
+        SubPath* ns = (SubPath*)svg_realloc(pb->s, (size_t)cap * sizeof(SubPath));
+        if (!ns) return 0;
+        pb->s = ns;
+        pb->cap = cap;
+    }
+    return 1;
+}
+
+/* Append a contour, transforming it into device space. */
+static int pb_contour(PB* pb, const float* xy, int npts, float ox, float oy,
+                      float ca, float sa, float gscale, float italic,
+                      int flip_y) {
+    if (npts < 3) return 1;
+    if (!pb_reserve(pb)) return 0;
+    Pt* p = (Pt*)svg_malloc((size_t)npts * sizeof(Pt));
+    if (!p) return 0;
+    for (int i = 0; i < npts; i++) {
+        float x = xy[i * 2] * gscale;
+        /* TrueType outlines are y-up; SVG is y-down. */
+        float y = (flip_y ? -xy[i * 2 + 1] : xy[i * 2 + 1]) * gscale;
+        if (italic != 0) x += -0.2126f * y;
+        p[i].x = x * ca - y * sa + ox;
+        p[i].y = x * sa + y * ca + oy;
+    }
+    pb->s[pb->n].p = p;
+    pb->s[pb->n].n = npts;
+    pb->s[pb->n].closed = 1;
+    pb->n++;
+    return 1;
+}
+
+static Path* pb_finish(PB* pb) {
+    if (pb->n == 0) { free(pb->s); return NULL; }
+    Path* p = (Path*)svg_malloc(sizeof(Path));
+    if (!p) { free(pb->s); return NULL; }
+    memset(p, 0, sizeof(*p));
+    p->s = pb->s;
+    p->n = pb->n;
+    p->cap = pb->cap;
+    p->shared_points = 0;
+    return p;
+}
+
+/* ------------------------------------------------------------------ */
+/* Glyph emission                                                      */
+/* ------------------------------------------------------------------ */
+
+static int emit_bitmap_glyph(PB* pb, const char* q, float ox, float oy,
+                             float ca, float sa, float scale, float be,
+                             float gscale) {
+    unsigned char rows[7];
+    if (!font_glyph((unsigned char)*q, rows)) return 1;
+    float gs = (scale + 2.0f * be) * gscale;
+    for (int row = 0; row < 7; row++) {
+        for (int col = 0; col < 5; col++) {
+            if (!(rows[row] & (1 << col))) continue;
+            float lx = ((float)col * scale - be) * gscale;
+            float ly = (-7.0f * scale + (float)row * scale - be) * gscale;
+            float xy[8] = { lx, ly,
+                            lx + gs, ly,
+                            lx + gs, ly + gs,
+                            lx, ly + gs };
+            if (!pb_contour(pb, xy, 4, ox, oy, ca, sa, 1.0f, 0.0f, 0)) return 0;
+        }
+    }
+    return 1;
+}
+
+static int emit_font_glyph(PB* pb, const FontFace* f, int gid, float size,
+                           float ox, float oy, float ca, float sa, float gscale,
+                           int italic) {
+    PtList pl;
+    memset(&pl, 0, sizeof(pl));
+    int nc = 0;
+    if (font_face_contours(f, gid, size, &pl, &nc)) {
+        free(pl.xy);
+        free(pl.cont);
+        return 1;                       /* empty glyph: nothing to draw */
+    }
+    int ok = 1;
+    size_t base = 0;
+    for (int c = 0; c < nc && c < pl.nc; c++) {
+        if (!pb_contour(pb, pl.xy + base, (int)pl.cont[c], ox, oy, ca, sa,
+                        gscale, italic != 0, 1)) {
+            ok = 0;
+            break;
+        }
+        base += (size_t)pl.cont[c] * 2;
+    }
+    free(pl.xy);
+    free(pl.cont);
+    return ok;
+}
+
+/* ------------------------------------------------------------------ */
+/* Path sampling (textPath)                                            */
+/* ------------------------------------------------------------------ */
+
 static int path_sample(const Path* p, float dist, float* ox, float* oy,
                        float* ang) {
     if (!p || dist < 0.0f) return 0;
@@ -40,46 +150,26 @@ static int path_sample(const Path* p, float dist, float* ox, float* oy,
     return 0;
 }
 
-/* Emit one glyph's lit pixels as quads.  `ox`,`oy` is the glyph origin on the
- * baseline; `angle` rotates the glyph clockwise (degrees).  Returns the number
- * of quads added. */
-static int emit_glyph(Path* p, int gi, Pt* pts, unsigned char rows[7],
-                      float ox, float oy, float angle, float scale, float be,
-                      float gscale, int italic) {
-    float a = angle * (float)SVG_PI / 180.0f;
-    float ca = cosf(a), sa = sinf(a);
-    float gs = (scale + 2.0f * be) * gscale;
-    int added = 0;
-    for (int row = 0; row < 7; row++) {
-        for (int col = 0; col < 5; col++) {
-            if (!(rows[row] & (1 << col))) continue;
-            float lx = ((float)col * scale - be) * gscale;
-            float ly = (-7.0f * scale + (float)row * scale - be) * gscale;
-            if (italic) lx += -0.2126f * ly;      /* 12 degree skew */
-            float rx = lx * ca - ly * sa + ox;
-            float ry = lx * sa + ly * ca + oy;
-            float ux = gs * ca, uy = gs * sa;     /* local +x in device */
-            float vx = -gs * sa, vy = gs * ca;    /* local +y in device */
-            Pt* q = pts + (size_t)(gi + added) * 4;
-            q[0].x = rx;             q[0].y = ry;
-            q[1].x = rx + ux;        q[1].y = ry + uy;
-            q[2].x = rx + ux + vx;   q[2].y = ry + uy + vy;
-            q[3].x = rx + vx;        q[3].y = ry + vy;
-            p->s[gi + added].p = q;
-            p->s[gi + added].n = 4;
-            p->s[gi + added].closed = 1;
-            added++;
+/* ------------------------------------------------------------------ */
+/* Layout                                                              */
+/* ------------------------------------------------------------------ */
+
+static void draw_chunk(Canvas* c, const TextChunk* ch, Mat world,
+                       float opacity, Mask* clip, int aa) {
+    if (!ch || !ch->text || !*ch->text || !(ch->fontsize > 0.0f)) return;
+    int n = (int)strlen(ch->text);
+    const FontFace* f = ch->font;
+    float scale = ch->fontsize / 7.0f;
+    float adv = f ? 0.0f : adv_of(ch->fontsize, ch->letterspacing);
+    if (f) {
+        /* The run's natural advance: the sum of the glyph advances plus
+         * letter-spacing after each glyph. */
+        for (const char* q = ch->text; *q; q++) {
+            int gid = font_face_glyph_index(f, (unsigned char)*q);
+            adv += font_face_advance(f, gid) * ch->fontsize + ch->letterspacing;
         }
     }
-    return added;
-}
 
-static Path* build_text_path(const TextChunk* ch, float* out_total) {
-    int n = (int)strlen(ch->text);
-    float scale = ch->fontsize / 7.0f;
-    if (n <= 0 || !(scale > 0.0f)) return NULL;
-
-    float adv = adv_of(ch->fontsize, ch->letterspacing);
     float gscale = 1.0f;
     float total = (float)n * adv;
     if (ch->textlen > 0.0f && total > 0.0f) {
@@ -93,28 +183,6 @@ static Path* build_text_path(const TextChunk* ch, float* out_total) {
         }
     }
 
-    int glyph_pixels = 0;
-    for (const char* q = ch->text; *q; q++) {
-        unsigned char rows[7];
-        if (font_glyph((unsigned char)*q, rows))
-            for (int r = 0; r < 7; r++)
-                for (int col = 0; col < 5; col++)
-                    if (rows[r] & (1 << col)) glyph_pixels++;
-    }
-    if (glyph_pixels <= 0) return NULL;
-
-    Path* p = (Path*)svg_malloc(sizeof(Path));
-    if (!p) return NULL;
-    memset(p, 0, sizeof(*p));
-    p->n = glyph_pixels;
-    p->s = (SubPath*)svg_malloc((size_t)glyph_pixels * sizeof(SubPath));
-    Pt* pts = (Pt*)svg_malloc((size_t)glyph_pixels * 4 * sizeof(Pt));
-    if (!p->s || !pts) { free(p->s); free(pts); free(p); return NULL; }
-    memset(p->s, 0, (size_t)glyph_pixels * sizeof(SubPath));
-    p->pts_arena = pts;
-    p->shared_points = 1;
-
-    float be = ch->bold ? 0.35f * scale : 0.0f;
     float ox = ch->x;
     float oy = ch->y + ch->baseline * ch->fontsize;
     if (!ch->writing) {
@@ -134,47 +202,48 @@ static Path* build_text_path(const TextChunk* ch, float* out_total) {
         ref_owned = 1;
     }
 
-    int gi = 0;
-    int i = 0;
-    for (const char* q = ch->text; *q; q++, i++) {
-        unsigned char rows[7];
-        int known = font_glyph((unsigned char)*q, rows);
-        if (known && gi < glyph_pixels) {
-            float px = ox, py = oy;
-            float angle = (ch->writing ? 90.0f : 0.0f);
-            if (ch->nrot > 0) angle += ch->rot[i % ch->nrot];
-            if (ref) {
-                float d = ch->start_offset + (float)i * adv;
-                float sx, sy, sang;
-                if (!path_sample(ref, d, &sx, &sy, &sang)) break;
-                px = sx;
-                py = sy;
-                angle += sang;
-            } else if (ch->writing) {
-                py = oy + (float)i * adv;
-            } else {
-                px = ox + (float)i * adv;
-            }
-            gi += emit_glyph(p, gi, pts, rows, px, py, angle, scale, be,
-                             gscale, ch->italic);
+    PB pb;
+    memset(&pb, 0, sizeof(pb));
+    float be = ch->bold ? 0.35f * scale : 0.0f;
+    float pen = 0.0f;
+    for (int i = 0; i < n; i++) {
+        float px = ox, py = oy;
+        float angle = (ch->writing ? 90.0f : 0.0f);
+        if (ch->nrot > 0) angle += ch->rot[i % ch->nrot];
+        if (ref) {
+            float sx, sy, sang;
+            if (!path_sample(ref, ch->start_offset + pen, &sx, &sy, &sang)) break;
+            px = sx;
+            py = sy;
+            angle += sang;
+        } else if (ch->writing) {
+            py = oy + pen;
+        } else {
+            px = ox + pen;
+        }
+        float ca = cosf(angle * (float)SVG_PI / 180.0f);
+        float sa = sinf(angle * (float)SVG_PI / 180.0f);
+        if (f) {
+            int gid = font_face_glyph_index(f, (unsigned char)ch->text[i]);
+            emit_font_glyph(&pb, f, gid, ch->fontsize, px, py, ca, sa, gscale,
+                            ch->italic);
+            pen += font_face_advance(f, gid) * ch->fontsize * gscale +
+                   ch->letterspacing * gscale;
+        } else {
+            emit_bitmap_glyph(&pb, ch->text + i, px, py, ca, sa, scale, be,
+                              gscale);
+            pen += adv;
         }
     }
     if (ref_owned) path_free(ref);
-    *out_total = total;
-    return p;
-}
 
-static void draw_chunk(Canvas* c, const TextChunk* ch, Mat world,
-                       float opacity, Mask* clip, int aa) {
-    if (!ch || !ch->text || !*ch->text || !(ch->fontsize > 0.0f)) return;
-    Path* p = build_text_path(ch, &(float){0.0f});
+    Path* p = pb_finish(&pb);
     if (!p) return;
     path_transform(p, world);
     float bb[4];
     path_bbox(p, bb);
-    if (ch->fill.type != PAINT_NONE) {
+    if (ch->fill.type != PAINT_NONE)
         fill_path(c, p, 0, &ch->fill, opacity, clip, bb, bb, aa, world);
-    }
     path_free(p);
 }
 
@@ -198,5 +267,6 @@ void render_text(Canvas* c, Node* n, Mat world, float opacity,
     ch.italic = n->italic;
     ch.anchor = n->anchor;
     ch.fill = n->fill;
+    ch.font = n->font;
     draw_chunk(c, &ch, world, opacity, clip, aa);
 }

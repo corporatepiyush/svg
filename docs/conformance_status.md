@@ -11,12 +11,12 @@ Appendix M. Test suite: the W3C SVG 1.1 test suite (525 accepted tests).
 
 | measure | result |
 |---|---|
-| Elements instantiated | **25 / 80** (31%) |
-| Presentation attributes honoured | **24 / 59** (41%) |
+| Elements instantiated | **53 / 80** (66%) |
+| Presentation attributes honoured | **26 / 59** (44%) |
 | Official suite, before the feature batches | **261 / 512 comparable** (51%) |
 | Official suite, implemented-area subset, after | **111 / 170 comparable** (65%) |
 | Text-only tests (not comparable) | 13 full / 2 subset |
-| Conformance corpus (hand-written) | 101 / 101 |
+| Conformance corpus (hand-written) | 125 / 125 |
 
 The official-suite number is the honest one: it is measured against an
 independent implementation of the same specification, not against our own
@@ -94,57 +94,58 @@ Two readings matter:
 | 6 Styling | 1 | 1 — `<style>` with type/class/id/descendant/child selectors, `!important` |
 | 8 Paths | 1 | 1 — all commands, `pathLength` |
 | 9 Basic shapes | 6 | 6 |
-| 10 Text | 8 | 2 — `text` and `tspan` (`x`/`y`/`dx`/`dy`, per-run fill); `tref`, `textPath`, `altGlyph*` missing |
+| 10 Text | 8 | 5 — `text`, `tspan`, `tref`, `textPath`, `altGlyph` (as fallback text); `altGlyphDef`, `altGlyphItem`, `glyphRef` are definitions only |
 | 11 Painting (markers) | 1 | 1 — `marker` with start/mid/end, `orient`, `markerUnits` |
 | 12 Color | 1 | 0 — `color-profile` |
 | 13 Gradients and patterns | 4 | 4 — `linearGradient`, `radialGradient`, `stop`, `pattern` |
 | 14 Clipping and masking | 2 | 2 — `clipPath`, `mask` |
-| 15 Filter effects | 25 | 0 |
+| 15 Filter effects | 25 | 25 — `filter` and all 24 `fe*` primitives |
 | 16 Interactivity | 1 | 0 — `cursor` |
-| 17 Linking | 2 | 1 — `image` (data URIs), `view` missing |
+| 17 Linking | 2 | 1 — `image` (data URIs and external files), `view` missing |
 | 18 Scripting | 1 | 0 (by design) |
 | 19 Animation | 6 | 0 |
-| 20 Fonts | 10 | 0 — bitmap font only |
+| 20 Fonts | 10 | 0 — SVG font elements are not implemented; an external font file can be named instead |
 | 21 Metadata | 1 | 0 (by design) |
-| **total** | **80** | **25** |
+| **total** | **80** | **53** |
 
 ## Attribute coverage
 
-- **Presentation attributes (Appendix M.2): 24 of 59.** Supported: `fill`,
+- **Presentation attributes (Appendix M.2): 26 of 59.** Supported: `fill`,
   `fill-rule`, `fill-opacity`, `stroke`, `stroke-width`, `stroke-opacity`,
   `stroke-linecap`, `stroke-linejoin`, `stroke-miterlimit`,
   `stroke-dasharray`, `stroke-dashoffset`, `opacity`, `color`, `clip-path`,
   `clip-rule`, `display`, `visibility`, `font-size`, `font-style`,
   `font-weight`, `letter-spacing`, `text-anchor`, `stop-color`,
-  `stop-opacity`. The other 35 are unimplemented (see below).
+  `stop-opacity`, `shape-rendering`, `color-interpolation`. The other 33 are
+  unimplemented (see below).
 - **Regular attributes (Appendix M.1):** geometry, `transform`, `viewBox`,
   `preserveAspectRatio`, `gradientUnits`, `gradientTransform`, `spreadMethod`,
-  `fx`/`fy`, `offset`, `clipPathUnits`, `href`/`xlink:href` are honoured on the
-  elements that support them. Missing on otherwise-supported elements:
-  `pathLength` (affects dash scaling), `overflow` on nested `<svg>`,
-  `zoomAndPan`, and the text layout attributes `dx`, `dy`, `rotate`,
-  `textLength`, `lengthAdjust`.
+  `fx`/`fy`, `offset`, `clipPathUnits`, `href`/`xlink:href`, `pathLength`,
+  `overflow`, and the text layout attributes `dx`, `dy`, `rotate`,
+  `textLength`, `lengthAdjust`, `startOffset` are honoured on the elements
+  that support them.  Missing: `zoomAndPan`, and per-primitive filter
+  subregions (`x`/`y`/`width`/`height` on an `fe*` element) except on
+  `feImage`.
 
 ## What is still pending, in order of size
 
-1. **Filter effects (chapter 15, 25 elements, 39 tests).** `<filter>` and all
-   24 `fe*` primitives, plus the `filter` property and
-   `color-interpolation-filters`. Nothing is implemented; this is the largest
-   remaining block.
-2. **Real fonts (chapter 20, 10 elements, 17 tests).** Text uses the built-in
-   5×7 bitmap font. There is no font-file parsing, no shaping, no font
-   selection, and no `font-family` matching. `font-size`, `font-weight`,
-   `font-style`, `letter-spacing` and `text-anchor` are honoured.
-3. **Text layout remainder.** `tref`, `textPath`, `altGlyph`/`altGlyphDef`/
-   `altGlyphItem`, `glyphRef`, per-glyph `rotate`, `textLength`/
-   `lengthAdjust`, `writing-mode`, `dominant-baseline`, `alignment-baseline`.
-   `tspan` `x`/`y`/`dx`/`dy` and per-run fill are implemented.
-4. **External images.** `data:image/png` and `data:image/svg+xml` work;
-   references to files (the common case in the W3C suite) need a base path and
-   a JPEG decoder, and are skipped today.
-5. **Long tail.** `<view>`, `color-profile`, `cursor`, and the rendering-hint
-   properties (`shape-rendering`, `text-rendering`, `color-rendering`,
-   `image-rendering`, `color-interpolation`) — these do not change geometry.
+1. **Font selection, matching and shaping.** A TrueType face can be loaded and
+   its outlines rendered, but only when the caller names the file: there is no
+   `font-family` matching, no `font-weight`/`font-style` face selection, no
+   kerning, no ligature substitution, no bidi and no glyph fallback, and
+   combining marks are drawn as separate glyphs.  SVG's own font elements
+   (`<font>`, `<glyph>`, `<font-face>`, `<hkern>`, `<vkern>`) are not
+   implemented.  CFF (`.otf`) outlines are not parsed.
+2. **The remaining long tail.** `<view>` (needs a document URI to select),
+   `<color-profile>` and `cursor` are accepted and ignored; `text-rendering`,
+   `color-rendering` and `image-rendering` are hints this rasteriser does not
+   act on; `zoomAndPan` is ignored; per-primitive filter subregions are
+   honoured only by `feImage`.
+3. **The official suite re-run.** The figures above for the whole suite predate
+   the feature batches; a 172-test subset covering the implemented chapters is
+   the current measurement (111/170 comparable, 65%).  Each test launches a
+   headless browser and several never exit, so the full run needs a quiet
+   machine.
 
 ## What this measurement changed
 

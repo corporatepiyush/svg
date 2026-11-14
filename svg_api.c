@@ -21,6 +21,7 @@ static void text_chunks_free(Node* n) {
 
 void svg_free(Node* n) {
     if (!n) return;
+    if (n->font_owned) font_face_free(n->font_owned);
     for (int i = 0; i < n->nkids; i++) svg_free(n->kids[i]);
     free(n->kids);
     path_free(n->path);
@@ -51,6 +52,7 @@ void svg_free(Node* n) {
 void svg_free_detached(Node* n, IdMap* ids) {
     if (!n) return;
     if (ids && n->id) idmap_remove(ids, n->id, n);
+    if (n->font_owned) font_face_free(n->font_owned);
     for (int i = 0; i < n->nkids; i++) svg_free_detached(n->kids[i], ids);
     free(n->kids);
     path_free(n->path);
@@ -159,6 +161,8 @@ Node* svg_parse(const char* data, size_t len, const svg2img_options* opts,
     ctx.nodes = 0;
     ctx.limit_hit = 0;
     ctx.base_path = o.base_path;
+    FontFace* face = o.font_path ? font_face_load(o.font_path) : NULL;
+    ctx.font = face;
     ctx.rules = NULL;
     ctx.nrules = ctx.caprules = 0;
     css_collect(&ctx, root);
@@ -170,6 +174,8 @@ Node* svg_parse(const char* data, size_t len, const svg2img_options* opts,
 
     if (root_node) {
         if (svg_resolve(root_node, &ids, &lim)) ctx.limit_hit = 1;
+        root_node->font = face;
+        root_node->font_owned = face;
         root_node->vp.w = W;
         root_node->vp.h = H;
         root_node->vp.tm = view;
@@ -179,9 +185,18 @@ Node* svg_parse(const char* data, size_t len, const svg2img_options* opts,
     idmap_free(&ids);
     xml_free(doc);
     /* A hard limit was hit while building: the caller maps this to
-     * SVG2IMG_ERR_LIMIT.  NULL also means "nothing was built" or an
-     * allocation failure, which the caller reports as a format error. */
-    if (ctx.limit_hit) { if (limit_hit) *limit_hit = 1; return NULL; }
+     * SVG2IMG_ERR_LIMIT.  The partially built tree (and the font it owns) is
+     * released here rather than handed back to be freed. */
+    if (ctx.limit_hit) {
+        svg_free(root_node);
+        if (limit_hit) *limit_hit = 1;
+        return NULL;
+    }
+    if (!root_node) {
+        /* Nothing was built: the face is not attached to any node. */
+        font_face_free(face);
+        return NULL;
+    }
     return root_node;
 }
 

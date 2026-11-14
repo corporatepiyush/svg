@@ -370,7 +370,7 @@ unsigned char* jpeg_decode_rgba(const unsigned char* d, size_t n,
                 }
             }
             /* Entropy-coded data starts after the SOS header. */
-            size_t data_start = p + len;
+            size_t data_start = p + (size_t)len;
             bits.d = d;
             bits.n = n;
             bits.pos = data_start;
@@ -443,14 +443,14 @@ unsigned char* jpeg_decode_rgba(const unsigned char* d, size_t n,
             if (!img) goto fail;
             for (int y = 0; y < j.height; y++) {
                 for (int x = 0; x < j.width; x++) {
-                    unsigned char* o = img + ((size_t)y * j.width + x) * 4;
+                    unsigned char* o = img + ((size_t)y * (size_t)j.width + (size_t)x) * 4;
                     if (j.ncomp == 1) {
                         JComp* c0 = &j.comp[0];
                         int sx = x * c0->h / max_h;
                         int sy = y * c0->v / max_v;
                         if (sx >= c0->pw) sx = c0->pw - 1;
                         if (sy >= c0->ph) sy = c0->ph - 1;
-                        int Y = c0->plane[(size_t)sy * c0->pw + sx];
+                        int Y = c0->plane[(size_t)sy * (size_t)c0->pw + (size_t)sx];
                         o[0] = o[1] = o[2] = (unsigned char)Y;
                         o[3] = 255;
                     } else if (j.ncomp >= 3) {
@@ -464,9 +464,9 @@ unsigned char* jpeg_decode_rgba(const unsigned char* d, size_t n,
                         if (y1 >= c1->ph) y1 = c1->ph - 1;
                         if (x2 >= c2->pw) x2 = c2->pw - 1;
                         if (y2 >= c2->ph) y2 = c2->ph - 1;
-                        float Y = (float)c0->plane[(size_t)y0 * c0->pw + x0];
-                        float Cb = (float)c1->plane[(size_t)y1 * c1->pw + x1] - 128.0f;
-                        float Cr = (float)c2->plane[(size_t)y2 * c2->pw + x2] - 128.0f;
+                        float Y = (float)c0->plane[(size_t)y0 * (size_t)c0->pw + (size_t)x0];
+                        float Cb = (float)c1->plane[(size_t)y1 * (size_t)c1->pw + (size_t)x1] - 128.0f;
+                        float Cr = (float)c2->plane[(size_t)y2 * (size_t)c2->pw + (size_t)x2] - 128.0f;
                         float r = Y + 1.402f * Cr;
                         float g = Y - 0.344136f * Cb - 0.714136f * Cr;
                         float b = Y + 1.772f * Cb;
@@ -488,7 +488,7 @@ unsigned char* jpeg_decode_rgba(const unsigned char* d, size_t n,
             *out_h = j.height;
             return img;
         }
-        p += len;
+        p += (size_t)len;
     }
     (void)have_sos;
 fail:

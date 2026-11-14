@@ -164,6 +164,7 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
     c->id = NULL;
     c->kids = NULL;
     c->nkids = 0;
+    c->font_owned = NULL;
     c->path = n->path ? path_copy(n->path) : NULL;
     if (n->path && !c->path) uc->failed = 1;
 

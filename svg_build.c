@@ -11,6 +11,7 @@ Node* svg_node_new(int type) {
     if (!n) return NULL;
     memset(n, 0, sizeof(*n));
     n->type = type;
+    n->font = NULL;
     n->opacity = 1.0f;
     n->visible = 1;
     n->fillop = n->strokeop = 1.0f;
@@ -436,6 +437,7 @@ oom:
     n->spec |= st.spec;
 
     n->sw = st.stroke_width;
+    n->font = ctx->font;
     n->linecap = st.linecap;
     n->linejoin = st.linejoin;
     n->miterlimit = st.miterlimit;

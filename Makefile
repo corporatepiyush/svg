@@ -25,7 +25,7 @@ SRCS = \
 	raster_text.c \
 	raster_node.c raster_image.c raster_filter.c raster_filter_gen.c \
 	png_deflate.c png_write.c \
-	font.c cli.c main.c
+	font.c font_ttf.c cli.c main.c
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
@@ -55,6 +55,7 @@ test: $(TARGET)
 
 check: $(TARGET)
 	python3 test/check.py ./$(TARGET)
+	python3 test/font_test.py ./$(TARGET)
 
 # Spec-derived conformance corpus: shapes, paths, transforms, viewBox, gradients,
 # clipPath, opacity, use, text, inline style, units, colours, dashes and joins.

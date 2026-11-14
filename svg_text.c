@@ -42,7 +42,8 @@ char* gather_text(const XMLNode* xn, int max_len, int* limit_hit) {
 /* ------------------------------------------------------------------ */
 
 static void push_chunk(Node* out, const char* s, float x, float y,
-                       const Style* st, int max_len, int* limit_hit) {
+                       const Style* st, int max_len, int* limit_hit,
+                       const FontFace* font) {
     if (!s || !*s) return;
     if (max_len <= 0) max_len = SVG2IMG_LIMIT_MAX_TEXT_LENGTH;
     if (*limit_hit) return;
@@ -70,6 +71,7 @@ static void push_chunk(Node* out, const char* s, float x, float y,
     ch->length_kind = st->length_kind;
     ch->writing = st->writing;
     ch->baseline = st->baseline;
+    ch->font = font;
     if (st->rot && st->nrot > 0) {
         ch->rot = (float*)svg_malloc((size_t)st->nrot * sizeof(float));
         if (ch->rot) {
@@ -185,7 +187,8 @@ static void run_element(const XMLNode* xn, Ctx* ctx, Style* parent,
     if (xn->text && *xn->text)
         push_chunk(out, xn->text, nx, ny, &child,
                    ctx->lim ? ctx->lim->max_text_length
-                            : SVG2IMG_LIMIT_MAX_TEXT_LENGTH, limit_hit);
+                            : SVG2IMG_LIMIT_MAX_TEXT_LENGTH, limit_hit,
+                   ctx->font);
     float scale = child.fontsize / 7.0f;
     *cx = nx + (float)strlen(xn->text ? xn->text : "") * (6.0f * scale +
                                                           child.letterspacing);
@@ -216,7 +219,7 @@ static void walk_chunks(const XMLNode* xn, Ctx* ctx, Style* st,
                     push_chunk(out, ref->text, *cx, *cy, &child,
                                ctx->lim ? ctx->lim->max_text_length
                                         : SVG2IMG_LIMIT_MAX_TEXT_LENGTH,
-                               limit_hit);
+                               limit_hit, ctx->font);
                 }
             }
             style_free(&child);
@@ -234,7 +237,8 @@ static void walk_chunks(const XMLNode* xn, Ctx* ctx, Style* st,
             if (text && *text) {
                 push_chunk(out, text, *cx, *cy, &child,
                            ctx->lim ? ctx->lim->max_text_length
-                                    : SVG2IMG_LIMIT_MAX_TEXT_LENGTH, limit_hit);
+                                    : SVG2IMG_LIMIT_MAX_TEXT_LENGTH, limit_hit,
+                           ctx->font);
                 if (out->nchunks > 0) {
                     TextChunk* ch = &out->chunks[out->nchunks - 1];
                     const char* d = xml_attr(k, "path");
@@ -271,7 +275,8 @@ void gather_chunks(const XMLNode* xn, Ctx* ctx, Node* out, int* limit_hit) {
     if (xn->text && *xn->text) {
         push_chunk(out, xn->text, x, y, &st,
                    ctx->lim ? ctx->lim->max_text_length
-                            : SVG2IMG_LIMIT_MAX_TEXT_LENGTH, limit_hit);
+                            : SVG2IMG_LIMIT_MAX_TEXT_LENGTH, limit_hit,
+                   ctx->font);
     }
     float scale = st.fontsize / 7.0f;
     float cx = x + (float)strlen(xn->text ? xn->text : "") *

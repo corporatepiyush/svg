@@ -53,11 +53,16 @@ is the contract between the library and its callers.
 - Colour: `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`,
   `hsl()`, `hsla()`, `transparent`, `currentColor`, 147 named colours.
 - Stroke: caps, joins, miter limit, dash arrays/offsets.
-- Text: built-in 5×7 bitmap font, bold/italic, anchors, letter-spacing,
-  `<tspan>` `x`/`y`/`dx`/`dy` and per-run fill, `rotate` (one angle per
-  glyph), `textLength`/`lengthAdjust`, `writing-mode="tb"`, `dominant-baseline`
-  (as an em offset), `tref`, `textPath` (`href` or `path`, `startOffset`) and
-  `altGlyph` (rendered as its fallback text).
+- Text: either the built-in 5×7 bitmap font or a real TrueType font file
+  (`svg2img_options.font_path`, `--font FILE` on the command line).  With a
+  font, glyph outlines are read from `glyf` (simple and composite glyphs,
+  quadratic flattening, `cmap` formats 4 and 12, `.ttf` and the first face of
+  `.ttc`) and filled through the normal path pipeline; without one, the
+  bitmap font is used.  Bold/italic, anchors, letter-spacing, `<tspan>`
+  `x`/`y`/`dx`/`dy` and per-run fill, `rotate` (one angle per glyph),
+  `textLength`/`lengthAdjust`, `writing-mode="tb"`, `dominant-baseline` (as an
+  em offset), `tref`, `textPath` (`href` or `path`, `startOffset`) and
+  `altGlyph` (rendered as its fallback text) all apply to both paths.
 - Output: RGBA8 PNG, 1×–8× supersampling, optional background.
 
 ## Unsupported / ignored
@@ -73,12 +78,17 @@ is the contract between the library and its callers.
   `image-rendering` are hints this rasteriser does not act on (text uses one
   bitmap font, colour is always sRGB, and images are always sampled
   nearest-neighbour).
-- Text details: no font selection or shaping, so `font-family`, `font-stretch`
-  and `font-variant` are ignored and every glyph comes from the built-in
-  5×7 font; `textLength` distributes spacing per glyph rather than per
-  character cluster; `dominant-baseline` is approximated as an em offset; and
-  a `textPath` distance is not calibrated by the referenced path's
-  `pathLength`.
+- Real font files are loaded only when the caller names one; nothing is
+  scanned or matched.  Text shaping is not performed.
+- Text details: there is no font selection, matching or shaping.  `font-family`,
+  `font-stretch`, `font-variant` and `font-feature-settings` are ignored; the
+  single font given to the conversion (if any) is used for every run.  There
+  is no kerning, no ligature substitution, no bidi and no glyph fallback, and
+  combining marks are drawn as separate glyphs.  CFF (OpenType `.otf`)
+  outlines are not parsed — only `glyf`.  `textLength` distributes spacing per
+  glyph rather than per cluster; `dominant-baseline` is approximated as an em
+  offset; and a `textPath` distance is not calibrated by the referenced
+  path's `pathLength`.
 - Filter details: a primitive's own `x`/`y`/`width`/`height` subregion is
   honoured only by `feImage`; other primitives use the whole filter region.
   `feTurbulence` uses a value-noise approximation rather than the reference
@@ -93,7 +103,6 @@ is the contract between the library and its callers.
   Progressive, arithmetic-coded and 12-bit JPEG are not supported (baseline
   sequential, Huffman, 8-bit only).  JPEG chroma is upsampled nearest-neighbour
   rather than with a triangle filter.
-- Real font files and text shaping.  Text uses the built-in bitmap font.
 - Full `<use>` shadow-tree styling beyond the implemented inheritance rules.
 
 Unsupported elements are ignored rather than treated as errors, so a document

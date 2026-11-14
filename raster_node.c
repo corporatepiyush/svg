@@ -65,11 +65,28 @@ int node_bbox_world(Node* n, Mat full_w, float out[4]) {
             float scale = ch->fontsize / 7.0f;
             float adv = 6.0f * scale + ch->letterspacing;
             float total = (float)strlen(ch->text) * adv;
+            float top = ch->y - 7.0f * scale;
+            float bottom = ch->y;
+            if (ch->font) {
+                /* Real font: the run's advance is the sum of the glyph
+                 * advances and the vertical extent comes from the font's
+                 * ascent and descent. */
+                total = 0.0f;
+                for (const char* q = ch->text; *q; q++) {
+                    int gid = font_face_glyph_index(ch->font, (unsigned char)*q);
+                    total += font_face_advance(ch->font, gid) * ch->fontsize +
+                             ch->letterspacing;
+                }
+                float asc = 0.8f, desc = -0.2f;
+                font_face_metrics(ch->font, &asc, &desc);
+                top = ch->y - asc * ch->fontsize;
+                bottom = ch->y - desc * ch->fontsize;
+            }
             float x = ch->x;
             if (ch->anchor == 1) x -= total * 0.5f;
             else if (ch->anchor == 2) x -= total;
-            Pt c[4] = { {x, ch->y - 7.0f * scale}, {x + total, ch->y - 7.0f * scale},
-                        {x + total, ch->y}, {x, ch->y} };
+            Pt c[4] = { {x, top}, {x + total, top},
+                        {x + total, bottom}, {x, bottom} };
             for (int i = 0; i < 4; i++) {
                 Pt q = mat_apply(full_w, c[i]);
                 if (q.x < out[0]) out[0] = q.x;

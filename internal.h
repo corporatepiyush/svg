@@ -223,6 +223,8 @@ typedef struct Paint {
     int    linear;              /* color-interpolation="linearRGB" */
 } Paint;
 
+typedef struct FontFace FontFace;
+
 /* One positioned run of text (a <text> or <tspan> fragment). */
 typedef struct {
     char*  text;
@@ -238,6 +240,7 @@ typedef struct {
     float  baseline;         /* dominant-baseline offset, em fractions */
     float* rot;              /* per-glyph rotation, degrees */
     int    nrot;
+    const FontFace* font;    /* real font, or NULL for the bitmap font */
     char*  path;             /* textPath data, or NULL */
     Path*  refpath;          /* textPath href="#id", resolved to geometry */
     char*  path_ref;         /* textPath href="#id", resolved later */
@@ -419,6 +422,8 @@ struct Node {
     float  img_x, img_y, img_w, img_h;
     unsigned char* img_px;    /* preloaded file image (PNG/JPEG), or NULL */
     int    img_iw, img_ih;
+    const FontFace* font;     /* borrowed font for this subtree, or NULL */
+    FontFace* font_owned;     /* set on the root node only: owns the face */
 
     /* <marker>: vertex marker (SVG 1.1 §11.6) */
     Node* marker_start, * marker_mid, * marker_end;
@@ -541,6 +546,7 @@ typedef struct Ctx {
     CssRule*    rules;           /* <style> rules, in document order     */
     int         nrules, caprules;
     const char* base_path;       /* for relative <image> references, or NULL */
+    const FontFace* font;        /* loaded font for this document, or NULL */
 } Ctx;
 
 Style  style_default(void);
@@ -556,6 +562,16 @@ int    style_get_decl(const char* decls, const char* key, char* out, size_t cap)
 int   color_parse(const char* s, Color* out);
 float length_parse(const char* s, float vw, float vh, float em, int axis, float def);
 float path_length(const Path* p);
+
+/* font_ttf.c */
+typedef struct { float* xy; int n, cap; int* cont; int nc, ccap; } PtList;
+FontFace* font_face_load(const char* path);
+void      font_face_free(FontFace* f);
+int       font_face_glyph_index(const FontFace* f, unsigned ch);
+float     font_face_advance(const FontFace* f, int gid);
+int       font_face_contours(const FontFace* f, int gid, float size,
+                             PtList* out, int* ncontours);
+float     font_face_metrics(const FontFace* f, float* ascent, float* descent);
 
 /* image_png.c / image_jpeg.c */
 unsigned char* png_decode_rgba(const unsigned char* d, size_t n,

@@ -75,6 +75,9 @@ typedef struct {
      * default) disables external file loading.  A relative base path is
      * resolved against the process working directory. */
     const char* base_path;
+    /* TrueType font file for text.  NULL (the default) uses the built-in 5x7
+     * bitmap font.  Loaded once per conversion and freed with the document. */
+    const char* font_path;
 } svg2img_options;
 
 /* Fill *out* with the built-in default limits.  Never fails. */

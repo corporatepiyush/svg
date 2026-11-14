@@ -16,6 +16,8 @@ void cli_usage(const char* prog) {
         "  -s, --scale F       Extra uniform scale factor (default 1.0)\n"
         "  -a, --aa N          Supersampling factor 1..8 (default 4)\n"
         "  -b, --background C  Background colour RRGGBB or RRGGBBAA\n"
+        "      --font FILE     TrueType font file for text\n"
+        "      --base-path DIR  Base directory for relative image files\n"
         "  -v, --verbose       Print progress information\n"
         "      --help          Show this help\n",
         SVG2IMG_VERSION, prog);
@@ -65,6 +67,12 @@ int cli_parse(int argc, char** argv, svg2img_options* opts,
                 cli_usage(argv[0]); return 2;
             }
             opts->has_background = 1;
+        } else if (!strcmp(a, "--font")) {
+            if (++i >= argc) { cli_usage(argv[0]); return 2; }
+            opts->font_path = argv[i];
+        } else if (!strcmp(a, "--base-path")) {
+            if (++i >= argc) { cli_usage(argv[0]); return 2; }
+            opts->base_path = argv[i];
         } else if (!strcmp(a, "-v") || !strcmp(a, "--verbose")) {
             opts->verbose = 1;
         } else if (!strcmp(a, "--help")) {
