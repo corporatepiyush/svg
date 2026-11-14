@@ -11,10 +11,11 @@ Everything is stdlib-only Python. No packages, no network.
 
 | path | what |
 |---|---|
-| `cases/*.svg` | 63 small self-contained documents, one per behaviour |
+| `cases/*.svg` | 85 small self-contained documents, one per behaviour |
 | `expectations.json` | per-case feature area, note, assertion list, `xfail` reasons |
 | `run.py` | the runner: render, assert, scorecard, JSON summary |
-| `measure.py` | dev helper: samples current output into an expectations file |
+| `verify_external.py` | samples every assertion from an independent renderer |
+| `measure.py` | dev helper: samples current output into an expectations file (never the oracle) |
 | `baseline/` | generated visual baselines (not committed) |
 
 ## Run it
@@ -84,18 +85,36 @@ python3 conformance/measure.py > /tmp/expectations.json
 
 ## Known gaps (xfail)
 
-These are confirmed conformance bugs, tracked here so they are measured rather
-than forgotten. Each names the responsible module.
+There are currently **none**. The three that used to be tracked here
+(`color_rgb_int`, `text_letterspacing`, `path_cubic_extent`) were real bugs and
+are fixed; each is now an ordinary case.
 
-1. `color_rgb_int` -- `rgb(0,128,0)` renders as pure green. `color.c
-   parse_rgb` treats every component as a 0..1 float; integers must be scaled
-   by 1/255.
-2. `text_letterspacing` -- `letter-spacing` is parsed into
-   `Style.letterspacing` but `svg_build.c` never copies it onto the node, so it
-   has no effect.
-3. `path_cubic_extent` -- high-curvature cubics are flattened too coarsely and
-   render visibly narrower than the true Bézier (Chrome and WebKit agree with
-   the analytic curve; this renderer does not).
+`path_cubic_extent` was a flattening bug, not a tolerance choice: the de
+Casteljau stack aliased its own slot, so the left half of every cubic was
+dropped. Fixing it made all 86 cases agree with Chrome.
+
+## Validating the expectations
+
+Expectations are written from the specification, but hand-written values can
+still be wrong. `verify_external.py` samples the exact coordinates of every
+`rgba`/`alpha` assertion from an independent renderer (Chrome, Inkscape or
+resvg) and compares them with the committed value:
+
+```sh
+python3 conformance/verify_external.py --backends chrome
+173 sampled assertion(s): 173 agree, 0 disagree, 5 skipped
+```
+
+Rules it enforces:
+
+- each case renders at its own `width`/`height`;
+- pixels the reference leaves partially covered are skipped (antialiasing
+  differs between rasterisers, so an edge pixel is not a conformance signal);
+- cases that must differ by design are listed in `external_intentional`
+  (currently `style_element`: there is no CSS engine).
+
+This check is what caught a miter join that asserted no ink where the spec
+requires the spike, and an `xfail` that was really a wrong expectation.
 
 ## Visual baseline (review aid)
 

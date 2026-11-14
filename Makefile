@@ -31,7 +31,7 @@ OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 TARGET = svg2img
 
-.PHONY: all clean test check strict conformance conformance-list baseline diff-external bench bench-update
+.PHONY: all clean test check strict strict-alloc conformance conformance-list baseline diff-external verify-external bench bench-update
 
 all: $(TARGET)
 
@@ -74,6 +74,12 @@ baseline: $(TARGET)
 diff-external: $(TARGET)
 	python3 fuzz/diff_external.py --bin ./$(TARGET)
 
+# Verify every conformance assertion against an independent renderer.  This is
+# the check that catches an expectation copied from our own output; it skips
+# cleanly when no external renderer is installed.
+verify-external: $(TARGET)
+	python3 conformance/verify_external.py --backends chrome,inkscape,resvg
+
 # Deterministic benchmark.  Informational by default; BENCH_CHECK=1 makes a
 # regression over threshold fail the target.
 bench: $(TARGET)
@@ -87,6 +93,11 @@ bench-update: $(TARGET)
 STRICT_CFLAGS = -std=c17 -O2 -Wall -Wextra -pedantic -Werror -Wconversion \
 	-Wsign-conversion -Wshadow -Wcast-qual -Wmissing-prototypes \
 	-Wold-style-definition -Wredundant-decls -Wwrite-strings
+
+# Strict build including the optional allocation-hook file.
+strict-alloc:
+	$(CC) $(STRICT_CFLAGS) -DSVG2IMG_ALLOC_HOOKS -I. -c -o /tmp/svg2img_strict_alloc.o svg_alloc.c
+	@echo "strict alloc build ok"
 
 strict:
 	@for f in $(SRCS); do \

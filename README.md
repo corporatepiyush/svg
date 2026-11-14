@@ -205,17 +205,18 @@ Private headers: `svg_internal.h`, `raster_internal.h`, `png_internal.h`.
 | Suite | What it checks |
 |---|---|
 | `test/check.py` | 40 exact RGBA checks over the sample corpus; PNG CRC/IHDR/IDAT validation |
-| `fuzz/regress.py` | 22 saved regression cases with pixel expectations |
+| `fuzz/regress.py` | 24 saved regression cases with pixel expectations |
 | `fuzz/difftest.py` | renderer invariants: fill rules, gradients, clips, opacity, transforms, viewBox |
 | `fuzz/semantic_cases.py` | pixel-oracle tests: 32 controls + 12 fixed-gap regressions, 0 xfail |
-| `conformance/` | 63 spec-derived cases across 13 feature areas, scorecard, baseline workflow |
+| `conformance/` | 85 spec-derived cases across 13 feature areas, scorecard, baseline workflow |
+| `conformance/verify_external.py` | validates every conformance assertion against an independent renderer |
 | `fuzz/diff_external.py` | differential testing against Chrome/Inkscape/resvg/WebKit |
 | `fuzz/alloc_fail.py`, `fuzz/limit_test.py` | allocation-failure injection and configurable resource-limit tests |
 | `fuzz/grammar_fuzz.py` | XML/reference/numeric grammar: DOCTYPE, CDATA, entities, use/symbol graphs, extreme numbers |
 | `fuzz/featurfuzz.py` | structure-aware feature documents (paths, gradients, dashes, use graphs) |
 | `fuzz/rawfuzz.py` | raw-byte / malformed-markup robustness |
 | `fuzz/resource_fuzz.py` | timeouts and unbounded work: use chains, dashes, wide/deep trees, huge text, large canvases |
-| `fuzz/leak_check.py` | leak regression under macOS `leaks` or Linux valgrind |
+| `fuzz/leak_check.py` | 16 leak cases under macOS `leaks` / Linux valgrind |
 | `make strict` | warning-clean build of every module |
 | `fuzz/docker/` | linux/amd64 strict build, pixel suite, regressions, invariants, semantic, resource, leak, sanitizers |
 
@@ -249,10 +250,23 @@ python3 fuzz/semantic_cases.py ./svg2img
 12 fixed, 32 controls, 0 gap cases: 0 unexpected failure(s), 0 xfail, 0 xpass
 ```
 
-`conformance/` adds 63 spec-derived cases across 13 feature areas (shapes,
+`conformance/` adds 85 spec-derived cases across 13 feature areas (shapes,
 paths, transforms, viewport, gradients, clip, opacity, use, text, units,
 colour, stroke, style), a feature scorecard, baseline capture/compare, and a
 perceptual diff with tolerance.
+
+Because the expectations are written by hand, they are only self-consistent
+until checked against something else.  `conformance/verify_external.py`
+samples every `rgba`/`alpha` assertion from an independent renderer and
+compares it with the committed value:
+
+```sh
+python3 conformance/verify_external.py --backends chrome
+173 sampled assertion(s): 173 agree, 0 disagree
+```
+
+That is the check that caught expectations copied from our own output, and
+what makes the scorecard meaningful.
 
 ### Remaining gaps / TODO
 

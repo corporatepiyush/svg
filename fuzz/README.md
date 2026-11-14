@@ -178,6 +178,49 @@ fixed, so `leak_check.py` reports 0 xfail and 0 xpass.
 
 Run `make leak` (macOS) or install `valgrind` (Linux).
 
+## Differential testing against an external renderer
+
+`diff_external.py` renders the conformance corpus with an installed browser or
+renderer (Chrome/Chromium/Brave/Edge, Inkscape, resvg, QuickLook) and compares
+it with our output.  It skips missing tools cleanly, so it is safe on any
+machine.
+
+```sh
+python3 fuzz/diff_external.py --list          # what is available
+python3 fuzz/diff_external.py --backends chrome
+```
+
+Only interiors are compared, with a per-channel tolerance and a budget on the
+fraction of differing pixels; antialiasing, colour management and font
+rasterisation differ between implementations, so edge pixels cannot be
+compared exactly.
+
+Current state: **86 cases, 0 mismatch groups** against Brave 157.
+
+### Verifying the expectations themselves
+
+`run.py` checks the corpus against *our* renderer using expectations written
+by hand.  That only proves self-consistency: an expectation copied from our
+own output passes while the renderer is wrong.  `verify_external.py` closes
+that hole by sampling the exact coordinates of every `rgba`/`alpha`
+assertion from an independent renderer and comparing them with the committed
+expectation.
+
+```sh
+python3 conformance/verify_external.py --backends chrome
+173 sampled assertion(s): 173 agree, 0 disagree, 5 skipped
+```
+
+It renders each case at its own `width`/`height` (the corpus mixes 100x100,
+200x100 and 200x200), skips pixels the reference leaves partially covered
+(antialiased edges), and reads `external_intentional` from
+`expectations.json` for cases that must differ by design (currently
+`style_element`: there is no CSS engine).
+
+This check has already caught three hand-written expectations that were
+wrong, including a miter join that asserted no ink where the spec requires
+the spike to be drawn.
+
 ## Differential testing against WebKit
 
 `refdiff.py` and `refdiff_rand.py` render documents with both this converter
@@ -191,8 +234,6 @@ gradients, clips, even-odd holes, rotations, `use`, `preserveAspectRatio`, and
 nested clips.  Known reference quirks (excluded from the random corpus):
 WebKit's radial `spreadMethod` with an off-centre focal point behaves like pad,
 and self-intersecting polygons can differ at edges.
-
-There is no Chrome-headless differential yet; that is a TODO.
 
 ## Regression corpus (`regress/`)
 
