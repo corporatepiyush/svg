@@ -252,7 +252,8 @@ enum {
                            * children are still traversed */
     NODE_PATTERNDEF = 8, /* <pattern>: tile definition, never painted directly */
     NODE_MASKDEF = 9,    /* <mask>: luminance mask, never painted directly */
-    NODE_MARKERDEF = 10  /* <marker>: vertex marker, never painted directly */
+    NODE_MARKERDEF = 10, /* <marker>: vertex marker, never painted directly */
+    NODE_IMAGE = 11      /* <image>: raster or embedded SVG image */
 };
 
 struct Node {
@@ -320,6 +321,10 @@ struct Node {
     float symbol_vb[4];     /* symbol viewBox (x,y,w,h) */
     int   symbol_vb_valid;
     int   symbol_par_none, symbol_par_slice, symbol_par_xa, symbol_par_ya;
+
+    /* <image>: href and placement (SVG 1.1 §5.6.4 / 12.2) */
+    char*  image_href;
+    float  img_x, img_y, img_w, img_h;
 
     /* <marker>: vertex marker (SVG 1.1 §11.6) */
     Node* marker_start, * marker_mid, * marker_end;
@@ -437,6 +442,10 @@ int    style_get_decl(const char* decls, const char* key, char* out, size_t cap)
 int   color_parse(const char* s, Color* out);
 float length_parse(const char* s, float vw, float vh, float em, int axis, float def);
 float path_length(const Path* p);
+
+/* image_png.c */
+unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
+                               int* out_w, int* out_h);
 
 /* ------------------------------------------------------------------ */
 /* Render tree building (svg_*.c)                                      */

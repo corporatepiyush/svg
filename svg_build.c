@@ -342,6 +342,16 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n = build_mask(ctx, xn);
     } else if (!strcmp(name, "marker")) {
         n = build_marker(ctx, xn);
+    } else if (!strcmp(name, "image")) {
+        n = svg_node_new(NODE_IMAGE);
+        if (!n) goto oom;
+        n->img_x = len_attr(ctx, xn, "x", 0, 0.0f);
+        n->img_y = len_attr(ctx, xn, "y", 1, 0.0f);
+        n->img_w = len_attr(ctx, xn, "width", 0, 0.0f);
+        n->img_h = len_attr(ctx, xn, "height", 1, 0.0f);
+        const char* ih = xml_attr(xn, "href");
+        if (!ih) ih = xml_attr(xn, "xlink:href");
+        if (ih) n->image_href = svg_strdup(ih);
     } else if (!strcmp(name, "clipPath")) {
         n = svg_node_new(NODE_CLIPDEF);
         if (!n) goto oom;

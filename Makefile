@@ -20,10 +20,10 @@ SRCS = \
 	raster_gradient.c raster_pattern.c \
 	raster_fill.c \
 	raster_stroke.c \
-	raster_shape.c \
+	raster_shape.c image_png.c \
 	raster_clip.c \
 	raster_text.c \
-	raster_node.c \
+	raster_node.c raster_image.c \
 	png_deflate.c png_write.c \
 	font.c cli.c main.c
 

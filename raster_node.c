@@ -316,6 +316,8 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
         render_shape(c, n, w, op, eff, aa);
     } else if (n->type == NODE_TEXT) {
         render_text(c, n, w, op, eff, aa);
+    } else if (n->type == NODE_IMAGE) {
+        render_image(c, n, w, op, eff, aa);
     }
     mask_free(own);
 }

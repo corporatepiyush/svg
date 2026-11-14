@@ -3070,6 +3070,92 @@
           "min": 30
         }
       ]
+    },
+    {
+      "name": "image_png_data",
+      "area": "images",
+      "note": "A data:image/png image is decoded and scaled into its viewport: the 2x2 source shows four quadrants in a 40x40 box.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 15,
+          "y": 15,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 35,
+          "y": 15,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 15,
+          "y": 35,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 35,
+          "y": 35,
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "image_svg_data",
+      "area": "images",
+      "note": "A data:image/svg+xml image is parsed and rendered into its viewport, so an embedded SVG behaves like an image.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 65,
+          "y": 15,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 45,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 55,
+          "y": 5,
+          "max": 8
+        }
+      ]
     }
   ],
   "external_intentional": []

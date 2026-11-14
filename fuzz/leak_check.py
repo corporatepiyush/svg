@@ -85,6 +85,11 @@ CASES = [
     ("tspan_chunks", svg('<text x="5" y="20" font-size="10">AB'
                          '<tspan x="40" fill="red">CD</tspan>'
                          '<tspan dx="3" dy="-2" fill="blue">EF</tspan></text>'), None),
+    # A data-URI image decodes into temporary buffers that must be freed.
+    ("image_data_png", svg('<image x="0" y="0" width="8" height="8"'
+                           ' href="data:image/png;base64,'
+                           'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ'
+                           'AAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="/>'), None),
 ]
 
 

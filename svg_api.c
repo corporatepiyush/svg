@@ -21,6 +21,7 @@ void svg_free(Node* n) {
     free(n->id);
     free(n->clip_ref);
     free(n->mask_ref);
+    free(n->image_href);
     free(n->marker_start_ref);
     free(n->marker_mid_ref);
     free(n->marker_end_ref);
@@ -41,6 +42,7 @@ void svg_free_detached(Node* n, IdMap* ids) {
     free(n->stroke.stops); free(n->stroke.ref);
     free(n->dash); free(n->text); free(n->id); free(n->clip_ref);
     free(n->mask_ref);
+    free(n->image_href);
     free(n->marker_start_ref);
     free(n->marker_mid_ref);
     free(n->marker_end_ref); free(n->use_ref);

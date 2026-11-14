@@ -72,6 +72,8 @@ Path* build_stroke(const Path* path, float w, int cap, int join,
 
 void render_shape(Canvas* c, Node* n, Mat world, float opacity,
                   Mask* clip, int aa);
+void render_image(Canvas* c, Node* n, Mat world, float opacity,
+                  Mask* clip, int aa);
 void render_text(Canvas* c, Node* n, Mat world, float opacity,
                  Mask* clip, int aa);
 
