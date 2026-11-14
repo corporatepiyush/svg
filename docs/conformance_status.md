@@ -13,13 +13,22 @@ Appendix M. Test suite: the W3C SVG 1.1 test suite (525 accepted tests).
 |---|---|
 | Elements instantiated | **25 / 80** (31%) |
 | Presentation attributes honoured | **24 / 59** (41%) |
-| Official W3C tests matching Chrome | **261 / 512 comparable** (51%) |
-| Text-only tests (not comparable) | 13 |
-| Conformance corpus (hand-written) | 85 / 85 |
+| Official suite, before the feature batches | **261 / 512 comparable** (51%) |
+| Official suite, implemented-area subset, after | **111 / 170 comparable** (65%) |
+| Text-only tests (not comparable) | 13 full / 2 subset |
+| Conformance corpus (hand-written) | 101 / 101 |
 
 The official-suite number is the honest one: it is measured against an
 independent implementation of the same specification, not against our own
 output.
+
+The two suite rows are not directly comparable: the first is the whole suite,
+the second is a 172-test subset chosen from the chapters the later batches
+implemented (shapes, paths, structure, gradients, masking, styling, text,
+linking, coordinates).  A full re-run is expensive here — each test launches a
+headless browser and several tests never exit — so the subset is the current
+signal, not a new full-suite figure.  Re-run the full suite on a quieter
+machine to refresh the first row.
 
 ## How the official suite is measured
 
@@ -45,7 +54,7 @@ compares the two images.
 python3 conformance/w3c_chrome.py --json /tmp/w3c.json
 ```
 
-## Result by specification chapter
+## Result by specification chapter (before the feature batches)
 
 | spec chapter | tests | comparable | pass | rate |
 |---|---:|---:|---:|---:|

@@ -134,8 +134,10 @@ renderer has a bitmap font, so glyphs cannot match), and reports the pass rate
 per specification chapter. Text-only tests are reported separately rather than
 counted as passes.
 
-Current result: **261 of 512 comparable tests match Chrome** (51%). The full
-breakdown and the list of what is missing are in
+Current result: **261 of 512 comparable tests match Chrome** (51%) before the
+feature batches; after them, a 172-test subset of the implemented chapters
+matches 111 of 170 comparable tests (65%). The full breakdown and the list of
+what is missing are in
 [`docs/conformance_status.md`](../docs/conformance_status.md).
 
 The suite's own reference PNGs are not used: they come from a renderer whose
