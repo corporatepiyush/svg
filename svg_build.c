@@ -327,6 +327,8 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     } else if (!strcmp(name, "radialGradient")) {
         n = build_gradient(ctx, xn, 1);
         if (!n) goto oom;
+    } else if (!strcmp(name, "pattern")) {
+        n = build_pattern(ctx, xn);
     } else if (!strcmp(name, "clipPath")) {
         n = svg_node_new(NODE_CLIPDEF);
         if (!n) goto oom;

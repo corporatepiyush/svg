@@ -33,6 +33,7 @@ Path* path_from_points_lim(const char* s, int close, const svg2img_limits* lim,
 Path* path_parse_lim(const char* d, const svg2img_limits* lim, int* limit_hit);
 
 Node* build_gradient(Ctx* ctx, const XMLNode* xn, int radial);
+Node* build_pattern(Ctx* ctx, const XMLNode* xn);
 int   parse_stops(const XMLNode* xn, Paint* p, int max_stops);
 char* gather_text(const XMLNode* xn, int max_len, int* limit_hit);
 

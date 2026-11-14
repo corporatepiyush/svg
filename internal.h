@@ -175,7 +175,8 @@ enum {
     PAINT_LINEAR = 2,
     PAINT_RADIAL = 3,
     PAINT_CURRENT_COLOR = 4,
-    PAINT_REF = 5
+    PAINT_REF = 5,
+    PAINT_PATTERN = 6
 };
 
 enum { UNITS_BBOX = 0, UNITS_USER = 1 };
@@ -216,8 +217,9 @@ typedef struct Paint {
     Stop*  stops;
     int    nstops;
     int    spread;
-    Mat    tm;                  /* gradientTransform */
+    Mat    tm;                  /* gradientTransform / patternTransform */
     char*  ref;                 /* referenced element id, without '#' */
+    void*  pat;                 /* NODE_PATTERNDEF, when type == PAINT_PATTERN */
 } Paint;
 
 /* ------------------------------------------------------------------ */
@@ -236,8 +238,9 @@ enum {
     NODE_GRADDEF = 4,
     NODE_IGNORE = 5,
     NODE_SYMBOL = 6,      /* <symbol>: never drawn directly, only via <use> */
-    NODE_TRANSPARENT = 7  /* unsupported element: no rendering, but its known
+    NODE_TRANSPARENT = 7, /* unsupported element: no rendering, but its known
                            * children are still traversed */
+    NODE_PATTERNDEF = 8  /* <pattern>: tile definition, never painted directly */
 };
 
 struct Node {
@@ -302,6 +305,14 @@ struct Node {
     float symbol_vb[4];     /* symbol viewBox (x,y,w,h) */
     int   symbol_vb_valid;
     int   symbol_par_none, symbol_par_slice, symbol_par_xa, symbol_par_ya;
+
+    /* <pattern>: tile definition (SVG 1.1 §13.3) */
+    int   pat_units;          /* UNITS_USER / UNITS_BBOX */
+    int   pat_content_units;
+    float pat_x, pat_y, pat_w, pat_h;
+    Mat   pat_tm;
+    float pat_vb[4]; int pat_vb_valid;
+    int   pat_par_none, pat_par_slice, pat_par_xa, pat_par_ya;
 };
 
 struct Canvas { int w, h; float* px; };   /* RGBA, straight alpha */

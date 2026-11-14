@@ -42,6 +42,26 @@ typedef struct {
 void  grad_build(Grad* g, const Paint* p, const float bbox[4], Mat world);
 Color grad_eval(const Grad* g, float x, float y);
 
+/* <pattern> tiles: rendered once per fill, then sampled per pixel. */
+typedef struct {
+    int   ok;
+    int   w, h;             /* tile size in pixels */
+    float* px;              /* RGBA, straight alpha */
+    float ox, oy;           /* tile origin in the referencing user space */
+    float tw, th;           /* tile size in user units */
+    float scale;            /* device pixels per user unit */
+    Mat   inv;              /* device -> user */
+    Mat   inv_pt;           /* user -> pattern space (patternTransform) */
+    int   has_inv;
+    int   use_pt;
+} Pattern;
+
+int   pattern_build(Pattern* out, const void* patnode, const float bbox[4],
+                    Mat world, int aa);
+Color pattern_eval(const Pattern* p, float x, float y);
+void  pattern_free(Pattern* p);
+void  render_subtree(Canvas* c, const Node* n, Mat world, int aa);
+
 void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                float opacity, const Mask* clip, const float bounds[4],
                const float grad_bbox[4], int aa, Mat world);

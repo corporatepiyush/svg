@@ -135,7 +135,7 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                       const float grad_bbox[4], int aa, Mat world) {
     if (!path || path->n == 0 || opacity <= 0.0f) return;
     if (paint->type != PAINT_COLOR && paint->type != PAINT_LINEAR &&
-        paint->type != PAINT_RADIAL) return;
+        paint->type != PAINT_RADIAL && paint->type != PAINT_PATTERN) return;
 
     int x0 = svg_f2i(floorf(bounds[0]), -1, c->w + 1, 0);
     int y0 = svg_f2i(floorf(bounds[1]), -1, c->h + 1, 0);
@@ -153,13 +153,18 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
         grad_build(&grad, paint, grad_bbox ? grad_bbox : bounds, world);
         has_grad = 1;
     }
+    Pattern pat;
+    int has_pat = 0;
+    if (paint->type == PAINT_PATTERN && paint->pat)
+        has_pat = pattern_build(&pat, paint->pat, bounds, world, aa);
+    int has_shader = has_grad || has_pat;
     Color solid = paint->color;
 
     /* Fully opaque solid fill at aa=1: coverage is binary, so a covered run
      * can be stored straight into the canvas without touching the coverage
      * buffer or running the blender.  This is the common case for thin
      * strokes and flat fills. */
-    const int direct = (aa == 1 && !has_grad && !clip &&
+    const int direct = (aa == 1 && !has_shader && !clip &&
                         solid.a * opacity >= 0.999f);
 
     Edge* edges = NULL;
@@ -337,7 +342,7 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
         int b_hi = touched_hi > touched_lo ? touched_hi : x0;
         int b_len = b_hi - b_lo;
 
-        if (!has_grad && !clip && b_len > 0) {
+        if (!has_shader && !clip && b_len > 0) {
             float k = solid.a * opacity;
             if (k >= 0.999f) {
                 blend_row_const(c, b_lo, py, b_len, solid, cov + (b_lo - x0));
@@ -346,15 +351,19 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                 for (int p = 0; p < b_len; p++) alpha_row[p] = src[p] * k;
                 blend_row_const(c, b_lo, py, b_len, solid, alpha_row);
             }
-        } else if (b_len > 0 && has_grad && !clip) {
-            /* Gradient, no clip: the per-pixel test is only coverage. */
+        } else if (b_len > 0 && has_shader && !clip) {
+            /* Gradient or pattern, no clip: the per-pixel test is only
+             * coverage. */
             for (int px = b_lo; px < b_hi; px++) {
                 float cv = cov[px - x0];
                 if (cv <= 0.0f) continue;
-                Color col = grad_eval(&grad, (float)px + 0.5f, (float)py + 0.5f);
+                Color col = has_pat ? pattern_eval(&pat, (float)px + 0.5f,
+                                                    (float)py + 0.5f)
+                                    : grad_eval(&grad, (float)px + 0.5f,
+                                                (float)py + 0.5f);
                 blend(c, px, py, col, col.a * opacity * cv);
             }
-        } else if (b_len > 0 && !has_grad) {
+        } else if (b_len > 0 && !has_shader) {
             /* Solid colour, clipped: one mask lookup per pixel. */
             for (int px = b_lo; px < b_hi; px++) {
                 float cv = cov[px - x0] * mask_get(clip, px, py);
@@ -362,7 +371,7 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                 blend(c, px, py, solid, solid.a * opacity * cv);
             }
         } else if (b_len > 0) {
-            /* Gradient and clip. */
+            /* Gradient or pattern, clipped. */
             for (int px = b_lo; px < b_hi; px++) {
                 float cv = cov[px - x0];
                 if (cv <= 0.0f) continue;
@@ -370,7 +379,10 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                 if (m <= 0.0f) continue;
                 cv *= m;
                 if (cv <= 0.0f) continue;
-                Color col = grad_eval(&grad, (float)px + 0.5f, (float)py + 0.5f);
+                Color col = has_pat ? pattern_eval(&pat, (float)px + 0.5f,
+                                                    (float)py + 0.5f)
+                                    : grad_eval(&grad, (float)px + 0.5f,
+                                                (float)py + 0.5f);
                 blend(c, px, py, col, col.a * opacity * cv);
             }
         }
@@ -381,4 +393,5 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
 
     free(edges);
     free(arena);
+    if (has_pat) pattern_free(&pat);
 }

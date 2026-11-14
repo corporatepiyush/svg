@@ -183,7 +183,8 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
      * only ever rendered through a <use> clone (which is retagged NODE_GROUP),
      * so a symbol left in the tree paints nothing. */
     if (!n || n->hidden_subtree || n->type == NODE_SYMBOL ||
-        n->type == NODE_IGNORE) return;
+        n->type == NODE_IGNORE || n->type == NODE_PATTERNDEF ||
+        n->type == NODE_GRADDEF || n->type == NODE_CLIPDEF) return;
     /* visibility:hidden suppresses this element's own painting but is
      * inherited per element, so a descendant that sets visibility:visible is
      * still drawn: traversal continues, only the painting is skipped.  The
@@ -271,6 +272,18 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
         render_text(c, n, w, op, eff, aa);
     }
     mask_free(own);
+}
+
+/* Render a node's children into an existing canvas (used by <pattern> tiles).
+ * The node itself is a definition, so only its children are drawn. */
+void render_subtree(Canvas* c, const Node* n, Mat world, int aa) {
+    if (!c || !n) return;
+    RenderState st;
+    st.lim = NULL;
+    st.layers = 0;
+    st.clips = 0;
+    for (int i = 0; i < n->nkids; i++)
+        render_node(c, n->kids[i], world, 1.0f, NULL, aa, &st);
 }
 
 void render_document(Canvas* c, Node* root, Mat view_tm,

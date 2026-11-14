@@ -25,7 +25,11 @@ static void resolve_paint_refs(Node* n, IdMap* ids) {
         Paint* p = (k == 0) ? &n->fill : &n->stroke;
         if (p->type == PAINT_REF && p->ref) {
             Node* g = idmap_get(ids, p->ref);
-            if (g && g->type == NODE_GRADDEF && g->fill.nstops > 0) {
+            if (g && g->type == NODE_PATTERNDEF && g->pat_w > 0.0f && g->pat_h > 0.0f) {
+                free(p->stops); p->stops = NULL; p->nstops = 0;
+                p->type = PAINT_PATTERN;
+                p->pat = g;
+            } else if (g && g->type == NODE_GRADDEF && g->fill.nstops > 0) {
                 paint_copy(p, &g->fill);
             } else {
                 free(p->stops); p->stops = NULL; p->nstops = 0;
@@ -372,8 +376,48 @@ static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
     return used;
 }
 
+/* Copy the attributes a pattern inherits from the pattern it references.
+ * Chains are possible, so iterate a bounded number of rounds. */
+static int pattern_href_pending(Node* n) {
+    return n->type == NODE_PATTERNDEF && n->fill.ref &&
+           !(n->pat_w > 0.0f) && !(n->pat_h > 0.0f);
+}
+
+static int pattern_hrefs_pending(Node* n) {
+    if (!n) return 0;
+    if (pattern_href_pending(n)) return 1;
+    for (int i = 0; i < n->nkids; i++)
+        if (pattern_hrefs_pending(n->kids[i])) return 1;
+    return 0;
+}
+
+static void resolve_pattern_hrefs_once(Node* n, IdMap* ids) {
+    if (!n) return;
+    if (pattern_href_pending(n)) {
+        Node* t = idmap_get(ids, n->fill.ref);
+        if (t && t->type == NODE_PATTERNDEF && t != n && t->pat_w > 0.0f) {
+            n->pat_units = t->pat_units;
+            n->pat_content_units = t->pat_content_units;
+            n->pat_x = t->pat_x; n->pat_y = t->pat_y;
+            n->pat_w = t->pat_w; n->pat_h = t->pat_h;
+            n->pat_tm = t->pat_tm;
+            if (t->pat_vb_valid) {
+                for (int i = 0; i < 4; i++) n->pat_vb[i] = t->pat_vb[i];
+                n->pat_vb_valid = 1;
+            }
+            n->pat_par_none = t->pat_par_none;
+            n->pat_par_slice = t->pat_par_slice;
+            n->pat_par_xa = t->pat_par_xa;
+            n->pat_par_ya = t->pat_par_ya;
+        }
+    }
+    for (int i = 0; i < n->nkids; i++) resolve_pattern_hrefs_once(n->kids[i], ids);
+}
+
 int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
     if (!n) return 0;
+    for (int pass = 0; pass < 8 && pattern_hrefs_pending(n); pass++)
+        resolve_pattern_hrefs_once(n, ids);
     resolve_gradient_hrefs(n, ids, 64);
     resolve_paint_refs(n, ids);
     resolve_clip_refs(n, ids);

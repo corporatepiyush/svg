@@ -53,6 +53,14 @@ CASES = [
                              '<rect x="6" width="4" height="4"/></g></defs>'
                              '<use href="#g" stroke="black" stroke-width="2"'
                              ' stroke-dasharray="4 2 1"/>'), None),
+    # A pattern tile is allocated for every fill and must be released; fill
+    # and stroke of the same shape allocate two.
+    ("pattern_fill_stroke", svg('<defs><pattern id="p" width="4" height="4"'
+                                ' patternUnits="userSpaceOnUse">'
+                                '<rect width="4" height="4" fill="red"/></pattern>'
+                                '</defs>'
+                                '<rect width="20" height="20" fill="url(#p)"'
+                                ' stroke="url(#p)" stroke-width="2"/>'), None),
 ]
 
 

@@ -11,13 +11,13 @@ SRCS = \
 	xml_parse.c xml_dom.c \
 	path_parse.c path_util.c \
 	color.c length.c \
-	svg_idmap.c svg_transform.c svg_geometry.c svg_gradient.c \
+	svg_idmap.c svg_transform.c svg_geometry.c svg_gradient.c svg_pattern.c \
 	svg_text.c svg_style.c svg_build.c svg_refs.c svg_viewport.c svg_api.c svg_alloc.c \
 	raster_util.c \
 	raster_canvas.c \
 	raster_blend.c \
 	raster_mask.c \
-	raster_gradient.c \
+	raster_gradient.c raster_pattern.c \
 	raster_fill.c \
 	raster_stroke.c \
 	raster_shape.c \
