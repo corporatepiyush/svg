@@ -107,6 +107,29 @@ static int build_edges(const Path* path, Edge** out) {
     return k;
 }
 
+/* Add the coverage of one horizontal run of sub-pixel samples [s0, s1) to
+ * the coverage row.  A pixel is fully covered only when the run covers all
+ * `aa` of its sample columns.  Spreading a run over the pixels it merely
+ * touches (the previous behaviour) made a run that ended mid-pixel cover
+ * that pixel completely, which dilated every antialiased edge by up to one
+ * pixel: a 1-unit vertical stroke at an integer coordinate rendered two
+ * pixels wide instead of one. */
+static void add_run(float* cov, int x0, int s0, int s1, int aa) {
+    if (s1 <= s0) return;
+    float* row = cov - x0;                 /* index by absolute pixel */
+    const float k = 1.0f / (float)(aa * aa);
+    const float full = (float)aa * k;      /* a fully covered pixel */
+    int first = s0 / aa;
+    int last = (s1 - 1) / aa;
+    if (first == last) {
+        row[first] += (float)(s1 - s0) * k;
+        return;
+    }
+    row[first] += (float)((first + 1) * aa - s0) * k;
+    for (int p = first + 1; p < last; p++) row[p] += full;
+    row[last] += (float)(s1 - last * aa) * k;
+}
+
 void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                       float opacity, const Mask* clip, const float bounds[4],
                       const float grad_bbox[4], int aa, Mat world) {
@@ -271,9 +294,7 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                                 d[p * 4 + 3] = 1.0f;
                             }
                         } else {
-                            float* dst = cov + (p0 - x0);
-                            int cnt = p1 - p0;
-                            for (int p = 0; p < cnt; p++) dst[p] += invaa;
+                            add_run(cov, x0, run_start, sx, aa);
                         }
                     }
                     run_start = sx;
@@ -301,9 +322,7 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                             d[p * 4 + 3] = 1.0f;
                         }
                     } else {
-                        float* dst = cov + (p0 - x0);
-                        int cnt = p1 - p0;
-                        for (int p = 0; p < cnt; p++) dst[p] += invaa;
+                        add_run(cov, x0, run_start, sx_hi, aa);
                     }
                 }
             }

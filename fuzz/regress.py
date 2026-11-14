@@ -115,6 +115,21 @@ EXPECT = {
     # map must drop it, otherwise a later <use href="#id"> reads freed memory.
     # The reference is dropped safely (nothing renders, no crash).
     "use_child_id.svg": [((50, 50), (0, 0, 0, 0))],
+    # Antialiasing: a horizontal run must only cover the pixels its samples
+    # fall in.  Spreading a run over whole pixels made a 1-unit stroke at an
+    # integer coordinate render two pixels wide (255/255 instead of 128/128).
+    "aa_thin_stroke.svg": [((29, 50), (0, 0, 0, 128)),
+                           ((30, 50), (0, 0, 0, 128)),
+                           ((68, 50), (0, 0, 0, 128)),
+                           ((69, 50), (0, 0, 0, 255)),
+                           ((70, 50), (0, 0, 0, 255)),
+                           ((71, 50), (0, 0, 0, 128))],
+    # The same bug over-covered diagonal edges: the hypotenuse pixel is 6/16
+    # covered at aa=4 (the true area is 1/2; 4x4 sampling quantises to 0.375).
+    "aa_diagonal.svg": [((78, 20), (0, 0, 0, 255)),
+                        ((79, 20), (0, 0, 0, 96)),
+                        ((48, 50), (0, 0, 0, 255)),
+                        ((49, 50), (0, 0, 0, 96))],
 }
 
 

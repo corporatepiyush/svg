@@ -551,7 +551,7 @@
     {
       "name": "transform_rotate",
       "area": "transforms",
-      "note": "rotate(45 50 50) spins the 20x20 rect about its own centre",
+      "note": "rotate(45 50 50) spins the 20x20 rect about its own centre. The rotated square has half-diagonal 14.14, so its top apex is at y=35.86: row 36 is the antialiased tip, row 38 is inside, row 34 is outside.",
       "checks": [
         {
           "kind": "rgba",
@@ -567,13 +567,20 @@
         {
           "kind": "rgba",
           "x": 50,
-          "y": 36,
+          "y": 38,
           "rgba": [
             255,
             0,
             0,
             255
           ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 36,
+          "min": 100,
+          "max": 200
         },
         {
           "kind": "alpha",
@@ -1289,7 +1296,7 @@
     {
       "name": "text_fontsize",
       "area": "text",
-      "note": "font-size scales the glyphs: the 36px line paints far more ink than the 12px line",
+      "note": "font-size scales the glyphs: the 36px line paints far more ink than the 12px line (the bitmap font has no hinting, so the small line is thin).",
       "checks": [
         {
           "kind": "ink",
@@ -1297,7 +1304,7 @@
           "y": 28,
           "w": 60,
           "h": 14,
-          "min": 60,
+          "min": 30,
           "rgb_max": 60
         },
         {
@@ -1698,7 +1705,7 @@
           "y": 16,
           "w": 9,
           "h": 3,
-          "min": 8,
+          "min": 4,
           "rgb_max": 60
         },
         {
@@ -1860,28 +1867,28 @@
       "checks": [
         {
           "kind": "ink",
-          "x": 35,
-          "y": 29,
-          "w": 5,
-          "h": 3,
+          "x": 33,
+          "y": 27,
+          "w": 9,
+          "h": 7,
           "min": 3,
           "rgb_max": 60
         },
         {
           "kind": "ink",
-          "x": 14,
-          "y": 49,
-          "w": 5,
-          "h": 3,
+          "x": 12,
+          "y": 47,
+          "w": 9,
+          "h": 7,
           "min": 3,
           "rgb_max": 60
         },
         {
           "kind": "ink",
-          "x": 8,
-          "y": 69,
-          "w": 5,
-          "h": 3,
+          "x": 6,
+          "y": 67,
+          "w": 9,
+          "h": 7,
           "min": 3,
           "rgb_max": 60
         }

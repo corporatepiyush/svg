@@ -218,6 +218,21 @@ static void use_inherit_paint(Paint* dst, const Paint* src, unsigned spec_bit,
     *dst_spec |= spec_bit;
 }
 
+/* Deep-copy a dash list (the array is owned per node). */
+static void dash_inherit(Node* n, const Node* parent) {
+    free(n->dash);
+    n->dash = NULL;
+    n->ndash = 0;
+    if (parent->dash && parent->ndash > 0) {
+        n->dash = (float*)svg_malloc(sizeof(float) * (size_t)parent->ndash);
+        if (n->dash) {
+            memcpy(n->dash, parent->dash, sizeof(float) * (size_t)parent->ndash);
+            n->ndash = parent->ndash;
+        }
+    }
+    n->dashoff = parent->dashoff;
+}
+
 /* Propagate already-resolved inherited values into a shadow-tree descendant
  * that did not specify the property itself.  Descendants inherit from their
  * shadow-tree parent, not directly from the use element: a target that sets
@@ -227,12 +242,22 @@ static void use_apply_child(Node* n, const Node* parent) {
     if (!n || !parent) return;
     if (!(n->spec & SPEC_FILL))   paint_inherit_copy(&n->fill, &parent->fill);
     if (!(n->spec & SPEC_STROKE)) paint_inherit_copy(&n->stroke, &parent->stroke);
-    if (!(n->spec & SPEC_FONT_SIZE))   n->fontsize = parent->fontsize;
-    if (!(n->spec & SPEC_FONT_WEIGHT)) n->bold = parent->bold;
-    if (!(n->spec & SPEC_FONT_STYLE))  n->italic = parent->italic;
-    if (!(n->spec & SPEC_TEXT_ANCHOR)) n->anchor = parent->anchor;
-    if (!(n->spec & SPEC_LETTER_SP))   n->letterspacing = parent->letterspacing;
-    if (!(n->spec & SPEC_VISIBILITY))  n->visible = parent->visible;
+    if (!(n->spec & SPEC_FONT_SIZE))     n->fontsize = parent->fontsize;
+    if (!(n->spec & SPEC_FONT_WEIGHT))   n->bold = parent->bold;
+    if (!(n->spec & SPEC_FONT_STYLE))    n->italic = parent->italic;
+    if (!(n->spec & SPEC_TEXT_ANCHOR))   n->anchor = parent->anchor;
+    if (!(n->spec & SPEC_LETTER_SP))     n->letterspacing = parent->letterspacing;
+    if (!(n->spec & SPEC_VISIBILITY))    n->visible = parent->visible;
+    if (!(n->spec & SPEC_STROKE_WIDTH))  n->sw = parent->sw;
+    if (!(n->spec & SPEC_LINECAP))       n->linecap = parent->linecap;
+    if (!(n->spec & SPEC_LINEJOIN))      n->linejoin = parent->linejoin;
+    if (!(n->spec & SPEC_MITERLIMIT))    n->miterlimit = parent->miterlimit;
+    if (!(n->spec & SPEC_FILL_RULE))     n->fillrule = parent->fillrule;
+    if (!(n->spec & SPEC_CLIP_RULE))     n->clip_rule = parent->clip_rule;
+    if (!(n->spec & SPEC_FILL_OPACITY))  n->fillop = parent->fillop;
+    if (!(n->spec & SPEC_STROKE_OPACITY)) n->strokeop = parent->strokeop;
+    if (!(n->spec & SPEC_DASH))          dash_inherit(n, parent);
+    if (!(n->spec & SPEC_DASH_OFFSET))   n->dashoff = parent->dashoff;
     for (int i = 0; i < n->nkids; i++) use_apply_child(n->kids[i], n);
 }
 
@@ -243,19 +268,25 @@ static void use_apply_style(Node* n, const Node* use) {
 
     /* SVG 1.1 §5.6: the use element's inherited properties supply any the
      * referenced root did not set.  Only the root takes values from the use
-     * site; descendants inherit within the shadow tree. */
-    if (!(n->spec & SPEC_FONT_SIZE) && (use->spec & SPEC_FONT_SIZE))
-        n->fontsize = use->fontsize;
-    if (!(n->spec & SPEC_FONT_WEIGHT) && (use->spec & SPEC_FONT_WEIGHT))
-        n->bold = use->bold;
-    if (!(n->spec & SPEC_FONT_STYLE) && (use->spec & SPEC_FONT_STYLE))
-        n->italic = use->italic;
-    if (!(n->spec & SPEC_TEXT_ANCHOR) && (use->spec & SPEC_TEXT_ANCHOR))
-        n->anchor = use->anchor;
-    if (!(n->spec & SPEC_LETTER_SP) && (use->spec & SPEC_LETTER_SP))
-        n->letterspacing = use->letterspacing;
-    if (!(n->spec & SPEC_VISIBILITY) && (use->spec & SPEC_VISIBILITY))
-        n->visible = use->visible;
+     * site; descendants inherit within the shadow tree.  The use element's
+     * *computed* value is what inherits, whether the use specified it or
+     * inherited it from its own parent. */
+    if (!(n->spec & SPEC_FONT_SIZE))      n->fontsize = use->fontsize;
+    if (!(n->spec & SPEC_FONT_WEIGHT))    n->bold = use->bold;
+    if (!(n->spec & SPEC_FONT_STYLE))     n->italic = use->italic;
+    if (!(n->spec & SPEC_TEXT_ANCHOR))    n->anchor = use->anchor;
+    if (!(n->spec & SPEC_LETTER_SP))      n->letterspacing = use->letterspacing;
+    if (!(n->spec & SPEC_VISIBILITY))     n->visible = use->visible;
+    if (!(n->spec & SPEC_STROKE_WIDTH))   n->sw = use->sw;
+    if (!(n->spec & SPEC_LINECAP))        n->linecap = use->linecap;
+    if (!(n->spec & SPEC_LINEJOIN))       n->linejoin = use->linejoin;
+    if (!(n->spec & SPEC_MITERLIMIT))     n->miterlimit = use->miterlimit;
+    if (!(n->spec & SPEC_FILL_RULE))      n->fillrule = use->fillrule;
+    if (!(n->spec & SPEC_CLIP_RULE))      n->clip_rule = use->clip_rule;
+    if (!(n->spec & SPEC_FILL_OPACITY))   n->fillop = use->fillop;
+    if (!(n->spec & SPEC_STROKE_OPACITY)) n->strokeop = use->strokeop;
+    if (!(n->spec & SPEC_DASH))           dash_inherit(n, use);
+    if (!(n->spec & SPEC_DASH_OFFSET))    n->dashoff = use->dashoff;
 
     for (int i = 0; i < n->nkids; i++) use_apply_child(n->kids[i], n);
 }

@@ -99,7 +99,7 @@ FIXED_CASES = [
     # --- Z followed by numbers starts a new subpath (SVG 1.1 §8.3) ---
     case("z_then_implicit_lineto",
          '<path d="M10,10 L60,10 L60,60 Z 100,10 L150,10 L150,60" fill="red"/>',
-         [expect_red_at(35, 35), expect_red_at(125, 35)],
+         [expect_red_at(45, 35), expect_red_at(135, 35)],
          w=200, h=100),
     # --- use shadow-tree style inheritance (SVG 1.1 §5.6) ---
     case("use_style_inherit",
@@ -180,7 +180,7 @@ CASES = []
 CONTROLS = [
     case("closed_path_fill",
          '<path d="M10,10 L60,10 L60,60 Z" fill="red"/>',
-         [expect_red_at(35, 35)]),
+         [expect_red_at(45, 35)]),
     case("polygon_fill",
          '<polygon points="10,10 90,10 50,90" fill="red"/>',
          [expect_red_at(50, 40)]),
@@ -244,7 +244,7 @@ CONTROLS = [
     # the new subpath's start point, not the old subpath's.
     case("z_then_relative_lineto",
          '<path d="M10,10 L40,10 L40,40 Z 100,10 l30,0 l0,30" fill="red"/>',
-         [expect_red_at(25, 25), expect_red_at(115, 25)],
+         [expect_red_at(35, 25), expect_red_at(125, 25)],
          w=200, h=100),
     # <use> of a <symbol> supplies the use site's fill to a symbol child that
     # did not set one.

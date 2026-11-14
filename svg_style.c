@@ -172,16 +172,21 @@ static void apply_one(void* ud, const char* k, const char* v) {
             else st->stroke.type = PAINT_NONE;
         }
     } else if (!strcmp(k, "stroke-width")) {
+        st->spec |= SPEC_STROKE_WIDTH;
         st->stroke_width = length_parse(v, ctx->vw, ctx->vh, ctx->em, 2, 1.0f);
         if (st->stroke_width < 0.0f) st->stroke_width = 0.0f;
     } else if (!strcmp(k, "stroke-linecap")) {
+        st->spec |= SPEC_LINECAP;
         st->linecap = !strcmp(v, "round") ? 1 : !strcmp(v, "square") ? 2 : 0;
     } else if (!strcmp(k, "stroke-linejoin")) {
+        st->spec |= SPEC_LINEJOIN;
         st->linejoin = !strcmp(v, "round") ? 1 : !strcmp(v, "bevel") ? 2 : 0;
     } else if (!strcmp(k, "stroke-miterlimit")) {
+        st->spec |= SPEC_MITERLIMIT;
         float f = strtof(v, NULL);
         st->miterlimit = f < 1.0f ? 1.0f : f;
     } else if (!strcmp(k, "stroke-dasharray")) {
+        st->spec |= SPEC_DASH;
         free(st->dash);
         st->dash = NULL;
         st->ndash = 0;
@@ -204,15 +209,20 @@ static void apply_one(void* ud, const char* k, const char* v) {
             }
         }
     } else if (!strcmp(k, "stroke-dashoffset")) {
+        st->spec |= SPEC_DASH_OFFSET;
         st->dashoff = length_parse(v, ctx->vw, ctx->vh, ctx->em, 2, 0.0f);
     } else if (!strcmp(k, "fill-rule")) {
+        st->spec |= SPEC_FILL_RULE;
         st->fillrule = !strcmp(v, "evenodd");
     } else if (!strcmp(k, "clip-rule")) {
+        st->spec |= SPEC_CLIP_RULE;
         st->cliprule = !strcmp(v, "evenodd") ? 1 : 0;
     } else if (!strcmp(k, "fill-opacity")) {
+        st->spec |= SPEC_FILL_OPACITY;
         float f = strtof(v, NULL);
         st->fillop = f < 0.0f ? 0.0f : (f > 1.0f ? 1.0f : f);
     } else if (!strcmp(k, "stroke-opacity")) {
+        st->spec |= SPEC_STROKE_OPACITY;
         float f = strtof(v, NULL);
         st->strokeop = f < 0.0f ? 0.0f : (f > 1.0f ? 1.0f : f);
     } else if (!strcmp(k, "color")) {

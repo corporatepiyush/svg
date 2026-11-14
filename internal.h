@@ -186,15 +186,25 @@ enum { SPREAD_PAD = 0, SPREAD_REFLECT = 1, SPREAD_REPEAT = 2 };
  * paint properties are tracked; use_apply_style() in svg_refs.c consults
  * these so a <use> never overwrites a value the referenced element set. */
 enum {
-    SPEC_NONE        = 0u,
-    SPEC_FILL        = 1u << 0,
-    SPEC_STROKE      = 1u << 1,
-    SPEC_FONT_SIZE   = 1u << 2,
-    SPEC_FONT_WEIGHT = 1u << 3,
-    SPEC_FONT_STYLE  = 1u << 4,
-    SPEC_TEXT_ANCHOR = 1u << 5,
-    SPEC_LETTER_SP   = 1u << 6,
-    SPEC_VISIBILITY  = 1u << 7
+    SPEC_NONE         = 0u,
+    SPEC_FILL         = 1u << 0,
+    SPEC_STROKE       = 1u << 1,
+    SPEC_FONT_SIZE    = 1u << 2,
+    SPEC_FONT_WEIGHT  = 1u << 3,
+    SPEC_FONT_STYLE   = 1u << 4,
+    SPEC_TEXT_ANCHOR  = 1u << 5,
+    SPEC_LETTER_SP    = 1u << 6,
+    SPEC_VISIBILITY   = 1u << 7,
+    SPEC_STROKE_WIDTH = 1u << 8,
+    SPEC_LINECAP      = 1u << 9,
+    SPEC_LINEJOIN     = 1u << 10,
+    SPEC_MITERLIMIT   = 1u << 11,
+    SPEC_FILL_RULE    = 1u << 12,
+    SPEC_CLIP_RULE    = 1u << 13,
+    SPEC_FILL_OPACITY = 1u << 14,
+    SPEC_STROKE_OPACITY = 1u << 15,
+    SPEC_DASH         = 1u << 16,
+    SPEC_DASH_OFFSET  = 1u << 17
 };
 
 typedef struct Paint {
