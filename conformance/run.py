@@ -95,6 +95,27 @@ def check_alpha(px, w, h, c, tol):
         c["x"], c["y"], a, lo, hi)
 
 
+def check_alpha_range(px, w, h, c, tol):
+    """Bounds on the minimum and maximum alpha over a rect (noise, blur)."""
+    x, y, rw, rh = c["rect"] if "rect" in c else (c["x"], c["y"], c["w"], c["h"])
+    amin, amax = 255, 0
+    for yy in range(max(0, y), min(h, y + rh)):
+        row = yy * w * 4
+        for xx in range(max(0, x), min(w, x + rw)):
+            a = px[row + xx * 4 + 3]
+            if a < amin: amin = a
+            if a > amax: amax = a
+    if "amin_max" in c and amin > c["amin_max"]:
+        return False, "min alpha %d want <= %d" % (amin, c["amin_max"])
+    if "amax_min" in c and amax < c["amax_min"]:
+        return False, "max alpha %d want >= %d" % (amax, c["amax_min"])
+    if "amin_min" in c and amin < c["amin_min"]:
+        return False, "min alpha %d want >= %d" % (amin, c["amin_min"])
+    if "amax_max" in c and amax > c["amax_max"]:
+        return False, "max alpha %d want <= %d" % (amax, c["amax_max"])
+    return True, "alpha range [%d,%d]" % (amin, amax)
+
+
 def check_bbox(px, w, h, c, tol):
     got = bbox(px, w, h)
     want = tuple(c["bbox"])
@@ -160,6 +181,7 @@ CHECKS = {
     "rgba": check_rgba,
     "color_count": check_color_count,
     "alpha": check_alpha,
+    "alpha_range": check_alpha_range,
     "bbox": check_bbox,
     "bbox_width": check_bbox_width,
     "bbox_center_x": check_bbox_center_x,

@@ -3156,6 +3156,604 @@
           "max": 8
         }
       ]
+    },
+    {
+      "name": "filter_gaussian_blur",
+      "area": "filters",
+      "note": "feGaussianBlur is a separable approximation of a Gaussian: a black square blurred by 6 is half-covered at its edge (alpha ~128 at x=20) and nearly clear 12 units out.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 20,
+          "y": 50,
+          "min": 90,
+          "max": 170
+        },
+        {
+          "kind": "alpha",
+          "x": 14,
+          "y": 50,
+          "min": 20,
+          "max": 110
+        },
+        {
+          "kind": "alpha",
+          "x": 8,
+          "y": 50,
+          "min": 2,
+          "max": 40
+        },
+        {
+          "kind": "alpha",
+          "x": 2,
+          "y": 50,
+          "min": 0,
+          "max": 12
+        }
+      ]
+    },
+    {
+      "name": "filter_flood_composite",
+      "area": "filters",
+      "note": "feFlood fills the filter region with a colour and feComposite operator=\"in\" cuts it to the source alpha, so the result is a solid green square with a transparent surround.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            204,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 24,
+          "y": 50,
+          "rgba": [
+            0,
+            204,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 10,
+          "y": 10,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_offset_merge",
+      "area": "filters",
+      "note": "feOffset shifts the source by 20 units and feMerge paints the original over the shifted copy: blue from x=10 to x=50.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 15,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 35,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 45,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_color_matrix",
+      "area": "filters",
+      "note": "feColorMatrix type=\"saturate\" values=\"0\" turns red into mid grey; hueRotate=\"120\" turns it green (the matrix preserves luminance, so the green is not fully saturated).",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 50,
+          "rgba": [
+            127,
+            127,
+            127,
+            255
+          ],
+          "tol": 6
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            50,
+            0,
+            50,
+            100
+          ],
+          "rgba": [
+            0,
+            170,
+            0
+          ],
+          "tol": 60,
+          "min": 3000
+        }
+      ]
+    },
+    {
+      "name": "filter_morphology",
+      "area": "filters",
+      "note": "feMorphology dilate with radius 4 grows the 20x20 square by 4 units on every side: red from 36 to 63, still clear at 34.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 36,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 63,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 34,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_blend_multiply",
+      "area": "filters",
+      "note": "feBlend mode=\"multiply\" multiplies the source by a copy shifted 30 units right; the overlap is a darker orange (blending happens in linearRGB, so the green channel squares in linear light).",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 50,
+          "rgba": [
+            255,
+            128,
+            0
+          ],
+          "tol": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 55,
+          "y": 50,
+          "rgba": [
+            255,
+            61,
+            0
+          ],
+          "tol": 10
+        },
+        {
+          "kind": "rgba",
+          "x": 80,
+          "y": 50,
+          "rgba": [
+            255,
+            128,
+            0
+          ],
+          "tol": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_lighting",
+      "area": "filters",
+      "note": "feDiffuseLighting treats the source alpha as a height field: a flat interior has a normal of (0,0,1), so the result is the light colour times N.L, written to sRGB.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            219,
+            219,
+            219,
+            255
+          ],
+          "tol": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 30,
+          "rgba": [
+            219,
+            219,
+            219,
+            255
+          ],
+          "tol": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 70,
+          "y": 70,
+          "rgba": [
+            219,
+            219,
+            219,
+            255
+          ],
+          "tol": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_turbulence",
+      "area": "filters",
+      "note": "feTurbulence generates a noise field; luminanceToAlpha turns it into varying alpha. The exact pattern is implementation-defined, so the assertion is on the spread, not the values.",
+      "checks": [
+        {
+          "kind": "alpha_range",
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "amin_max": 60,
+          "amax_min": 170
+        }
+      ]
+    },
+    {
+      "name": "filter_region_default",
+      "area": "filters",
+      "note": "The default filter region is -10%,-10%,120%,120% of the bounding box: the square spans 40..60 and the blur fades to nothing by 36 and 62. Chrome resolves the blur slightly wider than a region-clipped buffer at the region boundary, so the flank assertions are ranges.",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "min": 200,
+          "max": 255
+        },
+        {
+          "kind": "alpha",
+          "x": 40,
+          "y": 50,
+          "min": 90,
+          "max": 140
+        },
+        {
+          "kind": "alpha",
+          "x": 44,
+          "y": 50,
+          "min": 165,
+          "max": 205
+        },
+        {
+          "kind": "alpha",
+          "x": 36,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 62,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_convolve",
+      "area": "filters",
+      "note": "feConvolveMatrix with a 3x3 box kernel is a 9-tap average: a black/white split blurred across the boundary gives mid grey at the edge.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 80,
+          "y": 50,
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            213,
+            213,
+            213,
+            255
+          ],
+          "tol": 6
+        }
+      ]
+    },
+    {
+      "name": "filter_displacement",
+      "area": "filters",
+      "note": "feDisplacementMap offsets each pixel by scale*(channel-0.5) using a gradient map: with scale 20 the red/blue boundary moves by only a couple of pixels, so the split is still visible at x=50.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 46,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 60,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "filter_specular",
+      "area": "filters",
+      "note": "feSpecularLighting outputs a premultiplied highlight: a white light gives white with an alpha equal to the specular intensity, which falls off away from the highlight.",
+      "checks": [
+        {
+          "kind": "color_count",
+          "rect": [
+            49,
+            19,
+            3,
+            3
+          ],
+          "rgba": [
+            255,
+            255,
+            255
+          ],
+          "tol": 6,
+          "min": 6,
+          "alpha_min": 20
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 20,
+          "min": 25,
+          "max": 60
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "min": 8,
+          "max": 30
+        },
+        {
+          "kind": "alpha",
+          "x": 10,
+          "y": 10,
+          "max": 10
+        }
+      ]
+    },
+    {
+      "name": "filter_image_tile",
+      "area": "filters",
+      "note": "feImage decodes an embedded PNG into the filter region and feTile repeats that subregion: the 2x2 source becomes a checker of red and white squares. The exact colours differ between renderers (Chrome converts the image differently), so the assertion is on the colours with a wide tolerance.",
+      "checks": [
+        {
+          "kind": "color_count",
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "rgba": [
+            255,
+            0,
+            0
+          ],
+          "tol": 60,
+          "min": 2000
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "rgba": [
+            255,
+            255,
+            255
+          ],
+          "tol": 60,
+          "min": 2000
+        },
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0
+          ],
+          "tol": 60
+        },
+        {
+          "kind": "rgba",
+          "x": 15,
+          "y": 15,
+          "rgba": [
+            255,
+            255,
+            255
+          ],
+          "tol": 60
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0
+          ],
+          "tol": 60
+        }
+      ]
+    },
+    {
+      "name": "filter_primitive_units_bbox",
+      "area": "filters",
+      "note": "primitiveUnits=\"objectBoundingBox\" makes dx a fraction of the bounding box: dx=0.1 on a 50-wide square shifts the copy by 5, so the merged shape spans 20..75.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 22,
+          "y": 40,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 72,
+          "y": 40,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 74,
+          "y": 40,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 15,
+          "y": 40,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 78,
+          "y": 40,
+          "max": 8
+        }
+      ]
     }
   ],
   "external_intentional": []

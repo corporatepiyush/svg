@@ -41,6 +41,8 @@ void style_copy(Style* dst, const Style* src) {
     dst->marker_start = src->marker_start ? svg_strdup(src->marker_start) : NULL;
     dst->marker_mid   = src->marker_mid   ? svg_strdup(src->marker_mid)   : NULL;
     dst->marker_end   = src->marker_end   ? svg_strdup(src->marker_end)   : NULL;
+    free(dst->filter);
+    dst->filter = src->filter ? svg_strdup(src->filter) : NULL;
     if (src->dash && src->ndash > 0) {
         dst->dash = (float*)svg_malloc((size_t)src->ndash * sizeof(float));
         if (dst->dash) {
@@ -77,6 +79,7 @@ void style_free(Style* s) {
     free(s->marker_start); s->marker_start = NULL;
     free(s->marker_mid);   s->marker_mid = NULL;
     free(s->marker_end);   s->marker_end = NULL;
+    free(s->filter);       s->filter = NULL;
 }
 static void for_each_decl(const char* decls,
                           void (*fn)(void* ud, const char* k, const char* v),
@@ -272,6 +275,13 @@ static void apply_one(void* ud, const char* k, const char* v) {
         } else if (v && !strncmp(v, "url(#", 5)) {
             const char* e = strchr(v + 5, ')');
             if (e) *slot = svg_strndup(v + 5, (size_t)(e - (v + 5)));
+        }
+    } else if (!strcmp(k, "filter")) {
+        free(st->filter);
+        st->filter = NULL;
+        if (v && !strncmp(v, "url(#", 5)) {
+            const char* e = strchr(v + 5, ')');
+            if (e) st->filter = svg_strndup(v + 5, (size_t)(e - (v + 5)));
         }
     } else if (!strcmp(k, "display")) {
         /* `display` is not inherited; the value only matters on the element

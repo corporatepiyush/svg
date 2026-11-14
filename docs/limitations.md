@@ -37,10 +37,20 @@ is the contract between the library and its callers.
   `markerWidth`/`markerHeight` and `marker-start`/`mid`/`end`.
 - Images: `<image>` with embedded `data:image/png` and `data:image/svg+xml`
   URIs.  External file references are not loaded (see below).
+- Filters: `<filter>` with `filterUnits`, `primitiveUnits`,
+  `color-interpolation-filters`, `x`/`y`/`width`/`height`, href chaining, and
+  all 24 `fe*` primitives — `feBlend`, `feColorMatrix`,
+  `feComponentTransfer` (+ `feFuncR/G/B/A`), `feComposite`,
+  `feConvolveMatrix`, `feDiffuseLighting`, `feDisplacementMap`,
+  `feDistantLight`, `feFlood`, `feGaussianBlur`, `feImage`, `feMerge` /
+  `feMergeNode`, `feMorphology`, `feOffset`, `fePointLight`,
+  `feSpecularLighting`, `feSpotLight`, `feTile`, `feTurbulence`.  The
+  `filter` property accepts `url(#id)`; `none` disables it.
 - Colour: `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`,
   `hsl()`, `hsla()`, `transparent`, `currentColor`, 147 named colours.
 - Stroke: caps, joins, miter limit, dash arrays/offsets.
-- Text: built-in 5×7 bitmap font, bold/italic, anchors, letter-spacing.
+- Text: built-in 5×7 bitmap font, bold/italic, anchors, letter-spacing,
+  `<tspan>` `x`/`y`/`dx`/`dy` and per-run fill.
 - Output: RGBA8 PNG, 1×–8× supersampling, optional background.
 
 ## Unsupported / ignored
@@ -49,10 +59,17 @@ is the contract between the library and its callers.
   `!important` in inline `style` (author `!important` is honoured).
 - Geometry properties through CSS (`x`, `y`, `width`, `height`, `r`, `d`,
   `points`, `transform`).  Use XML attributes.
-- `<filter>` (all 24 `fe*` primitives), `<foreignObject>`, `<view>`,
-  `textPath`, `tspan` positioning, `dx`/`dy`, `textLength`, `lengthAdjust`,
-  `dominant-baseline`, `writing-mode`, `tref`, `altGlyph*`, and SMIL
-  animation.  `<script>` is not executed (correct for a rasteriser).
+- `<foreignObject>`, `<view>`, `textPath`, `tref`,
+  `textLength`/`lengthAdjust`, `dominant-baseline`, `writing-mode`, `rotate`
+  on text, `altGlyph*`, and SMIL animation.  `<script>` is not executed
+  (correct for a rasteriser).
+- Filter details: a primitive's own `x`/`y`/`width`/`height` subregion is
+  honoured only by `feImage`; other primitives use the whole filter region.
+  `feTurbulence` uses a value-noise approximation rather than the reference
+  gradient noise, so its exact pattern differs from Chrome's.  All primitives
+  that the specification defines on premultiplied values do so here.
+  `feConvolveMatrix` always premultiplies (it ignores `preserveAlpha`).  The
+  filter output is clipped to the filter region.
 - External image files: `<image href="file.png">` and JPEG/PNG files are not
   loaded.  The library API receives a document, not a base path, so a relative
   reference cannot be resolved safely; only embedded data URIs are decoded.
@@ -78,6 +95,11 @@ compiled-in default.
 | `max_text_length` | 100000 | truncate text |
 | `max_clip_depth` | 16 | ignore deeper clip paths |
 | `max_layers` | 64 | composite children directly |
+
+Filter chains are additionally bounded: the filter region is clipped to the
+canvas, the chain may open at most `max_layers` filter buffers, and the total
+filter buffer memory is capped at four times the region size plus 1 MiB.  A
+chain that exceeds the budget is skipped and the element is drawn unfiltered.
 | `max_use_expansion` | 20000 | stop cloning further `<use>` nodes |
 | `max_pixels` | 64 Mpx | fail with `SVG2IMG_ERR_LIMIT` |
 

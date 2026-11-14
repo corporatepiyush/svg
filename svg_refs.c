@@ -112,6 +112,12 @@ static void resolve_clip_refs(Node* n, IdMap* ids) {
         free(n->mask_ref);
         n->mask_ref = NULL;
     }
+    if (n->filter_ref) {
+        Node* f = idmap_get(ids, n->filter_ref);
+        if (f && f->type == NODE_FILTERDEF) n->filter = f;
+        free(n->filter_ref);
+        n->filter_ref = NULL;
+    }
     if (n->marker_start_ref) {
         Node* m = idmap_get(ids, n->marker_start_ref);
         if (m && m->type == NODE_MARKERDEF) n->marker_start = m;
@@ -223,6 +229,37 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
                     uc->failed = 1;
             }
             c->nchunks = n->nchunks;
+        }
+    }
+
+    /* Filter primitives own their parameter strings; a shallow struct copy
+     * would free the original's strings twice. */
+    c->prims = NULL;
+    c->nprims = 0;
+    if (n->nprims > 0 && n->prims) {
+        c->prims = (FilterPrim*)svg_malloc((size_t)n->nprims * sizeof(FilterPrim));
+        if (!c->prims) {
+            uc->failed = 1;
+        } else {
+            memcpy(c->prims, n->prims, (size_t)n->nprims * sizeof(FilterPrim));
+            for (int i = 0; i < n->nprims; i++) {
+                FilterPrim* d = &c->prims[i];
+                const FilterPrim* sc = &n->prims[i];
+                d->in = sc->in ? svg_strdup(sc->in) : NULL;
+                d->in2 = sc->in2 ? svg_strdup(sc->in2) : NULL;
+                d->result = sc->result ? svg_strdup(sc->result) : NULL;
+                d->href = sc->href ? svg_strdup(sc->href) : NULL;
+                d->nmerge = 0;
+                for (int m = 0; m < sc->nmerge && m < 8; m++)
+                    d->merge_in[d->nmerge++] =
+                        sc->merge_in[m] ? svg_strdup(sc->merge_in[m]) : NULL;
+                if ((sc->in && !d->in) || (sc->in2 && !d->in2) ||
+                    (sc->result && !d->result) || (sc->href && !d->href))
+                    uc->failed = 1;
+                for (int m = 0; m < sc->nmerge && m < 8; m++)
+                    if (sc->merge_in[m] && !d->merge_in[m]) uc->failed = 1;
+            }
+            c->nprims = n->nprims;
         }
     }
 

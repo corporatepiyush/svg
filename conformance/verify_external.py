@@ -99,7 +99,8 @@ def main(argv=None):
     ap.add_argument("--backends", default="chrome")
     ap.add_argument("--tol", type=int, default=12)
     ap.add_argument("--json", default="")
-    ap.add_argument("--only", default="")
+    ap.add_argument("--only", default="",
+                    help="case name prefix")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--require-backend", action="store_true")
     args = ap.parse_args(argv)
@@ -110,7 +111,7 @@ def main(argv=None):
     # "fail", which is noise rather than signal.
     intentional = set(spec.get("external_intentional", []))
     cases = [c for c in spec["cases"]
-             if (not args.only or c["name"] == args.only)
+             if (not args.only or c["name"].startswith(args.only))
              and c["name"] not in intentional]
     if args.limit:
         cases = cases[:args.limit]

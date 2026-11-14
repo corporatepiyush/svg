@@ -25,6 +25,9 @@ void svg_free(Node* n) {
     free(n->marker_start_ref);
     free(n->marker_mid_ref);
     free(n->marker_end_ref);
+    free(n->filter_ref);
+    free(n->filt_href);
+    filter_prims_free(n->prims, n->nprims);
     free(n->use_ref);
     free(n);
 }
@@ -46,6 +49,8 @@ void svg_free_detached(Node* n, IdMap* ids) {
     free(n->marker_start_ref);
     free(n->marker_mid_ref);
     free(n->marker_end_ref); free(n->use_ref);
+    free(n->filter_ref); free(n->filt_href);
+    filter_prims_free(n->prims, n->nprims);
     free(n);
 }
 

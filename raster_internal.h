@@ -84,4 +84,67 @@ Mask* make_mask_from_node(const Node* mn, Mat world, const float* bbox,
                           int W, int H, int aa);
 int node_bbox_world(Node* n, Mat full_w, float out[4]);
 
+/* ------------------------------------------------------------------ */
+/* Filter effects (SVG 1.1 §15)                                        */
+/* ------------------------------------------------------------------ */
+
+/* A filter buffer is a straight-alpha RGBA image, like a Canvas, but
+ * standalone: filter primitives never touch the destination canvas. */
+typedef struct { int w, h; float* px; } FBuf;
+
+FBuf* fbuf_create(int w, int h);
+void  fbuf_free(FBuf* b);
+FBuf* fbuf_copy(const FBuf* b);
+
+typedef struct NamedBuf {
+    char* name;              /* NULL for an unnamed intermediate result */
+    FBuf  fb;
+    int   sx, sy, sw, sh;    /* content subregion (feTile, feImage) */
+} NamedBuf;
+
+typedef struct FilterCtx {
+    FBuf  src;               /* SourceGraphic */
+    FBuf  alpha;             /* SourceAlpha */
+    NamedBuf* bufs;
+    int   n, cap;
+    int   last;              /* index into bufs, or -1 for SourceGraphic */
+    const float* bbox;       /* user-space bbox of the referencing element */
+    int   has_bbox;
+    float bw, bh;
+    int   prim_units_bbox;   /* primitiveUnits="objectBoundingBox" */
+    int   linear;            /* color-interpolation-filters: linearRGB */
+    Mat   world;
+    int   aa;
+    size_t bytes, max_bytes;
+    int   failed;
+    /* Content subregion reported by the primitive that just ran. */
+    int   last_sx, last_sy, last_sw, last_sh;
+} FilterCtx;
+
+FBuf* filter_execute(const Node* fdef, const FBuf* source, const float bbox[4],
+                     int has_bbox, Mat world, int aa, size_t max_bytes);
+FBuf* fe_run(FilterCtx* fc, const FilterPrim* p);
+FBuf* fe_run_generic(FilterCtx* fc, const FilterPrim* p);
+size_t fb_bytes(int w, int h);
+void  fe_release(FilterCtx* fc, FBuf* b);
+int   image_decode_href(const char* href, int aa, unsigned char** out,
+                        int* out_w, int* out_h);
+void  image_blit_rgba8(Canvas* dst, int dx, int dy, int dw, int dh,
+                       const unsigned char* src, int sw, int sh);
+void  image_blit_fbuf(FBuf* dst, int dx, int dy, int dw, int dh,
+                      const unsigned char* src, int sw, int sh);
+
+/* Helpers shared by the primitive files. */
+const FBuf* fe_input(FilterCtx* fc, const char* name);
+const NamedBuf* fe_lookup(FilterCtx* fc, const char* name);
+FBuf* fe_new(FilterCtx* fc, int w, int h);
+float fe_len(FilterCtx* fc, float v, int axis);   /* primitive units -> device px */
+int   fe_chan(const FBuf* b, int x, int y, int c);
+void  fe_premul(const FBuf* in, float* out);
+void  fe_unpremul(const float* in, FBuf* out);
+void  fe_srgb_to_linear(FBuf* b);
+void  fe_linear_to_srgb(FBuf* b);
+Color fe_tolinear(Color c);
+Color fe_tosrgb(Color c);
+
 #endif

@@ -8,6 +8,7 @@ typedef struct {
     int layers;                  /* opacity layers opened so far */
     int clips;                   /* nested clip masks opened so far */
     int masks;                   /* <mask> buffers opened so far */
+    int filters;                 /* filter chains opened so far */
 } RenderState;
 
 /* ------------------------------------------------------------------ */
@@ -156,6 +157,10 @@ static Mask* node_clip_mask(const Node* n, Mat world, Canvas* c,
 
 static void render_node(Canvas* c, Node* n, Mat world, float opacity,
                         Mask* clip, int aa, RenderState* rs);
+static void paint_self(Canvas* c, Node* n, Mat w, float op, Mask* eff, int aa,
+                       RenderState* rs);
+static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
+                            int aa, RenderState* rs);
 
 /* Render a group's children into a temporary layer and composite it with
  * the group's opacity.  `op` is the already-composed opacity (group
@@ -280,6 +285,20 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
     }
     Mask* eff = own ? own : clip;
 
+    if (n->filter && (!rs->lim || rs->filters < rs->lim->max_layers)) {
+        rs->filters++;
+        render_filtered(c, n, w, op, eff, aa, rs);
+        rs->filters--;
+    } else {
+        paint_self(c, n, w, op, eff, aa, rs);
+    }
+    mask_free(own);
+}
+
+/* Paint a node's own content, with no filter applied.  Group opacity and
+ * clipping are already resolved by the caller. */
+static void paint_self(Canvas* c, Node* n, Mat w, float op, Mask* eff, int aa,
+                       RenderState* rs) {
     if (n->type == NODE_GROUP || n->type == NODE_SYMBOL ||
         n->type == NODE_TRANSPARENT) {
         /* Collapse a chain of single-child, unclipped groups into one layer.
@@ -294,7 +313,7 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
                 Node* child = g->kids[0];
                 c_op *= child->opacity;
                 g = child;
-                if (c_op <= 0.0f) { mask_free(own); return; }
+                if (c_op <= 0.0f) return;
             }
             if (g != n) {
                 /* Render the collapsed group's children directly into a
@@ -304,7 +323,6 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
                 for (Node* t = n->kids[0]; t != g; t = t->kids[0])
                     chain_w = mat_mul(chain_w, t->tm);
                 render_group_layered(c, g, chain_w, c_op, eff, aa, rs);
-                mask_free(own);
                 return;
             }
             render_group_layered(c, n, w, op, eff, aa, rs);
@@ -319,7 +337,111 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
     } else if (n->type == NODE_IMAGE) {
         render_image(c, n, w, op, eff, aa);
     }
-    mask_free(own);
+}
+
+/* ------------------------------------------------------------------ */
+/* Filter effects                                                      */
+/* ------------------------------------------------------------------ */
+
+/* Filter region in device pixels: the intersection of the transformed region
+ * rectangle with the canvas.  Returns 0 when nothing of the element can be
+ * visible. */
+static int filter_region(const Node* f, Mat w, const float* lbb, int has_bb,
+                         int cw, int ch, int* ox, int* oy, int* iw, int* ih) {
+    float rx, ry, rw, rh;
+    if (f->filt_units == UNITS_BBOX && has_bb) {
+        float bw = lbb[2] - lbb[0];
+        float bh = lbb[3] - lbb[1];
+        if (!(bw > 0.0f) || !(bh > 0.0f)) return 0;
+        rx = lbb[0] + f->filt_x * bw;
+        ry = lbb[1] + f->filt_y * bh;
+        rw = f->filt_w * bw;
+        rh = f->filt_h * bh;
+    } else {
+        rx = f->filt_x;
+        ry = f->filt_y;
+        rw = f->filt_w;
+        rh = f->filt_h;
+    }
+    if (!(rw > 0.0f) || !(rh > 0.0f)) return 0;
+    Pt q[4] = { {rx, ry}, {rx + rw, ry}, {rx + rw, ry + rh}, {rx, ry + rh} };
+    float x0 = 1e30f, y0 = 1e30f, x1 = -1e30f, y1 = -1e30f;
+    for (int i = 0; i < 4; i++) {
+        Pt p = mat_apply(w, q[i]);
+        if (p.x < x0) x0 = p.x;
+        if (p.y < y0) y0 = p.y;
+        if (p.x > x1) x1 = p.x;
+        if (p.y > y1) y1 = p.y;
+    }
+    int ix0 = (int)floorf(x0), iy0 = (int)floorf(y0);
+    int ix1 = (int)ceilf(x1), iy1 = (int)ceilf(y1);
+    if (ix0 < 0) ix0 = 0;
+    if (iy0 < 0) iy0 = 0;
+    if (ix1 > cw) ix1 = cw;
+    if (iy1 > ch) iy1 = ch;
+    if (ix0 >= ix1 || iy0 >= iy1) return 0;
+    *ox = ix0;
+    *oy = iy0;
+    *iw = ix1 - ix0;
+    *ih = iy1 - iy0;
+    return 1;
+}
+
+/* Render the referencing element's content into a region-sized buffer, run
+ * the chain, and composite the result with the element's opacity and clip.
+ *
+ * The element is rendered without its clip: the specification applies filter,
+ * then clipping, masking and opacity, so the clip and mask are applied to the
+ * filtered result instead of to the source. */
+static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
+                            int aa, RenderState* rs) {
+    Node* f = n->filter;
+    float lbb[4];
+    int has_bb = node_bbox_world(n, mat_identity(), lbb);
+    int ix0 = 0, iy0 = 0, iw = 0, ih = 0;
+    if (!filter_region(f, w, lbb, has_bb, c->w, c->h, &ix0, &iy0, &iw, &ih))
+        return;
+
+    Canvas* tmp = canvas_create(iw, ih);
+    if (!tmp) return;
+    Mat local = mat_mul(mat_translate(-(float)ix0, -(float)iy0), w);
+    RenderState sub;
+    sub.lim = rs->lim;
+    sub.layers = 0;
+    sub.clips = 0;
+    sub.masks = 0;
+    sub.filters = rs->filters;
+    paint_self(tmp, n, local, 1.0f, NULL, aa, &sub);
+
+    FBuf src;
+    src.w = tmp->w;
+    src.h = tmp->h;
+    src.px = tmp->px;
+    tmp->px = NULL;                       /* ownership moved to src */
+    canvas_free(tmp);
+
+    /* Buffer budget: four copies of the region plus a little slack.  Past it
+     * the chain is skipped and the source is drawn unfiltered, which is the
+     * documented degradation for an oversized filter. */
+    size_t region_bytes = fb_bytes(iw, ih);
+    size_t max_bytes = region_bytes * 4 + (1u << 20);
+    FBuf* out = filter_execute(f, &src, lbb, has_bb, w, aa, max_bytes);
+    if (!out) out = fbuf_copy(&src);
+    free(src.px);                          /* src is an embedded struct */
+    src.px = NULL;
+    if (!out) return;
+
+    for (int y = 0; y < ih; y++) {
+        for (int x = 0; x < iw; x++) {
+            const float* s = out->px + ((size_t)y * (size_t)iw + (size_t)x) * 4;
+            float a = s[3] * op;
+            if (clip) a *= mask_get(clip, ix0 + x, iy0 + y);
+            if (a <= 0.0f) continue;
+            blend(c, ix0 + x, iy0 + y,
+                  (Color){s[0], s[1], s[2], s[3]}, a);
+        }
+    }
+    fbuf_free(out);
 }
 
 /* Render a node's children into an existing canvas (used by <pattern> tiles).
@@ -331,6 +453,7 @@ void render_subtree(Canvas* c, const Node* n, Mat world, int aa) {
     st.layers = 0;
     st.clips = 0;
     st.masks = 0;
+    st.filters = 0;
     for (int i = 0; i < n->nkids; i++)
         render_node(c, n->kids[i], world, 1.0f, NULL, aa, &st);
 }
@@ -344,6 +467,7 @@ void render_children(Canvas* c, const Node* n, Mat world, float opacity,
     st.layers = 0;
     st.clips = 0;
     st.masks = 0;
+    st.filters = 0;
     for (int i = 0; i < n->nkids; i++)
         render_node(c, n->kids[i], world, opacity, clip, aa, &st);
 }
@@ -358,5 +482,6 @@ void render_document(Canvas* c, Node* root, Mat view_tm,
     st.layers = 0;
     st.clips = 0;
     st.masks = 0;
+    st.filters = 0;
     render_node(c, root, view_tm, 1.0f, NULL, aa, &st);
 }

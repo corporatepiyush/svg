@@ -240,6 +240,82 @@ typedef struct Node Node;
 typedef struct Canvas Canvas;
 typedef struct Mask Mask;
 
+/* ------------------------------------------------------------------ */
+/* Filter effects (SVG 1.1 §15)                                        */
+/* ------------------------------------------------------------------ */
+
+enum {
+    FE_BLEND = 0, FE_COLOR_MATRIX, FE_COMPONENT_TRANSFER, FE_COMPOSITE,
+    FE_CONVOLVE_MATRIX, FE_DIFFUSE_LIGHTING, FE_DISPLACEMENT_MAP,
+    FE_DISTANT_LIGHT, FE_FLOOD, FE_GAUSSIAN_BLUR, FE_IMAGE, FE_MERGE,
+    FE_MERGE_NODE, FE_MORPHOLOGY, FE_OFFSET, FE_POINT_LIGHT,
+    FE_SPECULAR_LIGHTING, FE_SPOT_LIGHT, FE_TILE, FE_TURBULENCE,
+    FE_FUNC_R, FE_FUNC_G, FE_FUNC_B, FE_FUNC_A
+};
+
+enum { FE_CM_MATRIX = 0, FE_CM_SATURATE, FE_CM_HUE_ROTATE,
+       FE_CM_LUMINANCE_TO_ALPHA };
+enum { FE_CT_IDENTITY = 0, FE_CT_TABLE, FE_CT_DISCRETE, FE_CT_LINEAR,
+       FE_CT_GAMMA };
+enum { FE_COMP_OVER = 0, FE_COMP_IN, FE_COMP_OUT, FE_COMP_ATOP, FE_COMP_XOR,
+       FE_COMP_ARITH };
+enum { FE_BLEND_NORMAL = 0, FE_BLEND_MULTIPLY, FE_BLEND_SCREEN,
+       FE_BLEND_DARKEN, FE_BLEND_LIGHTEN };
+enum { FE_TURB_FRACTAL = 0, FE_TURB_TURBULENCE };
+enum { FE_LIGHT_DISTANT = 0, FE_LIGHT_POINT, FE_LIGHT_SPOT };
+enum { FE_CHAN_R = 0, FE_CHAN_G, FE_CHAN_B, FE_CHAN_A };
+
+/* One filter primitive.  A flat struct rather than a union: the parser and
+ * the rasteriser both want the whole parameter set, and the struct is only
+ * allocated once per primitive. */
+typedef struct FilterPrim {
+    int   type;
+    char* in;                 /* input name; NULL = previous result / SourceGraphic */
+    char* in2;                /* second input (blend, composite, displacement) */
+    char* result;             /* name this primitive's output is known by */
+
+    float num[8];             /* x, y, width, height, dx, dy, scale, ... */
+    float values[32];         /* feColorMatrix values / kernelMatrix */
+    int   nvalues;
+    float table[16];          /* feComponentTransfer tableValues */
+    int   ntable;
+
+    /* feComponentTransfer: one record per channel (R, G, B, A) */
+    int   ct_type[4];
+    float ct_slope[4], ct_intercept[4], ct_amplitude[4], ct_exponent[4],
+          ct_offset[4];
+    float ct_table[4][16];
+    int   ct_ntable[4];
+
+    /* feConvolveMatrix */
+    int   order_x, order_y, edge_mode;
+    float target_x, target_y;
+    float divisor, bias;
+    float kernel[32];
+    int   nkernel;
+
+    /* feDiffuseLighting / feSpecularLighting */
+    Color light_color;
+    float surface_scale, diffuse_constant, specular_constant, specular_exponent;
+    int   light_type;
+    float lx, ly, lz;         /* point/spot position */
+    float azimuth, elevation; /* distant light direction */
+    float points_at_x, points_at_y, points_at_z;
+    float limiting_cone_angle;
+
+    /* feTurbulence */
+    int   turb_type, stitch;
+    float base_freq_x, base_freq_y;
+    int   octaves, seed;
+
+    /* feImage */
+    char* href;
+
+    /* feMerge: the inputs of its feMergeNode children, in order */
+    char* merge_in[8];
+    int   nmerge;
+} FilterPrim;
+
 enum {
     NODE_GROUP = 0,
     NODE_SHAPE = 1,
@@ -253,7 +329,8 @@ enum {
     NODE_PATTERNDEF = 8, /* <pattern>: tile definition, never painted directly */
     NODE_MASKDEF = 9,    /* <mask>: luminance mask, never painted directly */
     NODE_MARKERDEF = 10, /* <marker>: vertex marker, never painted directly */
-    NODE_IMAGE = 11      /* <image>: raster or embedded SVG image */
+    NODE_IMAGE = 11,     /* <image>: raster or embedded SVG image */
+    NODE_FILTERDEF = 12  /* <filter>: filter chain, never painted directly */
 };
 
 struct Node {
@@ -350,6 +427,17 @@ struct Node {
     Mat   pat_tm;
     float pat_vb[4]; int pat_vb_valid;
     int   pat_par_none, pat_par_slice, pat_par_xa, pat_par_ya;
+
+    /* <filter>: filter effects (SVG 1.1 §15) */
+    Node* filter;             /* resolved <filter> definition, borrowed */
+    char* filter_ref;
+    int   filt_units;         /* UNITS_BBOX (default) / UNITS_USER */
+    int   filt_prim_units;    /* UNITS_USER (default) / UNITS_BBOX */
+    float filt_x, filt_y, filt_w, filt_h;
+    int   filt_linear;        /* color-interpolation-filters: linearRGB */
+    FilterPrim* prims;
+    int   nprims;
+    char* filt_href;          /* href of the referenced filter */
 };
 
 struct Canvas { int w, h; float* px; };   /* RGBA, straight alpha */
@@ -413,6 +501,7 @@ typedef struct Style {
     char* marker_start;    /* marker-start/mid/end: id without '#', or NULL   */
     char* marker_mid;
     char* marker_end;
+    char* filter;          /* filter: url(#id) -> id, or NULL                */
 } Style;
 
 /* Evaluation context passed down the DOM while building the tree. */

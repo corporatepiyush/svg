@@ -85,6 +85,24 @@ CASES = [
     ("tspan_chunks", svg('<text x="5" y="20" font-size="10">AB'
                          '<tspan x="40" fill="red">CD</tspan>'
                          '<tspan dx="3" dy="-2" fill="blue">EF</tspan></text>'), None),
+    # Filter chains allocate one buffer per primitive and release them all.
+    ("filters_all", svg('<defs><filter id="f">'
+                        '<feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"/>'
+                        '<feOffset in="b" dx="3" result="o"/>'
+                        '<feBlend in="b" in2="o" mode="multiply"/>'
+                        '</filter>'
+                        '<filter id="g">'
+                        '<feTurbulence baseFrequency="0.1" numOctaves="2" result="t"/>'
+                        '<feDisplacementMap in="SourceGraphic" in2="t" scale="4"/>'
+                        '</filter>'
+                        '<filter id="h">'
+                        '<feDiffuseLighting in="SourceAlpha" surfaceScale="3">'
+                        '<feDistantLight azimuth="30" elevation="40"/>'
+                        '</feDiffuseLighting>'
+                        '</filter></defs>'
+                        '<rect width="20" height="20" filter="url(#f)"/>'
+                        '<rect x="25" width="20" height="20" filter="url(#g)"/>'
+                        '<rect x="50" width="20" height="20" filter="url(#h)"/>'), None),
     # A data-URI image decodes into temporary buffers that must be freed.
     ("image_data_png", svg('<image x="0" y="0" width="8" height="8"'
                            ' href="data:image/png;base64,'

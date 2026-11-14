@@ -342,6 +342,8 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n = build_mask(ctx, xn);
     } else if (!strcmp(name, "marker")) {
         n = build_marker(ctx, xn);
+    } else if (!strcmp(name, "filter")) {
+        n = build_filter(ctx, xn);
     } else if (!strcmp(name, "image")) {
         n = svg_node_new(NODE_IMAGE);
         if (!n) goto oom;
@@ -434,6 +436,9 @@ oom:
         n->marker_mid_ref   = st.marker_mid;   st.marker_mid = NULL;
         n->marker_end_ref   = st.marker_end;   st.marker_end = NULL;
     }
+    if (n->type != NODE_FILTERDEF) {
+        n->filter_ref = st.filter; st.filter = NULL;
+    }
     if (path_scale != 1.0f && n->dash) {
         for (int i = 0; i < n->ndash; i++) n->dash[i] *= path_scale;
         n->dashoff *= path_scale;
@@ -481,6 +486,13 @@ oom:
         if (e) n->mask_ref = svg_strndup(mk + 5, (size_t)(e - (mk + 5)));
     }
 
+    if (n->type == NODE_FILTERDEF) {
+        /* Filter primitives are not render nodes; build_filter already
+         * consumed them.  Walking the children again would only allocate
+         * throw-away NODE_TRANSPARENT wrappers. */
+        style_free(&st);
+        return n;
+    }
     if (n->type == NODE_GRADDEF) {
         if (parse_stops(xn, &n->fill,
                         ctx->lim ? ctx->lim->max_gradient_stops

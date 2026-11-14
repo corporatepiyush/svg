@@ -1,4 +1,4 @@
-/* raster_image.c - <image> rendering.
+/* raster_image.c - <image> and feImage decoding.
  *
  * Embedded data URIs are supported: `data:image/svg+xml` (parsed and rendered
  * recursively) and `data:image/png` (decoded by image_png.c).  External files
@@ -56,16 +56,107 @@ static char* pctdecode(const char* s, size_t len) {
     return out;
 }
 
-static void scale_rgba8(Canvas* dst, const unsigned char* src, int sw, int sh) {
-    if (sw <= 0 || sh <= 0 || dst->w <= 0 || dst->h <= 0) return;
-    for (int y = 0; y < dst->h; y++) {
-        int sy = (int)((int64_t)y * sh / dst->h);
+/* Decode a data URI into an RGBA8 buffer.  Returns NULL when the URI is not
+ * an embedded image this build understands.  The caller frees *out. */
+int image_decode_href(const char* href, int aa, unsigned char** out,
+                      int* out_w, int* out_h) {
+    *out = NULL;
+    *out_w = *out_h = 0;
+    if (!href || strncmp(href, "data:", 5)) return 0;
+    const char* comma = strchr(href, ',');
+    if (!comma) return 0;
+    size_t meta_len = (size_t)(comma - href);
+    const char* data = comma + 1;
+    size_t data_len = strlen(data);
+    int is_b64 = meta_len >= 7 && !strncmp(comma - 7, ";base64", 7);
+    int is_svg = strstr(href, "svg") != NULL;
+    int is_png = strstr(href, "png") != NULL;
+    if (!is_svg && !is_png) return 0;
+
+    if (is_png) {
+        unsigned char* raw = NULL;
+        size_t rawn = 0;
+        if (is_b64) raw = b64decode(data, &rawn);
+        else {
+            char* dec = pctdecode(data, data_len);
+            if (dec) { raw = b64decode(dec, &rawn); free(dec); }
+        }
+        if (!raw) return 0;
+        int w = 0, h = 0;
+        unsigned char* px = png_decode_rgba(raw, rawn, &w, &h);
+        free(raw);
+        if (!px) return 0;
+        *out = px;
+        *out_w = w;
+        *out_h = h;
+        return 1;
+    }
+
+    char* svg = NULL;
+    size_t slen = 0;
+    if (is_b64) {
+        svg = (char*)b64decode(data, &slen);
+    } else {
+        svg = pctdecode(data, data_len);
+        if (svg) slen = strlen(svg);
+    }
+    if (!svg) return 0;
+
+    svg2img_options o;
+    memset(&o, 0, sizeof(o));
+    o.aa = aa;
+    o.scale = 1.0f;
+    svg2img_limits lim;
+    svg2img_default_limits(&lim);
+    int hit = 0;
+    Node* root = svg_parse(svg, slen, &o, &hit);
+    free(svg);
+    if (!root || !root->vp.valid || root->vp.w <= 0 || root->vp.h <= 0) {
+        svg_free(root);
+        return 0;
+    }
+    Canvas* src = canvas_create(root->vp.w, root->vp.h);
+    if (!src) { svg_free(root); return 0; }
+    render_document(src, root, mat_identity(), &o, &lim);
+    int w = root->vp.w, h = root->vp.h;
+    unsigned char* px = (unsigned char*)svg_malloc((size_t)w * (size_t)h * 4);
+    if (!px) { canvas_free(src); svg_free(root); return 0; }
+    size_t n = (size_t)w * (size_t)h;
+    for (size_t i = 0; i < n; i++) {
+        const float* s = src->px + i * 4;
+        unsigned char* d = px + i * 4;
+        float a = s[3];
+        float r = s[0], g = s[1], b = s[2];
+        /* Store premultiplied-equivalent values so scaling stays correct. */
+        d[0] = (unsigned char)(r * 255.0f + 0.5f);
+        d[1] = (unsigned char)(g * 255.0f + 0.5f);
+        d[2] = (unsigned char)(b * 255.0f + 0.5f);
+        d[3] = (unsigned char)(a * 255.0f + 0.5f);
+    }
+    canvas_free(src);
+    svg_free(root);
+    *out = px;
+    *out_w = w;
+    *out_h = h;
+    return 1;
+}
+
+/* Nearest-neighbour RGBA8 blit into a straight-alpha RGBA float canvas. */
+void image_blit_rgba8(Canvas* dst, int dx, int dy, int dw, int dh,
+                      const unsigned char* src, int sw, int sh) {
+    if (dw <= 0 || dh <= 0 || sw <= 0 || sh <= 0) return;
+    for (int y = 0; y < dh; y++) {
+        int sy = (int)((int64_t)y * sh / dh);
         if (sy >= sh) sy = sh - 1;
-        for (int x = 0; x < dst->w; x++) {
-            int sx = (int)((int64_t)x * sw / dst->w);
+        int ty = dy + y;
+        if (ty < 0 || ty >= dst->h) continue;
+        for (int x = 0; x < dw; x++) {
+            int sx = (int)((int64_t)x * sw / dw);
             if (sx >= sw) sx = sw - 1;
+            int tx = dx + x;
+            if (tx < 0 || tx >= dst->w) continue;
             const unsigned char* s = src + ((size_t)sy * (size_t)sw + (size_t)sx) * 4;
-            float* d = dst->px + ((size_t)y * (size_t)dst->w + (size_t)x) * 4;
+            float* d = dst->px + ((size_t)ty * (size_t)dst->w + (size_t)tx) * 4;
             d[0] = s[0] / 255.0f;
             d[1] = s[1] / 255.0f;
             d[2] = s[2] / 255.0f;
@@ -74,52 +165,33 @@ static void scale_rgba8(Canvas* dst, const unsigned char* src, int sw, int sh) {
     }
 }
 
-static int render_svg_data(const char* svg, size_t len, int w, int h,
-                           Canvas* out, int aa) {
-    svg2img_options o;
-    memset(&o, 0, sizeof(o));
-    o.aa = aa;
-    o.scale = 1.0f;
-    svg2img_limits lim;
-    svg2img_default_limits(&lim);
-    int hit = 0;
-    Node* root = svg_parse(svg, len, &o, &hit);
-    if (!root || !root->vp.valid) { svg_free(root); return 0; }
-    if (root->vp.w <= 0 || root->vp.h <= 0) { svg_free(root); return 0; }
-    Canvas* src = canvas_create(root->vp.w, root->vp.h);
-    if (!src) { svg_free(root); return 0; }
-    render_document(src, root, mat_identity(), &o, &lim);
-    for (int y = 0; y < h; y++) {
-        int sy = (int)((int64_t)y * src->h / h);
-        if (sy >= src->h) sy = src->h - 1;
-        for (int x = 0; x < w; x++) {
-            int sx = (int)((int64_t)x * src->w / w);
-            if (sx >= src->w) sx = src->w - 1;
-            const float* s = src->px + ((size_t)sy * (size_t)src->w + (size_t)sx) * 4;
-            float* d = out->px + ((size_t)y * (size_t)w + (size_t)x) * 4;
-            d[0] = s[0]; d[1] = s[1]; d[2] = s[2]; d[3] = s[3];
+/* Nearest-neighbour blit into an FBuf (feImage). */
+void image_blit_fbuf(FBuf* dst, int dx, int dy, int dw, int dh,
+                     const unsigned char* src, int sw, int sh) {
+    if (dw <= 0 || dh <= 0 || sw <= 0 || sh <= 0) return;
+    for (int y = 0; y < dh; y++) {
+        int sy = (int)((int64_t)y * sh / dh);
+        if (sy >= sh) sy = sh - 1;
+        int ty = dy + y;
+        if (ty < 0 || ty >= dst->h) continue;
+        for (int x = 0; x < dw; x++) {
+            int sx = (int)((int64_t)x * sw / dw);
+            if (sx >= sw) sx = sw - 1;
+            int tx = dx + x;
+            if (tx < 0 || tx >= dst->w) continue;
+            const unsigned char* s = src + ((size_t)sy * (size_t)sw + (size_t)sx) * 4;
+            float* d = dst->px + ((size_t)ty * (size_t)dst->w + (size_t)tx) * 4;
+            d[0] = s[0] / 255.0f;
+            d[1] = s[1] / 255.0f;
+            d[2] = s[2] / 255.0f;
+            d[3] = s[3] / 255.0f;
         }
     }
-    canvas_free(src);
-    svg_free(root);
-    return 1;
 }
 
 void render_image(Canvas* c, Node* n, Mat world, float opacity,
                   Mask* clip, int aa) {
     if (!n || !n->image_href || !(n->img_w > 0.0f) || !(n->img_h > 0.0f)) return;
-    const char* href = n->image_href;
-    if (strncmp(href, "data:", 5)) return;      /* external file: unsupported */
-
-    const char* comma = strchr(href, ',');
-    if (!comma) return;
-    size_t meta_len = (size_t)(comma - href);
-    const char* data = comma + 1;
-    size_t data_len = strlen(data);
-    int is_b64 = meta_len >= 6 && !strncmp(comma - 7, ";base64", 7);
-    int is_svg = strstr(href, "svg") != NULL;
-    int is_png = strstr(href, "png") != NULL;
-    if (!is_svg && !is_png) return;
 
     /* Device rectangle of the image viewport. */
     Pt q[4] = { {n->img_x, n->img_y},
@@ -145,41 +217,14 @@ void render_image(Canvas* c, Node* n, Mat world, float opacity,
 
     Canvas* img = canvas_create(dw, dh);
     if (!img) return;
-    int ok = 0;
-
-    if (is_png) {
-        unsigned char* raw = NULL;
-        size_t rawn = 0;
-        if (is_b64) raw = b64decode(data, &rawn);
-        else {
-            char* dec = pctdecode(data, data_len);
-            if (dec) { raw = b64decode(dec, &rawn); free(dec); }
-        }
-        if (raw) {
-            int sw = 0, sh = 0;
-            unsigned char* px = png_decode_rgba(raw, rawn, &sw, &sh);
-            free(raw);
-            if (px) {
-                scale_rgba8(img, px, sw, sh);
-                free(px);
-                ok = 1;
-            }
-        }
-    } else {
-        char* svg = NULL;
-        size_t slen = 0;
-        if (is_b64) {
-            svg = (char*)b64decode(data, &slen);
-        } else {
-            svg = pctdecode(data, data_len);
-            if (svg) slen = strlen(svg);
-        }
-        if (svg) {
-            ok = render_svg_data(svg, slen, dw, dh, img, aa);
-            free(svg);
-        }
+    unsigned char* raw = NULL;
+    int sw = 0, sh = 0;
+    if (!image_decode_href(n->image_href, aa, &raw, &sw, &sh)) {
+        canvas_free(img);
+        return;
     }
-    if (!ok) { canvas_free(img); return; }
+    image_blit_rgba8(img, 0, 0, dw, dh, raw, sw, sh);
+    free(raw);
 
     for (int y = 0; y < dh; y++) {
         for (int x = 0; x < dw; x++) {
