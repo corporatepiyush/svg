@@ -31,10 +31,16 @@ void idmap_put(IdMap* m, const char* k, Node* v) {
     }
     unsigned h = hash_str(k) % (unsigned)m->cap;
     while (m->e[h].key) {
-        if (!strcmp(m->e[h].key, k)) { m->e[h].val = v; return; }
+        if (!strcmp(m->e[h].key, k)) {
+            /* Replacing an existing id: the key is shared with the old entry,
+             * so keep it and only swap the value. */
+            m->e[h].val = v;
+            return;
+        }
         h = (h + 1) % (unsigned)m->cap;
     }
     m->e[h].key = svg_strdup(k);
+    if (!m->e[h].key) return;             /* allocation failure: no entry */
     m->e[h].val = v;
     m->n++;
 }

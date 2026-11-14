@@ -9,10 +9,12 @@
 #include <ctype.h>
 
 static XMLNode* new_elem(const char* name) {
+    if (!name) return NULL;
     XMLNode* n = (XMLNode*)svg_malloc(sizeof(XMLNode));
     if (!n) return NULL;
     memset(n, 0, sizeof(*n));
     n->name = svg_strdup(name);
+    if (!n->name) { free(n); return NULL; }   /* do not leave a nameless node */
     return n;
 }
 
@@ -209,7 +211,8 @@ XMLNode* xml_parse(const char* data, size_t len) {
             i = (j < len) ? j + 1 : len;
             while (sp > 0) {
                 XMLNode* n = stack[--sp];
-                if (strlen(n->name) == nlen && !strncmp(n->name, data + ns, nlen))
+                if (n->name && strlen(n->name) == nlen &&
+                    !strncmp(n->name, data + ns, nlen))
                     break;
             }
             cur = (sp > 0) ? stack[sp - 1] : doc;
@@ -225,7 +228,7 @@ XMLNode* xml_parse(const char* data, size_t len) {
             char* name = svg_strndup(data + ns, j - ns);
             XMLNode* el = new_elem(name);
             free(name);
-            if (!el) break;
+            if (!el) break;   /* allocation failure: stop parsing cleanly */
 
             int selfclose = 0;
             while (j < len) {
@@ -283,7 +286,13 @@ XMLNode* xml_parse(const char* data, size_t len) {
                 if (sp == scap) {
                     int nscap = scap ? scap * 2 : 16;
                     XMLNode** nsx = (XMLNode**)svg_realloc(stack, (size_t)nscap * sizeof(XMLNode*));
-                    if (!nsx) { xml_free(el); break; }          /* OOM */
+                    if (!nsx) {
+                        /* el is already linked into the tree; freeing it here
+                         * would leave a dangling child.  Stop parsing: the
+                         * document keeps what was built so far and is still
+                         * structurally valid. */
+                        break;
+                    }
                     stack = nsx; scap = nscap;
                 }
                 stack[sp++] = el;

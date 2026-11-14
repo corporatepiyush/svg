@@ -86,3 +86,33 @@ int cli_parse(int argc, char** argv, svg2img_options* opts,
     if (!*in || !*out) { cli_usage(argv[0]); return 2; }
     return 0;
 }
+/* ------------------------------------------------------------------ */
+/* Resource limits from the environment                                */
+/* ------------------------------------------------------------------ */
+
+static int env_int(const char* name, int* out) {
+    const char* s = getenv(name);
+    if (!s || !*s) return 0;
+    char* end = NULL;
+    long v = strtol(s, &end, 10);
+    if (end == s) return 0;
+    if (v < 0) v = 0;
+    if (v > 0x7FFFFFFFL) v = 0x7FFFFFFFL;
+    *out = (int)v;
+    return 1;
+}
+
+void cli_limits_from_env(svg2img_options* opts) {
+    if (!opts) return;
+    svg2img_limits* l = &opts->limits;
+    env_int("SVG2IMG_LIMIT_MAX_NODES", &l->max_nodes);
+    env_int("SVG2IMG_LIMIT_MAX_DEPTH", &l->max_depth);
+    env_int("SVG2IMG_LIMIT_MAX_PATH_POINTS", &l->max_path_points);
+    env_int("SVG2IMG_LIMIT_MAX_PATH_SUBPATHS", &l->max_path_subpaths);
+    env_int("SVG2IMG_LIMIT_MAX_GRADIENT_STOPS", &l->max_gradient_stops);
+    env_int("SVG2IMG_LIMIT_MAX_TEXT_LENGTH", &l->max_text_length);
+    env_int("SVG2IMG_LIMIT_MAX_CLIP_DEPTH", &l->max_clip_depth);
+    env_int("SVG2IMG_LIMIT_MAX_LAYERS", &l->max_layers);
+    env_int("SVG2IMG_LIMIT_MAX_USE_EXPANSION", &l->max_use_expansion);
+    env_int("SVG2IMG_LIMIT_MAX_PIXELS", &l->max_pixels);
+}

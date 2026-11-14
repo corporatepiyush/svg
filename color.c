@@ -107,8 +107,10 @@ static int parse_hex(const char* s, Color* out) {
 }
 
 /* Parse a comma/slash separated argument list into up to 4 floats.
- * Values are returned as-is; the caller decides how to interpret them. */
-static int parse_args(const char* s, float* v, int max) {
+ * Values are returned as-is; the caller decides how to interpret them.
+ * `percent_scale` is the divisor applied to a token that ends in `%`. */
+static int parse_args_scale(const char* s, float* v, int max,
+                            float percent_scale) {
     const char* p = strchr(s, '(');
     const char* e = strrchr(s, ')');
     if (!p || !e || e <= p) return 0;
@@ -126,19 +128,64 @@ static int parse_args(const char* s, float* v, int max) {
         int pct = 0;
         while (isspace((unsigned char)*q)) q++;
         if (*q == '%') { pct = 1; q++; }
-        v[n++] = pct ? f / 100.0f : f;
+        v[n++] = pct ? f / percent_scale : f;
     }
     free(inner);
     return n;
 }
 
+static int parse_args(const char* s, float* v, int max) {
+    return parse_args_scale(s, v, max, 100.0f);
+}
+
 static int parse_rgb(const char* s, Color* out) {
+    /* SVG 1.1 §4.4: rgb()/rgba() components are 0..255 integers or
+     * percentages.  CSS Color 3 also permits plain 0..1 fractions.  Decide
+     * from the argument list: an all-integer list is 0..255; any decimal
+     * point or exponent marks a fractional list.  Percentages are always
+     * divided by 100. */
+    const char* open = strchr(s, '(');
+    const char* close = open ? strchr(open, ')') : NULL;
+    if (!open || !close || close <= open) return 0;
+
+    char* inner = svg_strndup(open + 1, (size_t)(close - (open + 1)));
+    if (!inner) return 0;
+
     float v[4] = {0, 0, 0, 1};
-    int n = parse_args(s, v, 4);
+    int n = 0, saw_fraction = 0;
+    char* q = inner;
+    while (*q && n < 4) {
+        while (*q && (isspace((unsigned char)*q) || *q == ',' || *q == '/')) q++;
+        if (!*q) break;
+        const char* tok = q;
+        char* end = NULL;
+        float f = strtof(q, &end);
+        if (end == q) { free(inner); return 0; }
+        /* Inspect the consumed token for a fractional marker. */
+        for (const char* t = tok; t < end; t++) {
+            if (*t == '.' || *t == 'e' || *t == 'E') { saw_fraction = 1; break; }
+        }
+        q = end;
+        int pct = 0;
+        while (*q && isspace((unsigned char)*q)) q++;
+        if (*q == '%') { pct = 1; q++; }
+        if (pct) {
+            /* Percentages are already 0..1 after the division and must not
+             * be rescaled as a 0..255 integer triple. */
+            v[n++] = f / 100.0f;
+            saw_fraction = 1;
+        } else {
+            v[n++] = f;
+        }
+    }
+    free(inner);
     if (n < 3) return 0;
-    out->r = v[0];
-    out->g = v[1];
-    out->b = v[2];
+    if (!saw_fraction)
+        for (int i = 0; i < n && i < 3; i++) v[i] /= 255.0f;
+
+    out->r = v[0] < 0.0f ? 0.0f : (v[0] > 1.0f ? 1.0f : v[0]);
+    out->g = v[1] < 0.0f ? 0.0f : (v[1] > 1.0f ? 1.0f : v[1]);
+    out->b = v[2] < 0.0f ? 0.0f : (v[2] > 1.0f ? 1.0f : v[2]);
     out->a = (n >= 4) ? v[3] : 1.0f;
     return 1;
 }

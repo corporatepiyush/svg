@@ -25,14 +25,43 @@
 #define SVG_PI 3.14159265358979323846f
 #endif
 
+/* Limits travel in the public options struct (svg2img.h).  These macros name
+ * the compiled-in defaults for the implementation files that do not otherwise
+ * include the public header directly. */
+#define SVG2IMG_LIMIT_MAX_NODES          200000
+#define SVG2IMG_LIMIT_MAX_DEPTH          1024
+#define SVG2IMG_LIMIT_MAX_PATH_POINTS    500000
+#define SVG2IMG_LIMIT_MAX_PATH_SUBPATHS  100000
+#define SVG2IMG_LIMIT_MAX_GRADIENT_STOPS 256
+#define SVG2IMG_LIMIT_MAX_TEXT_LENGTH    100000
+#define SVG2IMG_LIMIT_MAX_CLIP_DEPTH     16
+#define SVG2IMG_LIMIT_MAX_LAYERS         64
+#define SVG2IMG_LIMIT_MAX_USE_EXPANSION  20000
+#define SVG2IMG_LIMIT_MAX_PIXELS         (64 * 1024 * 1024)
+
 /* ------------------------------------------------------------------ */
 /* Allocation                                                          */
 /* ------------------------------------------------------------------ */
 
+/* svg_malloc / svg_realloc / svg_strdup / svg_strndup are the only allocation
+ * points in the renderer.  In a normal build they are `static inline` wrappers
+ * around libc, so there is no indirect call in production.  Test builds that
+ * define SVG2IMG_ALLOC_HOOKS route them through function pointers so a test
+ * can inject allocation failure; that switch is compiled out by default and
+ * costs production nothing. */
+#ifdef SVG2IMG_ALLOC_HOOKS
+typedef void* (*svg_alloc_fn)(size_t);
+typedef void* (*svg_realloc_fn)(void*, size_t);
+void  svg_set_alloc_hooks(svg_alloc_fn alloc, svg_realloc_fn realloc_fn);
+void* svg_malloc(size_t n);
+void* svg_realloc(void* p, size_t n);
+#else
 static inline void* svg_malloc(size_t n) { return malloc(n ? n : 1); }
 static inline void* svg_realloc(void* p, size_t n) { return realloc(p, n ? n : 1); }
+#endif
 
 static inline char* svg_strdup(const char* s) {
+    if (!s) return NULL;                 /* tolerate a failed earlier alloc */
     size_t n = strlen(s);
     char* r = (char*)svg_malloc(n + 1);
     if (r) memcpy(r, s, n + 1);
@@ -95,6 +124,32 @@ static inline float mat_scale_factor(Mat m) {
     return sqrtf(fabsf(m.m[0] * m.m[3] - m.m[1] * m.m[2]));
 }
 
+/* Inverse of an affine matrix.  Returns 0 (and leaves *out untouched) when
+ * the matrix is singular or non-finite, so callers can fall back to treating
+ * the gradient as already being in device space. */
+static inline int mat_invert_checked(Mat m, Mat* out) {
+    float det = m.m[0] * m.m[3] - m.m[1] * m.m[2];
+    if (!isfinite(det) || fabsf(det) < 1e-20f) return 0;
+    float id = 1.0f / det;
+    Mat r;
+    r.m[0] =  m.m[3] * id;
+    r.m[1] = -m.m[1] * id;
+    r.m[2] = -m.m[2] * id;
+    r.m[3] =  m.m[0] * id;
+    r.m[4] = (m.m[2] * m.m[5] - m.m[3] * m.m[4]) * id;
+    r.m[5] = (m.m[1] * m.m[4] - m.m[0] * m.m[5]) * id;
+    for (int i = 0; i < 6; i++)
+        if (!isfinite(r.m[i])) return 0;
+    if (out) *out = r;
+    return 1;
+}
+
+static inline Mat mat_invert(Mat m) {
+    Mat r = mat_identity();
+    (void)mat_invert_checked(m, &r);
+    return r;
+}
+
 /* ------------------------------------------------------------------ */
 /* Paths                                                               */
 /* ------------------------------------------------------------------ */
@@ -126,6 +181,16 @@ enum {
 enum { UNITS_BBOX = 0, UNITS_USER = 1 };
 enum { SPREAD_PAD = 0, SPREAD_REFLECT = 1, SPREAD_REPEAT = 2 };
 
+/* Bits recorded in Node.spec for the properties the element itself
+ * specified (presentation attribute or inline style).  Only the inheritable
+ * paint properties are tracked; use_apply_style() in svg_refs.c consults
+ * these so a <use> never overwrites a value the referenced element set. */
+enum {
+    SPEC_NONE   = 0u,
+    SPEC_FILL   = 1u << 0,
+    SPEC_STROKE = 1u << 1
+};
+
 typedef struct Paint {
     int    type;
     Color  color;
@@ -153,7 +218,10 @@ enum {
     NODE_TEXT = 2,
     NODE_CLIPDEF = 3,
     NODE_GRADDEF = 4,
-    NODE_IGNORE = 5
+    NODE_IGNORE = 5,
+    NODE_SYMBOL = 6,      /* <symbol>: never drawn directly, only via <use> */
+    NODE_TRANSPARENT = 7  /* unsupported element: no rendering, but its known
+                           * children are still traversed */
 };
 
 struct Node {
@@ -192,12 +260,28 @@ struct Node {
     int   clip_units;
     int   clip_rule;
 
+    /* display:none hides the whole subtree (traversal stops); visibility is
+     * inherited per element and only suppresses that element's own painting. */
+    int hidden_subtree;
+
     /* use */
     char* use_ref;
     float use_x, use_y;
 
+    /* Bitmask of inheritable properties the element specified itself, used
+     * only when cloning a <use> target: the use site may supply the rest
+     * (SVG 1.1 §5.6).  See SPEC_* in internal.h. */
+    unsigned spec;
+
     /* root viewport, valid only on the root node */
     struct { int w, h; Mat tm; int valid; } vp;
+
+    /* nested <svg> viewport: clip children to this rectangle in the node's
+     * own (pre-transform) user space */
+    int   vp_clip;
+    float vp_x, vp_y, vp_w, vp_h;
+    Mat   vp_matrix;        /* viewport mapping, combined with the transform */
+    int   vp_matrix_valid;
 };
 
 struct Canvas { int w, h; float* px; };   /* RGBA, straight alpha */
@@ -227,6 +311,7 @@ XMLNode*    xml_child(const XMLNode* n, const char* name);
 /* ------------------------------------------------------------------ */
 
 Path* path_parse(const char* d);
+Path* path_parse_lim(const char* d, const svg2img_limits* lim, int* limit_hit);
 void  path_free(Path* p);
 void  path_transform(Path* p, Mat m);
 void  path_bbox(const Path* p, float out[4]);
@@ -254,6 +339,8 @@ typedef struct Style {
     float dashoff;
     float* dash;
     int   ndash;
+    int   saw_fill;        /* the element specified fill (for <use> cloning) */
+    int   saw_stroke;      /* the element specified stroke                    */
 } Style;
 
 /* Evaluation context passed down the DOM while building the tree. */
@@ -262,6 +349,9 @@ typedef struct IdMap IdMap;
 typedef struct Ctx {
     float       vw, vh, em;
     IdMap*      ids;
+    const svg2img_limits* lim;   /* resolved limits for this conversion */
+    int         nodes;           /* nodes built so far (max_nodes)       */
+    int         limit_hit;       /* a hard limit was exceeded            */
 } Ctx;
 
 Style  style_default(void);
@@ -282,9 +372,11 @@ float length_parse(const char* s, float vw, float vh, float em, int axis, float 
 /* ------------------------------------------------------------------ */
 
 Node* svg_node_new(int type);
-void  svg_resolve(Node* n, IdMap* ids);
-Node* svg_parse(const char* data, size_t len, const svg2img_options* opts);
+int   svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim);
+Node* svg_parse(const char* data, size_t len, const svg2img_options* opts,
+                int* limit_hit);
 void  svg_free(Node* n);
+void  limits_resolve(const svg2img_limits* in, svg2img_limits* out);
 
 /* ------------------------------------------------------------------ */
 /* Rasterization (raster_*.c)                                          */
@@ -293,7 +385,8 @@ void  svg_free(Node* n);
 Canvas* canvas_create(int w, int h);
 void    canvas_free(Canvas* c);
 void    canvas_clear(Canvas* c, Color col);
-void    render_document(Canvas* c, Node* root, Mat view_tm, const svg2img_options* opts);
+void    render_document(Canvas* c, Node* root, Mat view_tm,
+                        const svg2img_options* opts, const svg2img_limits* lim);
 
 /* ------------------------------------------------------------------ */
 /* PNG output (png_*.c)                                                */

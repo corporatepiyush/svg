@@ -67,6 +67,47 @@ static void render_clip_node(Canvas* c, Node* n, Mat world, int rule, int aa) {
 /* Rasterise a clipPath into an 8-bit alpha mask.  `obj_bbox` is the
  * bounding box of the referencing element, used when clipPathUnits is
  * objectBoundingBox. */
+/* Rasterise a nested <svg> viewport rectangle into an alpha mask.  `w` is the
+ * node's full transform (parent CTM * node matrix), which maps the viewport's
+ * user space to device space, so the rectangle's four corners are simply
+ * transformed.  Returns NULL if the mask could not be allocated (the caller
+ * then renders without the clip, which is the documented degradation). */
+Mask* make_rect_mask(const Node* n, Mat w, int W, int H, int aa) {
+    (void)aa;
+    if (!n) return NULL;
+    Pt c[4] = {
+        {n->vp_x,         n->vp_y},
+        {n->vp_x + n->vp_w, n->vp_y},
+        {n->vp_x + n->vp_w, n->vp_y + n->vp_h},
+        {n->vp_x,         n->vp_y + n->vp_h}
+    };
+    float x0 = 1e30f, y0 = 1e30f, x1 = -1e30f, y1 = -1e30f;
+    for (int i = 0; i < 4; i++) {
+        Pt q = mat_apply(w, c[i]);
+        if (!isfinite(q.x) || !isfinite(q.y)) return NULL;
+        if (q.x < x0) x0 = q.x;
+        if (q.y < y0) y0 = q.y;
+        if (q.x > x1) x1 = q.x;
+        if (q.y > y1) y1 = q.y;
+    }
+    int ix0 = svg_f2i(floorf(x0), -1, W + 1, 0);
+    int iy0 = svg_f2i(floorf(y0), -1, H + 1, 0);
+    int ix1 = svg_f2i(ceilf(x1), -1, W + 1, 0);
+    int iy1 = svg_f2i(ceilf(y1), -1, H + 1, 0);
+    if (ix0 < 0) ix0 = 0;
+    if (iy0 < 0) iy0 = 0;
+    if (ix1 > W) ix1 = W;
+    if (iy1 > H) iy1 = H;
+    if (ix0 >= ix1 || iy0 >= iy1) return mask_alloc(0, 0, W, H);
+    Mask* m = mask_alloc(ix0, iy0, ix1, iy1);
+    if (!m) return NULL;
+    for (int y = iy0; y < iy1; y++) {
+        float* row = m->m + (size_t)(y - iy0) * (size_t)(ix1 - ix0);
+        for (int x = ix0; x < ix1; x++) row[x - ix0] = 1.0f;
+    }
+    return m;
+}
+
 Mask* make_clip_mask(const Node* clipdef, Mat world,
                             const float* obj_bbox, int W, int H, int aa) {
     if (!clipdef) return NULL;

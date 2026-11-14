@@ -57,20 +57,33 @@ void grad_build(Grad* g, const Paint* p, const float bbox[4], Mat world) {
     if (fabsf(g->bh) < 1e-9f) g->bh = 1.0f;
 
     if (p->type == PAINT_LINEAR) {
-        float x1, y1, x2, y2;
+        float x1 = 0.0f, y1 = 0.0f, x2 = 0.0f, y2 = 0.0f;
         if (p->units == UNITS_BBOX) {
             Pt a = mat_apply(p->tm, (Pt){p->x1, p->y1});
             Pt b = mat_apply(p->tm, (Pt){p->x2, p->y2});
             x1 = a.x; y1 = a.y; x2 = b.x; y2 = b.y;
             g->normalized = 1;
         } else {
+            /* userSpaceOnUse: the gradient lives in the user space of the
+             * element that references it, so each pixel is mapped back into
+             * that space before projection.  Forward-transforming the
+             * gradient vector instead is only equivalent for a uniform
+             * scale; under a non-uniform CTM it shears the ramp
+             * (SVG 1.1 §13.2).  The geometry stays in user space and the
+             * inverse CTM is carried for grad_eval(). */
             Mat gt = mat_mul(world, p->tm);
-            Pt a = mat_apply(gt, (Pt){p->x1, p->y1});
-            Pt b = mat_apply(gt, (Pt){p->x2, p->y2});
-            x1 = a.x; y1 = a.y; x2 = b.x; y2 = b.y;
+            g->x1 = x1 = p->x1; g->y1 = y1 = p->y1;
+            g->dx = p->x2 - p->x1;
+            g->dy = p->y2 - p->y1;
+            x2 = p->x2; y2 = p->y2;
+            (void)x2; (void)y2;
+            g->normalized = 0;
+            g->has_inv = mat_invert_checked(gt, &g->inv);
         }
-        g->x1 = x1; g->y1 = y1;
-        g->dx = x2 - x1; g->dy = y2 - y1;
+        if (g->normalized) {
+            g->x1 = x1; g->y1 = y1;
+            g->dx = x2 - x1; g->dy = y2 - y1;
+        }
         float len2 = g->dx * g->dx + g->dy * g->dy;
         g->invlen2 = len2 > 1e-12f ? 1.0f / len2 : 0.0f;
     } else {
@@ -81,11 +94,25 @@ void grad_build(Grad* g, const Paint* p, const float bbox[4], Mat world) {
             g->r = p->r * mat_scale_factor(p->tm);
             g->normalized = 1;
         } else {
+            /* userSpaceOnUse radial: keep the definition in user space and
+             * invert the CTM per pixel, which is exact for a non-uniform
+             * transform (the circle becomes an ellipse in device space).
+             * Forward-transforming the centre and radius only works for a
+             * uniform scale. */
+            g->cx = p->cx; g->cy = p->cy;
+            g->fx = p->fx; g->fy = p->fy;
+            g->r = p->r;
             Mat gt = mat_mul(world, p->tm);
-            Pt c = mat_apply(gt, (Pt){p->cx, p->cy});
-            Pt f = mat_apply(gt, (Pt){p->fx, p->fy});
-            g->cx = c.x; g->cy = c.y; g->fx = f.x; g->fy = f.y;
-            g->r = p->r * mat_scale_factor(gt);
+            g->normalized = 0;
+            g->has_inv = mat_invert_checked(gt, &g->inv);
+            if (!g->has_inv) {
+                /* Singular transform: fall back to the device-space form so
+                 * the gradient still renders something sensible. */
+                Pt c = mat_apply(gt, (Pt){p->cx, p->cy});
+                Pt f = mat_apply(gt, (Pt){p->fx, p->fy});
+                g->cx = c.x; g->cy = c.y; g->fx = f.x; g->fy = f.y;
+                g->r = p->r * mat_scale_factor(gt);
+            }
         }
         /* SVG requires the focal point to lie inside the circle: if it is
          * outside, snap it to the circle along the centre->focal line. */
@@ -122,6 +149,12 @@ Color grad_eval(const Grad* g, float x, float y) {
         if (g->normalized) {
             px = (x - g->bx0) / g->bw;
             py = (y - g->by0) / g->bh;
+        } else if (g->has_inv) {
+            /* userSpaceOnUse: map the device pixel back into gradient space
+             * through the inverse CTM, so a non-uniform transform is
+             * reflected exactly rather than approximated. */
+            Pt q = mat_apply(g->inv, (Pt){x, y});
+            px = q.x; py = q.y;
         }
         t = ((px - g->x1) * g->dx + (py - g->y1) * g->dy) * g->invlen2;
     } else {
@@ -129,6 +162,9 @@ Color grad_eval(const Grad* g, float x, float y) {
         if (g->normalized) {
             px = (x - g->bx0) / g->bw;
             py = (y - g->by0) / g->bh;
+        } else if (g->has_inv) {
+            Pt q = mat_apply(g->inv, (Pt){x, y});
+            px = q.x; py = q.y;
         }
         if (g->rlen <= 0.0f) {
             /* Focal point at the centre: t is the normalised distance. */

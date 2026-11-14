@@ -45,11 +45,34 @@ float mask_get(const Mask* m, int x, int y) {
 
 Mask* mask_shift(const Mask* m, int x0, int y0, int x1, int y1) {
     if (!m) return NULL;
-    Mask* r = mask_alloc(x0, y0, x1, y1);
+    Mask* r = mask_alloc(0, 0, x1 - x0, y1 - y0);
     if (!r) return NULL;
     for (int y = y0; y < y1; y++)
         for (int x = x0; x < x1; x++)
             r->m[(size_t)(y - y0) * (size_t)(x1 - x0) + (size_t)(x - x0)] = mask_get(m, x, y);
+    return r;
+}
+
+/* Re-base a mask onto a layer's local coordinate system: the returned mask
+ * starts at (0,0) and `dx`/`dy` is subtracted from every sample, matching a
+ * child transform that already includes a -dx,-dy translation.  This is what
+ * the opacity-layer compositor needs; mask_shift() keeps absolute
+ * coordinates and is only used for same-space crops. */
+Mask* mask_translate(const Mask* m, int dx, int dy) {
+    if (!m) return NULL;
+    int w = m->x1 - m->x0, h = m->y1 - m->y0;
+    if (w <= 0 || h <= 0) return NULL;
+    /* Clip the region to the part that lands inside the layer. */
+    int sx0 = dx < m->x0 ? m->x0 : dx;
+    int sy0 = dy < m->y0 ? m->y0 : dy;
+    int sx1 = dx + w > m->x1 ? m->x1 : dx + w;
+    int sy1 = dy + h > m->y1 ? m->y1 : dy + h;
+    if (sx0 >= sx1 || sy0 >= sy1) return NULL;
+    Mask* r = mask_alloc(0, 0, w, h);
+    if (!r) return NULL;
+    for (int y = sy0; y < sy1; y++)
+        for (int x = sx0; x < sx1; x++)
+            r->m[(size_t)(y - dy) * (size_t)w + (size_t)(x - dx)] = mask_get(m, x, y);
     return r;
 }
 

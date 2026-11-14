@@ -1,6 +1,14 @@
 /* raster_node.c - Node bounds, opacity layers and tree traversal. */
 #include "raster_internal.h"
 
+/* Per-render budget state.  Passed down the tree instead of stored globally,
+ * so a single process can render several documents concurrently. */
+typedef struct {
+    const svg2img_limits* lim;   /* NULL = defaults */
+    int layers;                  /* opacity layers opened so far */
+    int clips;                   /* nested clip masks opened so far */
+} RenderState;
+
 /* ------------------------------------------------------------------ */
 /* Node bounding boxes                                                 */
 /* ------------------------------------------------------------------ */
@@ -31,12 +39,17 @@ static void path_bbox_transformed(const Path* p, Mat m, float out[4]) {
  * parent CTM.  Applying n->tm here as well would double-transform every
  * opacity layer that has its own transform. */
 int node_bbox_world(Node* n, Mat full_w, float out[4]) {
-    if (!n || !n->visible) return 0;
+    if (!n || !n->visible || n->hidden_subtree) return 0;
     if (n->type == NODE_SHAPE && n->path && n->path->n > 0) {
         path_bbox_transformed(n->path, full_w, out);
         if (n->stroke.type != PAINT_NONE && n->sw > 0.0f) {
-            out[0] -= n->sw * 0.5f; out[1] -= n->sw * 0.5f;
-            out[2] += n->sw * 0.5f; out[3] += n->sw * 0.5f;
+            /* The stroke width is authored in user units, so in device space
+             * it must be scaled by the CTM before it is added to the bbox.
+             * Without this the layer for an opacity group clips the stroke
+             * away whenever the CTM scales up. */
+            float half = n->sw * 0.5f * mat_scale_factor(full_w);
+            out[0] -= half; out[1] -= half;
+            out[2] += half; out[3] += half;
         }
         return 1;
     }
@@ -115,15 +128,26 @@ static Mask* node_clip_mask(const Node* n, Mat world, Canvas* c,
 }
 
 static void render_node(Canvas* c, Node* n, Mat world, float opacity,
-                        Mask* clip, int aa);
+                        Mask* clip, int aa, RenderState* rs);
 
 /* Render a group's children into a temporary layer and composite it with
  * the group's opacity.  `op` is the already-composed opacity (group
  * opacity * inherited opacity), and must be < 1 for a layer to be needed. */
 static void render_group_layered(Canvas* c, Node* n, Mat w, float op,
-                                 Mask* eff, int aa) {
+                                 Mask* eff, int aa, RenderState* rs) {
+    /* Layer budget: past the limit, draw straight into the parent instead of
+     * allocating another full-canvas buffer.  The result is slightly wrong
+     * for that one group (its opacity is applied per child rather than to the
+     * flattened group), which is the documented degradation. */
+    if (rs->lim && rs->layers >= rs->lim->max_layers) {
+        for (int i = 0; i < n->nkids; i++)
+            render_node(c, n->kids[i], w, op, eff, aa, rs);
+        return;
+    }
+    rs->layers++;
+
     float bb[4];
-    if (!node_bbox_world(n, w, bb)) return;
+    if (!node_bbox_world(n, w, bb)) { rs->layers--; return; }
 
     int x0 = svg_f2i(floorf(bb[0]), -1, c->w + 1, 0);
     int y0 = svg_f2i(floorf(bb[1]), -1, c->h + 1, 0);
@@ -133,24 +157,38 @@ static void render_group_layered(Canvas* c, Node* n, Mat w, float op,
     if (y0 < 0) y0 = 0;
     if (x1 > c->w) x1 = c->w;
     if (y1 > c->h) y1 = c->h;
-    if (x0 >= x1 || y0 >= y1) return;
+    if (x0 >= x1 || y0 >= y1) { rs->layers--; return; }
 
     Canvas* tmp = canvas_create(x1 - x0, y1 - y0);
-    if (!tmp) return;
+    if (!tmp) { rs->layers--; return; }
 
     Mat tw = mat_mul(mat_translate(-(float)x0, -(float)y0), w);
-    Mask* tclip = mask_shift(eff, x0, y0, x1, y1);
+    /* The layer renders in local coordinates (the child transform includes
+     * the -x0,-y0 shift), so the inherited mask must be re-based to the
+     * layer's own origin: a mask that keeps absolute device coordinates
+     * would sample outside a small layer and clip everything away. */
+    Mask* tclip = mask_translate(eff, x0, y0);
     for (int i = 0; i < n->nkids; i++)
-        render_node(tmp, n->kids[i], tw, 1.0f, tclip, aa);
+        render_node(tmp, n->kids[i], tw, 1.0f, tclip, aa, rs);
     mask_free(tclip);
 
     composite_layer(c, x0, y0, tmp->px, tmp->w, tmp->h, op);
     canvas_free(tmp);
+    rs->layers--;
 }
 
 static void render_node(Canvas* c, Node* n, Mat world, float opacity,
-                        Mask* clip, int aa) {
-    if (!n || !n->visible) return;
+                        Mask* clip, int aa, RenderState* rs) {
+    /* display:none stops the traversal; a NODE_SYMBOL is a definition that is
+     * only ever rendered through a <use> clone (which is retagged NODE_GROUP),
+     * so a symbol left in the tree paints nothing. */
+    if (!n || n->hidden_subtree || n->type == NODE_SYMBOL) return;
+    /* visibility:hidden suppresses this element's own painting but is
+     * inherited per element, so a descendant that sets visibility:visible is
+     * still drawn: traversal continues, only the painting is skipped.  The
+     * subtree is skipped for a hidden shape/text too, which have no children;
+     * for a hidden group we still descend. */
+    if (!n->visible && (n->type == NODE_SHAPE || n->type == NODE_TEXT)) return;
     Mat w = mat_mul(world, n->tm);
     float op = opacity * n->opacity;
     if (op <= 0.0f) return;
@@ -161,12 +199,41 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
     int has_bb = node_bbox_world(n, w, bb);
 
     int clipped_away = 0;
-    Mask* own = node_clip_mask(n, w, c, clip, has_bb ? bb : NULL, aa,
-                               &clipped_away);
-    if (clipped_away) { mask_free(own); return; }
+    Mask* own = NULL;
+    if (n->vp_clip) {
+        /* Nested <svg>: clip to the viewport rectangle.  The rectangle is
+         * transformed by the node's full transform, which maps its user space
+         * (including the viewBox) to device space. */
+        Mask* vm = make_rect_mask(n, w, c->w, c->h, aa);
+        if (vm) {
+            if (vm->empty) { mask_free(vm); return; }   /* empty viewport */
+            if (!clip) {
+                own = vm;
+            } else {
+                own = mask_intersect(clip, vm);
+                mask_free(vm);
+                if (!own) return;                       /* fully clipped away */
+            }
+        }
+    }
+    if (n->clip) {
+        /* Clip-depth budget: past the limit the clip is ignored rather than
+         * recursing without bound. */
+        if (!rs->lim || rs->clips < rs->lim->max_clip_depth) {
+            Mask* cm;
+            rs->clips++;
+            cm = node_clip_mask(n, w, c, own ? own : clip, has_bb ? bb : NULL,
+                                aa, &clipped_away);
+            rs->clips--;
+            if (clipped_away) { mask_free(own); return; }
+            mask_free(own);
+            own = cm;
+        }
+    }
     Mask* eff = own ? own : clip;
 
-    if (n->type == NODE_GROUP) {
+    if (n->type == NODE_GROUP || n->type == NODE_SYMBOL ||
+        n->type == NODE_TRANSPARENT) {
         /* Collapse a chain of single-child, unclipped groups into one layer.
          * "A group of one thing at opacity a" equals "that thing at opacity
          * a*b", so N nested <g opacity=.9> cost one layer, not N.  Without
@@ -188,14 +255,14 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
                 Mat chain_w = w;
                 for (Node* t = n->kids[0]; t != g; t = t->kids[0])
                     chain_w = mat_mul(chain_w, t->tm);
-                render_group_layered(c, g, chain_w, c_op, eff, aa);
+                render_group_layered(c, g, chain_w, c_op, eff, aa, rs);
                 mask_free(own);
                 return;
             }
-            render_group_layered(c, n, w, op, eff, aa);
+            render_group_layered(c, n, w, op, eff, aa, rs);
         } else {
             for (int i = 0; i < n->nkids; i++)
-                render_node(c, n->kids[i], w, op, eff, aa);
+                render_node(c, n->kids[i], w, op, eff, aa, rs);
         }
     } else if (n->type == NODE_SHAPE) {
         render_shape(c, n, w, op, eff, aa);
@@ -206,9 +273,13 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
 }
 
 void render_document(Canvas* c, Node* root, Mat view_tm,
-                     const svg2img_options* opts) {
+                     const svg2img_options* opts, const svg2img_limits* lim) {
     int aa = (opts && opts->aa > 0) ? opts->aa : 4;
     if (aa < 1) aa = 1;
     if (aa > 8) aa = 8;
-    render_node(c, root, view_tm, 1.0f, NULL, aa);
+    RenderState st;
+    st.lim = lim;
+    st.layers = 0;
+    st.clips = 0;
+    render_node(c, root, view_tm, 1.0f, NULL, aa, &st);
 }

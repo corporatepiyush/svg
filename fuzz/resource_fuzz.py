@@ -105,20 +105,20 @@ def canvas(n):
 # name, svg, budget seconds, xfail reason
 def cases():
     c = [
-        ("deep_2000", deep(2000), 10, None),
-        ("deep_5000", deep(5000), 10, None),
-        ("wide_100k", wide(100000), 15, None),
-        ("use_10", use_chain(10), 10, None),
-        ("use_18", use_chain(18), 20, None),
+        ("deep_2000", deep(2000), 10, None, None),
+        ("deep_5000", deep(5000), 10, None, None),
+        ("wide_100k", wide(100000), 15, None, None),
+        ("use_10", use_chain(10), 10, None, None),
+        ("use_18", use_chain(18), 20, None, {"SVG2IMG_LIMIT_MAX_USE_EXPANSION": "2000000", "SVG2IMG_LIMIT_MAX_NODES": "2000000"}),
         ("use_22", use_chain(22), 20,
-         "exponential use expansion: ~2M nodes, ~26 s on this machine"),
-        ("dash_60k", dashed(60000), 15, None),
-        ("dash_200k", dashed(200000), 30, None),
-        ("text_200k", text(200000), 20, None),
-        ("siblings_100k", siblings(100000), 15, None),
-        ("attr_1m", attr_1m(), 10, None),
-        ("canvas_4096", canvas(4096), 30, None),
-        ("path_1m", path_points(1000000), 40, None),
+         "exponential use expansion: ~2M nodes, ~26 s on this machine", None),
+        ("dash_60k", dashed(60000), 15, "exceeds the 500k-point default; dash extraction is quadratic in points", None),
+        ("dash_200k", dashed(200000), 30, "exceeds the 500k-point default; dash extraction is quadratic in points", None),
+        ("text_200k", text(200000), 20, None, {"SVG2IMG_LIMIT_MAX_TEXT_LENGTH": "300000"}),
+        ("siblings_100k", siblings(100000), 15, None, None),
+        ("attr_1m", attr_1m(), 10, None, None),
+        ("canvas_4096", canvas(4096), 30, None, None),
+        ("path_1m", path_points(1000000), 40, None, None),
     ]
     if QUICK:
         c = [x for x in c if x[0] not in ("path_1m", "canvas_4096")]
@@ -133,16 +133,19 @@ def limit():
         pass
 
 
-def run(name, svg, budget, xfail):
+def run(name, svg, budget, xfail, env_extra=None):
     path = write(name, svg)
     out = os.path.join(TMP, name + ".png")
     t0 = time.monotonic()
     status = "ok"
     detail = ""
     try:
+        env = dict(os.environ)
+        if env_extra:
+            env.update(env_extra)
         r = subprocess.run([BIN, "-a", "1", path, out], timeout=budget,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                           preexec_fn=limit)
+                           env=env, preexec_fn=limit)
         if r.returncode != 0:
             status = "exit=%d" % r.returncode
             detail = r.stderr.decode("utf-8", "replace").strip()[:160]
@@ -168,8 +171,8 @@ def run(name, svg, budget, xfail):
 def main():
     failures = 0
     total = 0.0
-    for name, svg, budget, xfail in cases():
-        ok, elapsed = run(name, svg, budget, xfail)
+    for name, svg, budget, xfail, env_extra in cases():
+        ok, elapsed = run(name, svg, budget, xfail, env_extra)
         total += elapsed
         if not ok:
             failures += 1

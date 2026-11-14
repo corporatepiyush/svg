@@ -12,7 +12,7 @@ SRCS = \
 	path_parse.c path_util.c \
 	color.c length.c \
 	svg_idmap.c svg_transform.c svg_geometry.c svg_gradient.c \
-	svg_text.c svg_style.c svg_build.c svg_refs.c svg_viewport.c svg_api.c \
+	svg_text.c svg_style.c svg_build.c svg_refs.c svg_viewport.c svg_api.c svg_alloc.c \
 	raster_util.c \
 	raster_canvas.c \
 	raster_blend.c \
@@ -31,7 +31,7 @@ OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 TARGET = svg2img
 
-.PHONY: all clean test check strict
+.PHONY: all clean test check strict conformance conformance-list baseline diff-external bench bench-update
 
 all: $(TARGET)
 
@@ -56,6 +56,34 @@ test: $(TARGET)
 check: $(TARGET)
 	python3 test/check.py ./$(TARGET)
 
+# Spec-derived conformance corpus: shapes, paths, transforms, viewBox, gradients,
+# clipPath, opacity, use, text, inline style, units, colours, dashes and joins.
+conformance: $(TARGET)
+	python3 conformance/run.py --bin ./$(TARGET)
+
+conformance-list:
+	python3 conformance/run.py --list
+
+# Visual baseline: capture, then diff a re-render against it.
+baseline: $(TARGET)
+	python3 tools/baseline.py capture
+	python3 tools/baseline.py compare
+
+# Differential test against whichever external renderer is installed locally
+# (Chrome/Chromium, Inkscape, resvg, QuickLook).  Skips missing tools cleanly.
+diff-external: $(TARGET)
+	python3 fuzz/diff_external.py --bin ./$(TARGET)
+
+# Deterministic benchmark.  Informational by default; BENCH_CHECK=1 makes a
+# regression over threshold fail the target.
+bench: $(TARGET)
+	python3 bench/gen.py
+	python3 bench/run.py --bin ./$(TARGET) $(if $(BENCH_CHECK),--check)
+
+bench-update: $(TARGET)
+	python3 bench/gen.py
+	python3 bench/run.py --bin ./$(TARGET) --update-baseline
+
 STRICT_CFLAGS = -std=c17 -O2 -Wall -Wextra -pedantic -Werror -Wconversion \
 	-Wsign-conversion -Wshadow -Wcast-qual -Wmissing-prototypes \
 	-Wold-style-definition -Wredundant-decls -Wwrite-strings
@@ -68,3 +96,4 @@ strict:
 
 clean:
 	rm -f $(OBJS) $(DEPS) $(TARGET) css.o path.o png.o raster.o svg.o xml.o
+	rm -rf conformance/baseline bench/cases

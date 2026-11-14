@@ -63,3 +63,21 @@ fuzz/fuzz_run
 fuzz/one
 fuzz/one_fast
 fuzz/*.dSYM/
+
+# Measurement artifacts
+conformance/summary.json
+conformance/baseline/
+conformance/diff_external.md
+conformance/diff_external.json
+bench/cases/
+bench/results.json
+bench/results.md
+*.diff/
+__pycache__/
+
+# Build/measurement artifacts
+*.o.tmp
+fuzz/alloc_run
+
+# Main binary
+/svg2img

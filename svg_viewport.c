@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <math.h>
 
-static int parse_viewbox(const char* s, float* x, float* y, float* w, float* h) {
+int svg_parse_viewbox(const char* s, float* x, float* y, float* w, float* h) {
     if (!s) return 0;
     const char* p = s;
     float* out[4] = {x, y, w, h};
@@ -24,12 +24,27 @@ static int parse_viewbox(const char* s, float* x, float* y, float* w, float* h) 
 #define SVG2IMG_MAX_PIXELS ((size_t)1 << 28) /* 256 Mpx total          */
 
 void compute_viewport(const XMLNode* svg, const svg2img_options* opts,
-                             int* W, int* H, Mat* tm) {
+                             int* W, int* H, Mat* tm,
+                             const svg2img_limits* lim, int* clamped) {
+    if (clamped) *clamped = 0;
+    int max_dim = SVG2IMG_MAX_DIM;
+    size_t max_pixels = SVG2IMG_MAX_PIXELS;
+    if (lim) {
+        /* Derive a dimension cap from the pixel budget so a caller who lowers
+         * max_pixels also gets a proportionally smaller square bound. */
+        if (lim->max_pixels > 0) {
+            size_t mp = (size_t)lim->max_pixels;
+            int d = 1;
+            while ((size_t)d * (size_t)d <= mp && d < SVG2IMG_MAX_DIM) d++;
+            if (d > 1) max_dim = d - 1;
+            max_pixels = mp;
+        }
+    }
     float vw = length_parse(xml_attr(svg, "width"), 0.0f, 0.0f, 16.0f, 0, 0.0f);
     float vh = length_parse(xml_attr(svg, "height"), 0.0f, 0.0f, 16.0f, 1, 0.0f);
 
     float vbx = 0, vby = 0, vbw = 0, vbh = 0;
-    int has_vb = parse_viewbox(xml_attr(svg, "viewBox"), &vbx, &vby, &vbw, &vbh);
+    int has_vb = svg_parse_viewbox(xml_attr(svg, "viewBox"), &vbx, &vby, &vbw, &vbh);
     if (!has_vb || !(vbw > 0.0f) || !(vbh > 0.0f)) has_vb = 0;
 
     /* Reject non-finite and non-positive sizes; fall back to the viewBox
@@ -46,15 +61,16 @@ void compute_viewport(const XMLNode* svg, const svg2img_options* opts,
     double dh = (double)vh * (double)scale + 0.5;
     if (!(dw > 0.0)) dw = 1.0;
     if (!(dh > 0.0)) dh = 1.0;
-    if (dw > (double)SVG2IMG_MAX_DIM) dw = (double)SVG2IMG_MAX_DIM;
-    if (dh > (double)SVG2IMG_MAX_DIM) dh = (double)SVG2IMG_MAX_DIM;
+    if (dw > (double)max_dim) { dw = (double)max_dim; if (clamped) *clamped = 1; }
+    if (dh > (double)max_dim) { dh = (double)max_dim; if (clamped) *clamped = 1; }
 
     int outw = (opts && opts->width > 0)  ? opts->width  : (int)dw;
     int outh = (opts && opts->height > 0) ? opts->height : (int)dh;
-    if (outw > SVG2IMG_MAX_DIM) outw = SVG2IMG_MAX_DIM;
-    if (outh > SVG2IMG_MAX_DIM) outh = SVG2IMG_MAX_DIM;
-    if ((size_t)outw * (size_t)outh > SVG2IMG_MAX_PIXELS) {
-        double k = sqrt((double)SVG2IMG_MAX_PIXELS /
+    if (outw > max_dim) { outw = max_dim; if (clamped) *clamped = 1; }
+    if (outh > max_dim) { outh = max_dim; if (clamped) *clamped = 1; }
+    if ((size_t)outw * (size_t)outh > max_pixels) {
+        if (clamped) *clamped = 1;
+        double k = sqrt((double)max_pixels /
                         ((double)outw * (double)outh));
         outw = (int)((double)outw * k);
         outh = (int)((double)outh * k);
@@ -88,10 +104,19 @@ void compute_viewport(const XMLNode* svg, const svg2img_options* opts,
             float s = slice ? (sx > sy ? sx : sy) : (sx < sy ? sx : sy);
             float ex = (float)outw - vbw * s;
             float ey = (float)outh - vbh * s;
+            /* preserveAspectRatio meet: the scaled viewBox is centred in
+             * the viewport; the remainder is letterboxed.  The translation
+             * must map the viewBox origin to (ox,oy), so it is applied
+             * before the scale, not after. */
+            /* mat_mul(A,B) applies B first.  To map viewBox coordinates to
+             * ox + s*(v - vb), first translate by -vb, then scale, then
+             * translate by (ox,oy).  Translating by (ox,oy) before the scale
+             * shifts letterboxed content by the full offset. */
             float ox = (xa == 1) ? ex * 0.5f : (xa == 2 ? ex : 0.0f);
             float oy = (ya == 1) ? ey * 0.5f : (ya == 2 ? ey : 0.0f);
             m = mat_mul(mat_translate(ox, oy),
-                        mat_mul(mat_scale(s, s), mat_translate(-vbx, -vby)));
+                        mat_mul(mat_scale(s, s),
+                                mat_translate(-vbx, -vby)));
         }
     }
     *W = outw;

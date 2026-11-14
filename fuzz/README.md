@@ -21,7 +21,10 @@ opaque text (for example in XML-grammar tests); it must never crash.
 |---|---|
 | `fuzz_run.c` | fork-per-input batch runner (ASan + UBSan) |
 | `semantics.py` | shared PNG/render/pixel helpers for oracle tests |
-| `semantic_cases.py` | pixel-oracle tests: 14 controls + 12 `xfail` conformance gaps |
+| `semantic_cases.py` | pixel-oracle tests: 32 controls + 12 fixed-gap regressions, 0 xfail |
+| `alloc_fail.py`, `alloc_run.c` | allocation-failure injection (failing-malloc wrapper) |
+| `limit_test.py` | configurable resource-limit behaviour |
+| `diff_external.py` | differential test against Chrome/Inkscape/resvg/WebKit |
 | `gen_seeds.py` | structured seed corpus: every feature, odd numbers, deep/wide docs |
 | `mutate.py` | structure-aware mutation (splice, duplicate, rewrite numbers/tags) |
 | `rawfuzz.py` | raw-byte / malformed-markup fuzzer |
@@ -53,7 +56,9 @@ make raw                # generate 4000 raw-byte mutants
 make raw-run            # generate + run them in parallel
 make feature            # 6000 feature-targeted mutants + parallel run
 make grammar            # XML/reference/numeric grammar mutants + parallel run
-make semantic           # pixel-oracle tests (14 controls, 12 xfail)
+make semantic           # pixel-oracle tests (32 controls, 0 xfail)
+make limits             # resource-limit tests (16 cases)
+make alloc              # allocation-failure injection (failing malloc)
 make resource           # timeout / unbounded-work tests (full)
 make resource-quick     # timeout / unbounded-work tests (fast subset)
 make leak               # leak regression tests
@@ -108,30 +113,24 @@ styling.
 
 ```sh
 python3 fuzz/semantic_cases.py ./svg2img
-14 controls, 12 gap cases: 0 unexpected failure(s), 12 xfail
+12 fixed, 32 controls, 0 gap cases: 0 unexpected failure(s), 0 xfail, 0 xpass
 ```
 
-- **Controls** are behaviour that must keep working (closed-path fill,
-  polygon, clip inside/outside, linear gradient, group opacity, `use`,
-  symbol-via-use, text, `<style>` ignored, inline style, `font-size: %`,
-  stop inline style, opacity inline style, clip-path inline style).
-- **xfail cases** are confirmed SVG conformance bugs.  The runner prints
-  `XPASS` when one is fixed; remove the marker then.
+- **Controls** cover closed/open-path fill, polygons, clip inside/outside,
+  linear gradients, group opacity, `use`, symbol-via-use, text, `<style>`
+  ignored, inline style, `font-size: %`, stop inline style, opacity inline
+  style, and clip-path inline style.
+- The 12 former conformance gaps are now controls: open-subpath fill, `Z` with
+  an implicit lineto, `use` style inheritance, forward/nested `use`, gradient
+  `href` chains, symbol top-level rendering, nested `<svg>`, visibility
+  override, stroke/opacity-layer bbox, userSpaceOnUse gradients, and
+  stop-color inheritance.
+- There are currently **0 xfail** cases; a future regression will show up as a
+  normal failure.
 
-Current xfail list:
-
-1. Open subpaths are not filled as if closed (`polyline`/open `path`).
-2. `Z` followed by implicit lineto is appended to the closed subpath.
-3. `<use>` does not inherit styles from the `use` element.
-4. Forward/nested `<use>` can lose nested content.
-5. Chained gradient `href` fails for forward references.
-6. `<symbol>` renders at the top level.
-7. Nested `<svg>` ignores `x`/`y`/`width`/`height`/`viewBox`.
-8. `visibility="visible"` cannot override inherited `visibility:hidden`.
-9. Strokes can be clipped by an opacity-layer bbox under a scaled CTM.
-10. `userSpaceOnUse` gradients are wrong under non-uniform scale/shear.
-11. `stop-color` is not inherited from the gradient element.
-12. `<use>` with children leaks the child nodes (`leak_check.py`).
+`conformance/` is the broader scorecard: 63 spec-derived cases across 13
+feature areas, with baseline capture/compare and a perceptual diff.  Run it
+with `python3 conformance/run.py --bin ./svg2img` or `make conformance`.
 
 ## Grammar fuzzer
 
@@ -161,7 +160,7 @@ a wall-clock budget and an address-space limit.  Cases:
 | `wide_100k` | many siblings (`node_add_child` growth) |
 | `use_10`, `use_18` | `use` expansion |
 | `use_22` (xfail) | exponential `use` expansion (~2M nodes) |
-| `dash_60k`, `dash_200k` | dashed-stroke extraction |
+| `dash_60k`, `dash_200k` (xfail) | dashed-stroke extraction; exceeds the 500k-point default |
 | `text_200k` | long text node (glyph-pixel accumulator) |
 | `siblings_100k` | wide render tree |
 | `attr_1m` | 1 MB attribute value |
@@ -174,11 +173,8 @@ the case is marked xfail; an xfail that finishes is reported as `XPASS`.
 ## Leak tests
 
 `leak_check.py` runs a corpus through macOS `leaks --atExit` or Linux
-valgrind.  It currently tracks one known leak:
-
-- `<use>` with children: `resolve_use` frees the child array but not the child
-  `Node`s (4 blocks per child).  The leak suite reports it as `xfail`; it will
-  print `XPASS` when fixed.
+valgrind.  It tracks the corpus for leaks.  The former `<use>`-with-children leak is
+fixed, so `leak_check.py` reports 0 xfail and 0 xpass.
 
 Run `make leak` (macOS) or install `valgrind` (Linux).
 
@@ -224,7 +220,9 @@ The container runs:
 - the quick resource tests;
 - the leak checker (valgrind);
 - sanitizer batch runs over seeds, structured mutants, and grammar mutants,
-  using `run_parallel.sh` with all online CPUs.
+  using `run_parallel.sh` with all online CPUs;
+- resource limits (`fuzz/limit_test.py`);
+- allocation-failure injection (`fuzz/alloc_fail.py`).
 
 ## What the harness has found
 
@@ -251,16 +249,18 @@ The container runs:
   (xfail until fixed) in `semantic_cases.py`.
 - **Grammar case:** add to `XML_RAW`, `REF_BODIES`, or `NUM_BODIES` in
   `grammar_fuzz.py`.
-- **Resource case:** add `(name, svg, budget, xfail)` to `cases()` in
-  `resource_fuzz.py`.
+- **Resource case:** add `(name, svg, budget, xfail, env_extra)` to
+  `cases()` in `resource_fuzz.py`.
 - **Leak case:** add `(name, svg, xfail)` to `CASES` in `leak_check.py`.
 
 ## Notes / TODO
 
-- No allocation-failure injection yet; add a failing-malloc wrapper.
+- Allocation-failure injection exists (`make alloc`) but does not cover every
+  optional allocation path.
 - No coverage-guided fuzzing (libFuzzer/AFL++); the generators are
   structure-aware but not instrumented.
-- No Chrome-headless differential; `refdiff` is macOS WebKit only.
+- `diff_external.py` can use Chrome/Inkscape/resvg/WebKit when installed; it
+  skips cleanly when none are available.
 - The campaign stops at the first reproducible crash and writes
   `campaign/minimal.svg`.  Fix the bug, add a `regress/` case, then rerun.
 - The sanitizer build finds the bugs; `make fast` is the timing build.

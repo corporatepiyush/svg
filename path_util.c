@@ -30,8 +30,15 @@ Path* path_copy(const Path* p) {
         q->s[i].n = p->s[i].n;
         q->s[i].closed = p->s[i].closed;
         q->s[i].p = (Pt*)svg_malloc((size_t)(p->s[i].n ? p->s[i].n : 1) * sizeof(Pt));
-        if (p->s[i].n && q->s[i].p) memcpy(q->s[i].p, p->s[i].p,
-                                          (size_t)p->s[i].n * sizeof(Pt));
+        if (!q->s[i].p) {
+            /* Allocation failure: leave this subpath empty rather than
+             * dereferencing NULL in memcpy below.  The copy keeps the
+             * subpaths it could allocate. */
+            q->s[i].n = 0;
+            continue;
+        }
+        if (p->s[i].n)
+            memcpy(q->s[i].p, p->s[i].p, (size_t)p->s[i].n * sizeof(Pt));
     }
     return q;
 }

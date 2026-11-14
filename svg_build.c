@@ -33,6 +33,12 @@ int node_add_child(Node* parent, Node* child) {
 
 Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     if (depth > SVG2IMG_MAX_DEPTH) return NULL;
+    /* Hard depth limit: refuse to build past max_depth.  The caller drops the
+     * subtree and the conversion reports SVG2IMG_ERR_LIMIT. */
+    if (ctx->lim && depth > ctx->lim->max_depth) { ctx->limit_hit = 1; return NULL; }
+    /* Node budget: refuse to build past max_nodes. */
+    if (ctx->lim && ctx->nodes >= ctx->lim->max_nodes) { ctx->limit_hit = 1; return NULL; }
+    ctx->nodes++;
     Style st = style_default();
     if (parent) style_copy(&st, parent);
     ctx->em = st.fontsize;
@@ -59,14 +65,80 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     Node* n = NULL;
     int in_defs = 0;
 
-    if (!strcmp(name, "svg") || !strcmp(name, "g") || !strcmp(name, "a") ||
-        !strcmp(name, "symbol")) {
+    if (!strcmp(name, "svg") || !strcmp(name, "g") || !strcmp(name, "a")) {
         n = svg_node_new(NODE_GROUP);
+        if (n && !strcmp(name, "svg")) {
+            /* A nested <svg> establishes a new viewport: x/y/width/height
+             * position and size it, and viewBox maps its own user space into
+             * that viewport (SVG 1.1 §5.1.2).  Only the *root* svg was
+             * handled before; here a nested one gets the same treatment by
+             * folding the viewport transform into the node's matrix and
+             * clipping to the viewport rectangle. */
+            float vx = len_attr(ctx, xn, "x", 0, 0.0f);
+            float vy = len_attr(ctx, xn, "y", 1, 0.0f);
+            float vw = len_attr(ctx, xn, "width", 0, 0.0f);
+            float vh = len_attr(ctx, xn, "height", 1, 0.0f);
+            if (!(vw > 0.0f)) vw = ctx->vw;
+            if (!(vh > 0.0f)) vh = ctx->vh;
+            Mat m = mat_translate(vx, vy);
+            float vbx = 0, vby = 0, vbw = 0, vbh = 0;
+            if (svg_parse_viewbox(xml_attr(xn, "viewBox"),
+                                  &vbx, &vby, &vbw, &vbh) &&
+                vbw > 0.0f && vbh > 0.0f) {
+                /* preserveAspectRatio: only the "none" (stretch) case is
+                 * honoured exactly; the default uniform fit is computed here
+                 * and matches the root viewport code. */
+                float sx = vw / vbw, sy = vh / vbh;
+                int none = 0, slice = 0, xa = 1, ya = 1;
+                const char* par = xml_attr(xn, "preserveAspectRatio");
+                if (par && strncmp(par, "none", 4) == 0) none = 1;
+                else if (par) {
+                    if (strstr(par, "xMin")) xa = 0;
+                    else if (strstr(par, "xMax")) xa = 2;
+                    if (strstr(par, "YMin")) ya = 0;
+                    else if (strstr(par, "YMax")) ya = 2;
+                    if (strstr(par, "slice")) slice = 1;
+                }
+                if (none) {
+                    m = mat_mul(m, mat_mul(mat_scale(sx, sy),
+                                           mat_translate(-vbx, -vby)));
+                } else {
+                    float s = slice ? (sx > sy ? sx : sy) : (sx < sy ? sx : sy);
+                    float ex = vw - vbw * s, ey = vh - vbh * s;
+                    float ox = (xa == 1) ? ex * 0.5f : (xa == 2 ? ex : 0.0f);
+                    float oy = (ya == 1) ? ey * 0.5f : (ya == 2 ? ey : 0.0f);
+                    m = mat_mul(m, mat_mul(mat_translate(ox, oy),
+                                mat_mul(mat_scale(s, s),
+                                        mat_translate(-vbx, -vby))));
+                }
+            }
+            /* The node's own transform attribute is applied before the
+             * viewport transform, per the SVG transform semantics; stash the
+             * matrix and combine it once the transform attribute is parsed
+             * below. */
+            n->vp_matrix = m;
+            n->vp_matrix_valid = 1;
+            /* Clip to the viewport rectangle (overflow is hidden by default
+             * on the outermost svg and on nested viewports).  The rectangle
+             * is expressed in the node's own user space -- the space `w`
+             * maps to device -- which starts at (0,0) and is vw x vh. */
+            n->vp_clip = 1;
+            n->vp_x = 0.0f; n->vp_y = 0.0f; n->vp_w = vw; n->vp_h = vh;
+        }
+    } else if (!strcmp(name, "symbol")) {
+        /* <symbol> is never rendered directly: it is only instantiated by a
+         * <use> reference, which clones it like any other subtree.  Building
+         * it as a group but tagging it NODE_SYMBOL keeps the definition out
+         * of the render tree while still allowing clone_node() to copy it. */
+        n = svg_node_new(NODE_SYMBOL);
+        if (!n) goto oom;
     } else if (!strcmp(name, "defs")) {
         n = svg_node_new(NODE_IGNORE);
+        if (!n) goto oom;
         in_defs = 1;
     } else if (!strcmp(name, "rect")) {
         n = svg_node_new(NODE_SHAPE);
+        if (!n) goto oom;
         float x = len_attr(ctx, xn, "x", 0, 0.0f);
         float y = len_attr(ctx, xn, "y", 1, 0.0f);
         float w = len_attr(ctx, xn, "width", 0, 0.0f);
@@ -78,12 +150,14 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n->path = path_from_rect(x, y, w, h, rx, ry);
     } else if (!strcmp(name, "circle")) {
         n = svg_node_new(NODE_SHAPE);
+        if (!n) goto oom;
         float cx = len_attr(ctx, xn, "cx", 0, 0.0f);
         float cy = len_attr(ctx, xn, "cy", 1, 0.0f);
         float r  = len_attr(ctx, xn, "r",  2, 0.0f);
         n->path = path_from_ellipse(cx, cy, r, r);
     } else if (!strcmp(name, "ellipse")) {
         n = svg_node_new(NODE_SHAPE);
+        if (!n) goto oom;
         float cx = len_attr(ctx, xn, "cx", 0, 0.0f);
         float cy = len_attr(ctx, xn, "cy", 1, 0.0f);
         float rx = len_attr(ctx, xn, "rx", 0, 0.0f);
@@ -91,35 +165,47 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n->path = path_from_ellipse(cx, cy, rx, ry);
     } else if (!strcmp(name, "line")) {
         n = svg_node_new(NODE_SHAPE);
+        if (!n) goto oom;
         n->path = path_from_line(len_attr(ctx, xn, "x1", 0, 0.0f),
                                  len_attr(ctx, xn, "y1", 1, 0.0f),
                                  len_attr(ctx, xn, "x2", 0, 0.0f),
                                  len_attr(ctx, xn, "y2", 1, 0.0f));
     } else if (!strcmp(name, "polyline")) {
         n = svg_node_new(NODE_SHAPE);
-        n->path = path_from_points(xml_attr(xn, "points"), 0);
+        if (!n) goto oom;
+        n->path = path_from_points_lim(xml_attr(xn, "points"), 0, ctx->lim,
+                                       &ctx->limit_hit);
     } else if (!strcmp(name, "polygon")) {
         n = svg_node_new(NODE_SHAPE);
-        n->path = path_from_points(xml_attr(xn, "points"), 1);
+        if (!n) goto oom;
+        n->path = path_from_points_lim(xml_attr(xn, "points"), 1, ctx->lim,
+                                       &ctx->limit_hit);
     } else if (!strcmp(name, "path")) {
         n = svg_node_new(NODE_SHAPE);
+        if (!n) goto oom;
         const char* d = xml_attr(xn, "d");
-        n->path = path_parse(d ? d : "");
+        n->path = path_parse_lim(d ? d : "", ctx->lim, &ctx->limit_hit);
     } else if (!strcmp(name, "text")) {
         n = svg_node_new(NODE_TEXT);
+        if (!n) goto oom;
         n->x = len_attr(ctx, xn, "x", 0, 0.0f);
         n->y = len_attr(ctx, xn, "y", 1, 0.0f);
-        n->text = gather_text(xn);
+        n->text = gather_text(xn, ctx->lim ? ctx->lim->max_text_length
+                                           : SVG2IMG_LIMIT_MAX_TEXT_LENGTH,
+                              &ctx->limit_hit);
         n->fontsize = st.fontsize;
         n->bold = st.bold;
         n->italic = st.italic;
         n->anchor = st.anchor;
     } else if (!strcmp(name, "linearGradient")) {
         n = build_gradient(ctx, xn, 0);
+        if (!n) goto oom;
     } else if (!strcmp(name, "radialGradient")) {
         n = build_gradient(ctx, xn, 1);
+        if (!n) goto oom;
     } else if (!strcmp(name, "clipPath")) {
         n = svg_node_new(NODE_CLIPDEF);
+        if (!n) goto oom;
         const char* cu = xml_attr(xn, "clipPathUnits");
         n->clip_units = (cu && !strcmp(cu, "objectBoundingBox")) ? UNITS_BBOX : UNITS_USER;
         n->clip_rule = -1;
@@ -127,6 +213,7 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         if (cr) n->clip_rule = !strcmp(cr, "evenodd") ? 1 : 0;
     } else if (!strcmp(name, "use")) {
         n = svg_node_new(NODE_GROUP);
+        if (!n) goto oom;
         const char* href = xml_attr(xn, "href");
         if (!href) href = xml_attr(xn, "xlink:href");
         if (href) {
@@ -137,8 +224,18 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n->use_x = len_attr(ctx, xn, "x", 0, 0.0f);
         n->use_y = len_attr(ctx, xn, "y", 1, 0.0f);
     } else {
-        n = svg_node_new(NODE_IGNORE);
+        /* Unsupported element.  Policy (see docs/limitations.md): unknown
+         * elements are ignored, but they are treated as transparent
+         * containers, so a known child (e.g. <rect> inside <foo>) still
+         * renders.  Only elements that *define* content for others (defs,
+         * clipPath, gradients) are opaque.  <switch>, <tref>, animation and
+         * filter primitives therefore cost nothing and change nothing. */
+        n = svg_node_new(NODE_TRANSPARENT);
+        if (!n) goto oom;
     }
+    if (!n) goto oom;
+
+oom:
     if (!n) { style_free(&st); return NULL; }
 
     /* Take ownership of the style's heap-owned fields. */
@@ -154,6 +251,11 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         st.dash = NULL; st.ndash = 0;
     }
 
+    /* Record which paint properties this element specified itself, so a
+     * <use> can supply the ones it did not (shadow-tree inheritance). */
+    if (st.saw_fill)   n->spec |= SPEC_FILL;
+    if (st.saw_stroke) n->spec |= SPEC_STROKE;
+
     n->sw = st.stroke_width;
     n->linecap = st.linecap;
     n->linejoin = st.linejoin;
@@ -163,6 +265,7 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     n->clip_rule = st.cliprule;
     n->fillop = st.fillop;
     n->strokeop = st.strokeop;
+    n->letterspacing = st.letterspacing;
 
     char style_val[256];
     const char* op = xml_attr(xn, "opacity");
@@ -172,8 +275,19 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         float v = strtof(op, NULL);
         n->opacity = v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v);
     }
-    n->visible = !(st.display_none || st.visibility_hidden);
+    /* visibility:hidden suppresses this element's own painting but is
+     * inherited per element; a descendant that sets visibility:visible must
+     * still draw, so this is not a subtree flag.  display:none, by contrast,
+     * stops the traversal entirely. */
+    n->visible = !st.visibility_hidden;
+    n->hidden_subtree = st.display_none;
     n->tm = transform_attr(xn);
+    if (n->vp_matrix_valid) {
+        /* A nested <svg> built its viewport matrix above; the transform
+         * attribute (if any) is applied first, then the viewport mapping. */
+        n->tm = mat_mul(n->tm, n->vp_matrix);
+        n->vp_matrix_valid = 0;
+    }
 
     const char* id = xml_attr(xn, "id");
     if (id) {
@@ -189,7 +303,10 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     }
 
     if (n->type == NODE_GRADDEF) {
-        parse_stops(xn, &n->fill);
+        if (parse_stops(xn, &n->fill,
+                        ctx->lim ? ctx->lim->max_gradient_stops
+                                 : SVG2IMG_LIMIT_MAX_GRADIENT_STOPS))
+            ctx->limit_hit = 1;
         style_free(&st);
         return n;
     }

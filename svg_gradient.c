@@ -23,11 +23,14 @@ static float grad_len(Ctx* ctx, const XMLNode* xn, const char* name, int axis,
     return v;
 }
 
-void parse_stops(const XMLNode* xn, Paint* p) {
+int parse_stops(const XMLNode* xn, Paint* p, int max_stops) {
+    if (max_stops <= 0) max_stops = SVG2IMG_LIMIT_MAX_GRADIENT_STOPS;
+    int truncated = 0;
     int cap = 0;
     for (int i = 0; i < xn->nkids; i++) {
         const XMLNode* c = xn->kids[i];
         if (strcmp(c->name, "stop")) continue;
+        if (p->nstops >= max_stops) { truncated = 1; break; }
 
         float off = 0.0f;
         const char* so = xml_attr(c, "offset");
@@ -36,6 +39,26 @@ void parse_stops(const XMLNode* xn, Paint* p) {
             if (strchr(so, '%')) off /= 100.0f;
         }
         Color col = {0, 0, 0, 1};
+        /* stop-color / stop-opacity are inherited from the gradient element
+         * (SVG 1.1 §13.2), so a stop with no colour of its own takes the
+         * gradient's colour.  Build the gradient's effective colour from its
+         * own presentation attributes and inline style, then let the stop's
+         * own attributes override it. */
+        Color inherited = {0, 0, 0, 1};
+        const char* gsc = xml_attr(xn, "stop-color");
+        if (!gsc) gsc = xml_attr(xn, "color");   /* `color` feeds currentColor */
+        if (gsc) color_parse(gsc, &inherited);
+        const char* gsop = xml_attr(xn, "stop-opacity");
+        if (gsop) inherited.a = strtof(gsop, NULL);
+        char gsval[128];
+        const char* gsdecl = xml_attr(xn, "style");
+        if (style_get_decl(gsdecl, "stop-color", gsval, sizeof gsval)) {
+            Color gc;
+            if (color_parse(gsval, &gc)) inherited = gc;
+        }
+        if (style_get_decl(gsdecl, "stop-opacity", gsval, sizeof gsval))
+            inherited.a = strtof(gsval, NULL);
+        col = inherited;
         const char* sc = xml_attr(c, "stop-color");
         if (sc) color_parse(sc, &col);
         const char* sop = xml_attr(c, "stop-opacity");
@@ -52,9 +75,12 @@ void parse_stops(const XMLNode* xn, Paint* p) {
             col.a = strtof(sval, NULL);
 
         if (p->nstops == cap) {
-            cap = cap ? cap * 2 : 4;
-            p->stops = (Stop*)svg_realloc(p->stops, (size_t)cap * sizeof(Stop));
-            if (!p->stops) { p->nstops = 0; return; }
+            int ncap = cap ? cap * 2 : 4;
+            if (ncap > max_stops) ncap = max_stops;
+            Stop* ns = (Stop*)svg_realloc(p->stops, (size_t)ncap * sizeof(Stop));
+            if (!ns) { p->nstops = 0; return 1; }
+            p->stops = ns;
+            cap = ncap;
         }
         p->stops[p->nstops].off = off;
         p->stops[p->nstops].c = col;
@@ -72,6 +98,7 @@ void parse_stops(const XMLNode* xn, Paint* p) {
         if (i > 0 && off < p->stops[i - 1].off) off = p->stops[i - 1].off;
         p->stops[i].off = off;
     }
+    return truncated;
 }
 
 Node* build_gradient(Ctx* ctx, const XMLNode* xn, int radial) {

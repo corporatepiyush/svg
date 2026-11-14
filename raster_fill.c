@@ -62,12 +62,18 @@ static void sort_cross(Cross* a, int n) {
 static int build_edges(const Path* path, Edge** out) {
     /* Count first so the edge array is allocated exactly once.  The count
      * and the fill loop below must agree on which subpaths contribute, so
-     * both skip subpaths with fewer than two points. */
+     * both skip subpaths with fewer than two points.
+     *
+     * Every subpath is filled as if it were closed (SVG 1.1 §11.4): an open
+     * subpath is implicitly closed with a straight segment before filling,
+     * so it contributes exactly sp->n edges.  Stroke geometry is built
+     * separately by build_stroke() and never comes through here, so this
+     * does not affect open strokes. */
     int n = 0;
     for (int s = 0; s < path->n; s++) {
         const SubPath* sp = &path->s[s];
         if (sp->n < 2 || !sp->p) continue;
-        n += sp->closed ? sp->n : sp->n - 1;
+        n += sp->n;
     }
     if (n <= 0) { *out = NULL; return 0; }
 
@@ -80,7 +86,7 @@ static int build_edges(const Path* path, Edge** out) {
         /* A subpath with fewer than two points has no segments; guard the
          * modulo too, since (i+1) % 0 is undefined. */
         if (sp->n < 2 || !sp->p) continue;
-        const int nseg = sp->closed ? sp->n : sp->n - 1;
+        const int nseg = sp->n;            /* fill closes open subpaths */
         const Pt* pts = sp->p;
         for (int i = 0; i < nseg; i++) {
             Pt a = pts[i];

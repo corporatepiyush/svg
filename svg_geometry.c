@@ -45,6 +45,13 @@ Path* path_from_line(float x1, float y1, float x2, float y2) {
 }
 
 Path* path_from_points(const char* s, int close) {
+    return path_from_points_lim(s, close, NULL, NULL);
+}
+
+Path* path_from_points_lim(const char* s, int close, const svg2img_limits* lim,
+                           int* limit_hit) {
+    if (limit_hit) *limit_hit = 0;
+    const int max_points = lim ? lim->max_path_points : SVG2IMG_LIMIT_MAX_PATH_POINTS;
     Path* p = (Path*)svg_malloc(sizeof(Path));
     if (!p) return NULL;
     memset(p, 0, sizeof(*p));
@@ -70,10 +77,17 @@ Path* path_from_points(const char* s, int close) {
         if (end == q) break;
         q = end;
 
+        if (p->s[0].n >= max_points) {           /* resource limit */
+            if (limit_hit) *limit_hit = 1;
+            break;
+        }
         if (p->s[0].n == cap) {
-            cap = cap ? cap * 2 : 8;
-            p->s[0].p = (Pt*)svg_realloc(p->s[0].p, (size_t)cap * sizeof(Pt));
-            if (!p->s[0].p) { p->s[0].n = 0; break; }
+            int ncap = cap ? cap * 2 : 8;
+            if (ncap > max_points) ncap = max_points;
+            Pt* np = (Pt*)svg_realloc(p->s[0].p, (size_t)ncap * sizeof(Pt));
+            if (!np) break;
+            p->s[0].p = np;
+            cap = ncap;
         }
         p->s[0].p[p->s[0].n].x = x;
         p->s[0].p[p->s[0].n].y = y;

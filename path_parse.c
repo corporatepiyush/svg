@@ -8,12 +8,16 @@
 typedef struct { int type; Pt p0, c1, c2, p3; } Seg;   /* 0=line, 1=cubic */
 typedef struct { Seg* segs; int n, cap; int closed; } RawSub;
 
-static void raw_add(RawSub* r, Seg s) {
+static int raw_add(RawSub* r, Seg s) {
     if (r->n == r->cap) {
-        r->cap = r->cap ? r->cap * 2 : 8;
-        r->segs = (Seg*)svg_realloc(r->segs, (size_t)r->cap * sizeof(Seg));
+        int nc = r->cap ? r->cap * 2 : 8;
+        Seg* ns = (Seg*)svg_realloc(r->segs, (size_t)nc * sizeof(Seg));
+        if (!ns) return 0;              /* allocation failure: drop the segment */
+        r->segs = ns;
+        r->cap = nc;
     }
     r->segs[r->n++] = s;
+    return 1;
 }
 
 static int read_num(const char* s, size_t len, size_t* i, float* out) {
@@ -132,6 +136,15 @@ static void append_arc(RawSub* r, Pt p1, Pt p2, double rx, double ry,
 }
 
 Path* path_parse(const char* d) {
+    svg2img_limits def;
+    svg2img_default_limits(&def);
+    return path_parse_lim(d, &def, NULL);
+}
+
+Path* path_parse_lim(const char* d, const svg2img_limits* lim, int* limit_hit) {
+    if (limit_hit) *limit_hit = 0;
+    const int max_points = lim ? lim->max_path_points : SVG2IMG_LIMIT_MAX_PATH_POINTS;
+    const int max_subpaths = lim ? lim->max_path_subpaths : SVG2IMG_LIMIT_MAX_PATH_SUBPATHS;
     Path* path = (Path*)svg_malloc(sizeof(Path));
     if (!path) return NULL;
     memset(path, 0, sizeof(*path));
@@ -150,9 +163,13 @@ Path* path_parse(const char* d) {
     char cmd = 0;
 
     #define NEW_SUB() do { \
+        if (nsubs >= max_subpaths) { if (limit_hit) *limit_hit = 1; goto flatten; } \
         if (nsubs == capsubs) { \
-            capsubs = capsubs ? capsubs * 2 : 8; \
-            subs = (RawSub*)svg_realloc(subs, (size_t)capsubs * sizeof(RawSub)); \
+            int ncap = capsubs ? capsubs * 2 : 8; \
+            if (ncap > max_subpaths) ncap = max_subpaths; \
+            RawSub* ns = (RawSub*)svg_realloc(subs, (size_t)ncap * sizeof(RawSub)); \
+            if (!ns) goto flatten; \
+            subs = ns; capsubs = ncap; \
         } \
         cur = nsubs++; \
         subs[cur].segs = NULL; subs[cur].n = 0; subs[cur].cap = 0; subs[cur].closed = 0; \
@@ -298,7 +315,12 @@ Path* path_parse(const char* d) {
             if (cur < 0) { NEW_SUB(); sp = cp; }
             append_arc(&subs[cur], cp, p2, rx, ry, rot, laf, sf);
             prev_cubic = 1; prev_quad = 0;
-            prev_c2 = subs[cur].segs[subs[cur].n - 1].c2;
+            /* The arc may have added no segment at all if an allocation
+             * failed inside append_arc; only then is there a last segment. */
+            if (subs[cur].n > 0)
+                prev_c2 = subs[cur].segs[subs[cur].n - 1].c2;
+            else
+                prev_cubic = 0;
             cp = p2;
             break;
         }
@@ -314,6 +336,15 @@ Path* path_parse(const char* d) {
                 size_t save = i;
                 while (i < len && (isspace((unsigned char)d[i]) || d[i] == ',')) i++;
                 if (i < len && !isalpha((unsigned char)d[i])) {
+                    /* The numbers after Z start a *new* subpath (SVG 1.1
+                     * §8.3.3: a closepath followed by any other command
+                     * starts the next subpath at the same initial point).
+                     * Closing the old subpath and opening a fresh one keeps
+                     * the fill rule and the stroke join behaviour correct. */
+                    if (cur >= 0) {
+                        NEW_SUB();
+                        cp.x = sp.x; cp.y = sp.y;
+                    }
                     cmd = (cmd == 'Z') ? 'L' : 'l';
                     i = save;   /* leave i at the number; 'L' will read it */
                 }
@@ -332,6 +363,7 @@ Path* path_parse(const char* d) {
         if (i == iter_start) i++;
     }
 
+flatten: {
     /* Compute a scale-aware flattening tolerance from the control-point bbox. */
     float bx0 = 1e30f, by0 = 1e30f, bx1 = -1e30f, by1 = -1e30f;
     for (int s = 0; s < nsubs; s++) {
@@ -349,9 +381,17 @@ Path* path_parse(const char* d) {
     }
     float diag = sqrtf((bx1 - bx0) * (bx1 - bx0) + (by1 - by0) * (by1 - by0));
     if (!(diag > 0.0f)) diag = 1.0f;
-    float tol = diag / 5000.0f;
-    if (tol < 0.01f) tol = 0.01f;
-    if (tol > 10.0f) tol = 10.0f;
+    /* Flattening tolerance.  The old 1/5000-of-diagonal rule put only a
+     * handful of segments on a high-curvature cubic, visibly narrowing the
+     * curve.  Use a device-pixel-sized tolerance instead: 0.05 px is well
+     * below one output pixel and is bounded by max_points. */
+    /* Flattening tolerance.  The old 1/5000-of-diagonal rule put only a
+     * handful of segments on a high-curvature cubic, visibly narrowing the
+     * curve.  Use a device-pixel-sized tolerance: 0.05 px is well below one
+     * output pixel and is bounded by max_points. */
+    float tol = diag / 2000.0f;
+    if (tol < 0.05f) tol = 0.05f;
+    if (tol > 2.0f) tol = 2.0f;
 
     /* Flatten. */
     path->n = nsubs;
@@ -371,12 +411,25 @@ Path* path_parse(const char* d) {
         SubPath* out = &path->s[s];
         out->p = NULL; out->n = 0; out->closed = subs[s].closed;
         int cap = 0;
+        int full = 0;   /* per-subpath point limit reached */
+        /* Push one flattened point.  `full` is set (and nothing is written)
+         * once the point limit is reached; the caller stops the segment loop.
+         * A failed realloc also sets `full`: the path keeps the points it has
+         * rather than dereferencing NULL. */
         #define PUSH_PT(P) do { \
-            if (out->n == cap) { cap = cap ? cap * 2 : 16; \
-                out->p = (Pt*)svg_realloc(out->p, (size_t)cap * sizeof(Pt)); } \
-            out->p[out->n++] = (P); \
+            if (out->n >= max_points) { full = 1; if (limit_hit) *limit_hit = 1; } \
+            else { \
+                if (out->n == cap) { \
+                    int ncap = cap ? cap * 2 : 16; \
+                    if (ncap > max_points) ncap = max_points; \
+                    Pt* np = (Pt*)svg_realloc(out->p, (size_t)ncap * sizeof(Pt)); \
+                    if (!np) { full = 1; } \
+                    else { out->p = np; cap = ncap; } \
+                } \
+                if (!full) out->p[out->n++] = (P); \
+            } \
         } while (0)
-        for (int k = 0; k < subs[s].n; k++) {
+        for (int k = 0; k < subs[s].n && !full; k++) {
             Seg* g = &subs[s].segs[k];
             if (k == 0) PUSH_PT(g->p0);
             if (g->type == 0) {
@@ -431,4 +484,5 @@ Path* path_parse(const char* d) {
     #undef ADD_LINE
     #undef ADD_CUBIC
     return path;
+}
 }

@@ -29,12 +29,10 @@ CASES = [
     ("use_no_children", svg('<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
                             '<use href="#r"/>'), None),
     ("use_one_child", svg('<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
-                          '<use href="#r"><rect width="5" height="5"/></use>'),
-     "resolve_use frees the child array but not the child Node (svg_refs.c)"),
+                          '<use href="#r"><rect width="5" height="5"/></use>'), None),
     ("use_two_children", svg('<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
                              '<use href="#r"><rect width="5" height="5"/>'
-                             '<circle cx="1" cy="1" r="2"/></use>'),
-     "resolve_use leaks each child Node"),
+                             '<circle cx="1" cy="1" r="2"/></use>'), None),
 ]
 
 
@@ -86,7 +84,12 @@ def main():
         return 0
 
     failed, xfailed, xpassed, skipped = [], [], [], []
-    for i, (name, text, xfail) in enumerate(CASES):
+    for i, case in enumerate(CASES):
+        if len(case) == 3:
+            name, text, xfail = case
+        else:
+            name, text = case
+            xfail = None
         src = os.path.join(TMP, "%03d_%s.svg" % (i, name))
         out = os.path.join(TMP, "%03d_%s.png" % (i, name))
         with open(src, "w") as f:

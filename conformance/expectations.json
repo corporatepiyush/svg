@@ -1,0 +1,1873 @@
+{
+  "meta": {
+    "description": "svg2img conformance corpus. Each case is a small SVG plus assertions derived from the SVG 1.1 specification, not from current output. Pixel coordinates are in the SVG's own user units (every case uses a viewBox equal to its width/height, so user units map 1:1 to pixels). Assertions sample flat interiors, away from antialiased edges.",
+    "areas": [
+      "shapes",
+      "paths",
+      "transforms",
+      "viewport",
+      "gradients",
+      "clip",
+      "opacity",
+      "use",
+      "text",
+      "style",
+      "units",
+      "color",
+      "stroke"
+    ],
+    "tolerance": "per-channel 8-bit; default 10, overridable with --tol"
+  },
+  "cases": [
+    {
+      "name": "shapes_rect",
+      "area": "shapes",
+      "note": "rect: fill covers the interior, corners are exact",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 40,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 12,
+          "y": 22,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 15,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "shapes_rrect",
+      "area": "shapes",
+      "note": "rect rx/ry rounds only the corners; the straight edges stay at the rect bounds",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 40,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 12,
+          "y": 12,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 11,
+          "y": 11,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "shapes_circle",
+      "area": "shapes",
+      "note": "circle: radius 30 about (50,50)",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 24,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 15,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "shapes_ellipse",
+      "area": "shapes",
+      "note": "ellipse rx 40 ry 20: spans x 10..90, y 30..70",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            165,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 12,
+          "y": 50,
+          "rgba": [
+            255,
+            165,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 25,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "shapes_line",
+      "area": "shapes",
+      "note": "line is stroked, never filled; sample the midpoint and an off-line point",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 55,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 45,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "shapes_polyline",
+      "area": "shapes",
+      "note": "open polyline with fill=none: only the stroke is painted",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 50,
+          "rgba": [
+            0,
+            128,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 60,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "shapes_polygon",
+      "area": "shapes",
+      "note": "polygon auto-closes and fills its interior",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            255,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 25,
+          "rgba": [
+            0,
+            255,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 8,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "path_lines",
+      "area": "paths",
+      "note": "H/V/Z close the rect",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 15,
+          "y": 15,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 95,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "path_cubic",
+      "area": "paths",
+      "note": "C with symmetric control points: filled between the curve and the chord",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 70,
+          "rgba": [
+            220,
+            20,
+            60,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 45,
+          "rgba": [
+            220,
+            20,
+            60,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "path_quad",
+      "area": "paths",
+      "note": "Q single control point",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 75,
+          "rgba": [
+            255,
+            140,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 55,
+          "rgba": [
+            255,
+            140,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 35,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "path_arc",
+      "area": "paths",
+      "note": "A rx ry rot large sweep: a half-disc above the chord",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 45,
+          "rgba": [
+            70,
+            130,
+            180,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 20,
+          "rgba": [
+            70,
+            130,
+            180,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 55,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "path_relative",
+      "area": "paths",
+      "note": "lowercase m/h/v/z are relative and equivalent to the absolute form",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 15,
+          "y": 15,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 95,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "path_evenodd",
+      "area": "paths",
+      "note": "fill-rule=evenodd punches a square hole at 30..70",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            70,
+            130,
+            180,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 20,
+          "rgba": [
+            70,
+            130,
+            180,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "path_nonzero",
+      "area": "paths",
+      "note": "inner subpath wound the other way: nonzero also leaves a hole",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            70,
+            130,
+            180,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 20,
+          "rgba": [
+            70,
+            130,
+            180,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "path_stroke",
+      "area": "paths",
+      "note": "fill=none leaves only the stroke; width 6 centred on y=50",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 45,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_translate",
+      "area": "transforms",
+      "note": "translate(30,20) moves the 40x40 rect from (10,10) to (40,30)",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 30,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_rotate",
+      "area": "transforms",
+      "note": "rotate(45 50 50) spins the 20x20 rect about its own centre",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 36,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 34,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_scale",
+      "area": "transforms",
+      "note": "scale(1.5) about the origin, then translate(10,10): the 40x40 rect spans 10..70",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 65,
+          "y": 65,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 75,
+          "y": 75,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_matrix",
+      "area": "transforms",
+      "note": "matrix(1,0,0.5,1,10,10) shears x by 0.5*y and offsets by (10,10)",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 12,
+          "y": 12,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 5,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_nested",
+      "area": "transforms",
+      "note": "nested groups compose: translate(20,0) then scale(2)",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 10,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 55,
+          "y": 35,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 65,
+          "y": 5,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "viewbox_scale",
+      "area": "viewport",
+      "note": "viewBox 0 0 100 100 on 200x200 scales 2x; the 30-unit rect at (10,10) covers device (20,20)-(80,80), so sample the interior at (40,40) and the letterbox at (10,10).",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 40,
+          "y": 40,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 10,
+          "y": 10,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "par_meet",
+      "area": "viewport",
+      "note": "xMidYMid meet: 100x100 into 200x100 fits width, centres vertically",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 100,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 25,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "par_none",
+      "area": "viewport",
+      "note": "preserveAspectRatio=none stretches to fill",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 100,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "par_slice",
+      "area": "viewport",
+      "note": "slice scales to cover, cropping the overflow",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 100,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "grad_linear",
+      "area": "gradients",
+      "note": "objectBoundingBox linear gradient runs left to right",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "tol": 20
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "tol": 20
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ],
+          "tol": 30
+        }
+      ]
+    },
+    {
+      "name": "grad_radial",
+      "area": "gradients",
+      "note": "radial white centre to black edge",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "tol": 20
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "tol": 30
+        }
+      ]
+    },
+    {
+      "name": "grad_focal",
+      "area": "gradients",
+      "note": "focal point fx=0.25 pulls the hot spot left of centre",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "tol": 30
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "tol": 30
+        }
+      ]
+    },
+    {
+      "name": "grad_spread",
+      "area": "gradients",
+      "note": "spreadMethod=repeat wraps the ramp past r=0.5",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "tol": 30
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "tol": 45
+        }
+      ]
+    },
+    {
+      "name": "grad_stop_opacity",
+      "area": "gradients",
+      "note": "stop-opacity fades the same colour out",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 50,
+          "min": 220
+        },
+        {
+          "kind": "alpha",
+          "x": 95,
+          "y": 50,
+          "max": 40
+        }
+      ]
+    },
+    {
+      "name": "grad_user_space",
+      "area": "gradients",
+      "note": "userSpaceOnUse maps the ramp to user coordinates, not the bbox",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "tol": 40
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "tol": 40
+        }
+      ]
+    },
+    {
+      "name": "clip_rect",
+      "area": "clip",
+      "note": "clipPath clips to the inner rect",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 10,
+          "y": 10,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "clip_obb",
+      "area": "clip",
+      "note": "objectBoundingBox clip maps the unit circle onto the rect bbox",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            128,
+            128,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 12,
+          "y": 12,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "clip_rule",
+      "area": "clip",
+      "note": "clip-rule=evenodd punches a hole in the clip path",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 15,
+          "rgba": [
+            255,
+            165,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "clip_nested",
+      "area": "clip",
+      "note": "nested clips intersect",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            128,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 15,
+          "y": 15,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "opacity_group",
+      "area": "opacity",
+      "note": "group opacity 0.5 gives alpha ~128",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "min": 108,
+          "max": 148
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            128
+          ],
+          "tol": 25
+        }
+      ]
+    },
+    {
+      "name": "opacity_fill",
+      "area": "opacity",
+      "note": "fill-opacity applies to the fill only; the stroke stays opaque",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            128
+          ],
+          "tol": 25
+        }
+      ]
+    },
+    {
+      "name": "opacity_nested",
+      "area": "opacity",
+      "note": "0.5 * 0.5 = 0.25 -> alpha ~64",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "min": 44,
+          "max": 84
+        }
+      ]
+    },
+    {
+      "name": "use_basic",
+      "area": "use",
+      "note": "use x/y offsets the referenced rect",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 60,
+          "y": 60,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 10,
+          "y": 10,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_transform",
+      "area": "use",
+      "note": "use transform composes with x/y (x/y default to 0 here)",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 70,
+          "y": 30,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 85,
+          "y": 45,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 10,
+          "y": 10,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_symbol",
+      "area": "use",
+      "note": "symbol renders only through use",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "text_basic",
+      "area": "text",
+      "note": "bitmap font paints dark pixels inside the em box",
+      "checks": [
+        {
+          "kind": "ink",
+          "x": 10,
+          "y": 20,
+          "w": 30,
+          "h": 40,
+          "min": 40,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "text_anchor",
+      "area": "text",
+      "note": "text-anchor=middle centres the run on x=50",
+      "checks": [
+        {
+          "kind": "bbox_center_x",
+          "x": 50,
+          "tol": 8
+        },
+        {
+          "kind": "ink",
+          "x": 25,
+          "y": 20,
+          "w": 50,
+          "h": 40,
+          "min": 40,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "text_spacing",
+      "area": "text",
+      "note": "letter-spacing widens the run but keeps the glyphs",
+      "checks": [
+        {
+          "kind": "ink",
+          "x": 10,
+          "y": 28,
+          "w": 50,
+          "h": 34,
+          "min": 40,
+          "rgb_max": 60
+        },
+        {
+          "kind": "bbox_width",
+          "min": 40
+        }
+      ]
+    },
+    {
+      "name": "text_fontsize",
+      "area": "text",
+      "note": "font-size scales the glyphs: the 36px line paints far more ink than the 12px line",
+      "checks": [
+        {
+          "kind": "ink",
+          "x": 10,
+          "y": 28,
+          "w": 60,
+          "h": 14,
+          "min": 60,
+          "rgb_max": 60
+        },
+        {
+          "kind": "ink",
+          "x": 10,
+          "y": 62,
+          "w": 60,
+          "h": 30,
+          "min": 300,
+          "rgb_max": 60
+        },
+        {
+          "kind": "compare_ink",
+          "a": [
+            10,
+            62,
+            60,
+            30
+          ],
+          "b": [
+            10,
+            28,
+            60,
+            14
+          ],
+          "min_ratio": 2.0,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "style_inline_fill",
+      "area": "style",
+      "note": "inline style fill overrides the presentation attribute",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "style_inline_opacity",
+      "area": "style",
+      "note": "opacity as an inline declaration",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "min": 108,
+          "max": 148
+        }
+      ]
+    },
+    {
+      "name": "style_element",
+      "area": "style",
+      "note": "a <style> element is opaque text and must not affect rendering",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "units_absolute",
+      "area": "units",
+      "note": "1in = 96px in a 120x120 viewport",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 110,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "units_cm",
+      "area": "units",
+      "note": "1cm = 96/2.54 ~= 37.8px",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 45,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "units_percent",
+      "area": "units",
+      "note": "percentages resolve against the viewport",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 70,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "units_em",
+      "area": "units",
+      "note": "em resolves against the current font size (20), so 2em = 40",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "colors_solid",
+      "area": "color",
+      "note": "hex, short hex, #rrggbbaa, rgb() integers/percentages, rgba(), hsl(), hsla(), transparent, currentColor",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 37,
+          "y": 5,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 72,
+          "y": 5,
+          "rgba": [
+            0,
+            0,
+            255,
+            128
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 37,
+          "rgba": [
+            0,
+            128,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 37,
+          "y": 37,
+          "rgba": [
+            255,
+            0,
+            0,
+            128
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 72,
+          "y": 37,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 72,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 37,
+          "y": 72,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 72,
+          "y": 72,
+          "rgba": [
+            0,
+            128,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stroke_dash",
+      "area": "stroke",
+      "note": "dasharray 8 8: 10..18 painted, 18..26 gap",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 14,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 22,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "stroke_dashoffset",
+      "area": "stroke",
+      "note": "dashoffset 8 shifts the pattern: the first dash moves off the start",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 14,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 22,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stroke_cap_round",
+      "area": "stroke",
+      "note": "round cap extends the line by half the stroke width",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 17,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stroke_cap_butt",
+      "area": "stroke",
+      "note": "butt cap stops exactly at the endpoint",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 17,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 22,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stroke_join_miter",
+      "area": "stroke",
+      "note": "miter join on a wide angle: ink on both legs, none past the vertex",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 14,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "stroke_join_round",
+      "area": "stroke",
+      "note": "round join rounds the vertex instead of mitering it",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 15,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "stroke_miterlimit",
+      "area": "stroke",
+      "note": "miterlimit 1 bevels the sharp apex: no spike above the vertex",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 2,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 10,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 71,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stroke_width",
+      "area": "stroke",
+      "note": "stroke-width 12 spans y 44..56",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 46,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 54,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 40,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "text_letterspacing",
+      "area": "text",
+      "note": "letter-spacing adds trailing space after every glyph (including the last), so the run advances visibly",
+      "checks": [
+        {
+          "kind": "compare_ink",
+          "a": [
+            10,
+            28,
+            90,
+            34
+          ],
+          "b": [
+            10,
+            28,
+            47,
+            34
+          ],
+          "min_ratio": 1.15
+        },
+        {
+          "kind": "ink",
+          "x": 10,
+          "y": 28,
+          "w": 90,
+          "h": 34,
+          "min": 40,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "color_rgb_int",
+      "area": "color",
+      "note": "rgb(0,128,0) is an integer triple; percentages are the only form that works today",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            128,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "path_cubic_extent",
+      "area": "paths",
+      "note": "The true cubic M10,80 C10,10 90,10 90,80 passes near x=50 at y=30 and x=33 at y=50; a coarse flattening renders the curve too narrow.",
+      "checks": [
+        {
+          "kind": "ink",
+          "x": 44,
+          "y": 29,
+          "w": 6,
+          "h": 3,
+          "min": 4,
+          "rgb_max": 60
+        },
+        {
+          "kind": "ink",
+          "x": 30,
+          "y": 49,
+          "w": 6,
+          "h": 3,
+          "min": 4,
+          "rgb_max": 60
+        }
+      ]
+    }
+  ]
+}

@@ -18,6 +18,10 @@ int main(int argc, char** argv) {
     if (cr == 1) return 0;
     if (cr != 0) return 1;
 
+    /* Environment overrides are applied after the flags so a test can set a
+     * limit without adding a command-line option. */
+    cli_limits_from_env(&o);
+
     if (o.verbose) {
         fprintf(stderr, "svg2img: %s -> %s (scale %.3f, aa %d)\n",
                 in, out, o.scale, o.aa);

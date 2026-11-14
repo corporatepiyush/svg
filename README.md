@@ -207,7 +207,10 @@ Private headers: `svg_internal.h`, `raster_internal.h`, `png_internal.h`.
 | `test/check.py` | 40 exact RGBA checks over the sample corpus; PNG CRC/IHDR/IDAT validation |
 | `fuzz/regress.py` | 22 saved regression cases with pixel expectations |
 | `fuzz/difftest.py` | renderer invariants: fill rules, gradients, clips, opacity, transforms, viewBox |
-| `fuzz/semantic_cases.py` | pixel-oracle tests: 14 controls + 12 `xfail` conformance gaps |
+| `fuzz/semantic_cases.py` | pixel-oracle tests: 32 controls + 12 fixed-gap regressions, 0 xfail |
+| `conformance/` | 63 spec-derived cases across 13 feature areas, scorecard, baseline workflow |
+| `fuzz/diff_external.py` | differential testing against Chrome/Inkscape/resvg/WebKit |
+| `fuzz/alloc_fail.py`, `fuzz/limit_test.py` | allocation-failure injection and configurable resource-limit tests |
 | `fuzz/grammar_fuzz.py` | XML/reference/numeric grammar: DOCTYPE, CDATA, entities, use/symbol graphs, extreme numbers |
 | `fuzz/featurfuzz.py` | structure-aware feature documents (paths, gradients, dashes, use graphs) |
 | `fuzz/rawfuzz.py` | raw-byte / malformed-markup robustness |
@@ -223,46 +226,42 @@ Sanitizers and limits:
 - Fuzz runs are process-parallel: `fuzz/run_parallel.sh` defaults to the
   online CPU count (`JOBS=0`), and `feature`, `grammar`, `run`, `gen-run`,
   `raw-run`, `campaign`, `big`, and the Docker cross-test all use it.
-- DOM depth capped at 1024; output capped at 32768 px/side and 256 Mpx.
-- Non-finite coordinates are clamped before float→int conversion.
-- Allocation failures are checked at the render-path allocation sites; the
-  fuzzers still have an allocation-failure injection gap (see below).
+- Resource limits are configurable through `svg2img_options.limits`
+  (nodes, depth, path points/subpaths, gradient stops, text length, clip
+  depth, layers, use expansion, output pixels).  Defaults are documented in
+  `svg2img.h`; `fuzz/limit_test.py` exercises every limit.
+- Allocation failures are injected by `fuzz/alloc_fail.py` using
+  `-DSVG2IMG_ALLOC_HOOKS`; the renderer must fail cleanly, never crash.
+- DOM depth capped at 1024; output capped by the pixel budget; non-finite
+  coordinates are clamped before float→int conversion.
 
 ### Semantic oracle
 
-`fuzz/semantic_cases.py` is the conformance TODO.  It renders small documents
-and asserts pixels.  Cases marked `xfail` are confirmed bugs; the runner
-prints `XPASS` when one is fixed, so remove the marker then.
+`fuzz/semantic_cases.py` renders small documents and asserts pixels.  The 12
+former conformance gaps are now ordinary controls: open-subpath fill, `Z` with
+an implicit lineto, `<use>` style inheritance and forward/nested references,
+gradient `href` chains, symbol viewport behaviour, nested `<svg>`, visibility
+override, stroke/opacity-layer bbox, userSpaceOnUse gradients, and stop-color
+inheritance.  There are currently **0 xfail** cases.
 
 ```sh
 python3 fuzz/semantic_cases.py ./svg2img
-14 controls, 12 gap cases: 0 unexpected failure(s), 12 xfail
+12 fixed, 32 controls, 0 gap cases: 0 unexpected failure(s), 0 xfail, 0 xpass
 ```
 
-Known SVG gaps currently tracked:
+`conformance/` adds 63 spec-derived cases across 13 feature areas (shapes,
+paths, transforms, viewport, gradients, clip, opacity, use, text, units,
+colour, stroke, style), a feature scorecard, baseline capture/compare, and a
+perceptual diff with tolerance.
 
-1. Open subpaths are not filled as if closed (`polyline`/open `path`).
-2. `Z` followed by implicit lineto is appended to the closed subpath.
-3. `<use>` does not inherit styles from the `use` element.
-4. Forward/nested `<use>` can lose nested content.
-5. Chained gradient `href` fails for forward references.
-6. `<symbol>` renders at the top level (should require `<use>`).
-7. Nested `<svg>` ignores `x`/`y`/`width`/`height`/`viewBox`.
-8. `visibility="visible"` cannot override inherited `visibility:hidden`.
-9. Strokes can be clipped by an opacity-layer bbox under a scaled CTM.
-10. `userSpaceOnUse` gradients are wrong under non-uniform scale/shear.
-11. `stop-color` is not inherited from the gradient element.
-12. `<use>` with children leaks the child nodes (`fuzz/leak_check.py`).
+### Remaining gaps / TODO
 
-### Fuzzing gaps / TODO
-
-- No allocation-failure injection yet (a failing-malloc wrapper).
 - No coverage-guided fuzzing (libFuzzer/AFL++); the generators are
   structure-aware but not instrumented.
-- No Chrome-headless differential; `refdiff.py` uses macOS WebKit via
-  `qlmanage` and compares interiors only.
-- No conformance tests for nested `<svg>`, `<symbol>` viewports, `use`
-  shadow-tree styles, or real font shaping (they are the `xfail` cases).
+- Real font shaping and a full `<use>` shadow tree are still out of scope;
+  text uses the built-in bitmap font.
+- Allocation-failure injection covers the current corpus but is not exhaustive
+  for every optional allocation.
 - `fuzz_run.c` uses `_exit`, so the crash runner cannot detect leaks; use
   `fuzz/leak_check.py` or Linux ASan/LSan.
 
@@ -291,8 +290,7 @@ The nested-opacity case also dropped from 2.1 GB to 19 MB peak RSS.
 - No CSS `<style>`, selectors, at-rules, or cascade.
 - Geometry properties via `style=` (`x`, `width`, `d`, `transform`, ...) are
   not supported; use XML attributes.
-- No nested `<svg>` viewport, `<symbol>` viewport, or full `<use>` shadow tree
-  (see the semantic `xfail` list).
+- No full `<use>` shadow tree or real font shaping; see the remaining gaps above.
 - Radial `spreadMethod` with an off-centre focal point, and self-intersecting
   polygons, can differ from other renderers; the specification is ambiguous
   there and implementations disagree.

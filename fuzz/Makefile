@@ -13,6 +13,8 @@
 #   make run        run the seed corpus under sanitizers
 #   make regress    render the saved regression cases
 #   make semantic   run the pixel-oracle semantic tests
+#   make limits     run the configurable resource-limit tests
+#   make alloc      build+run the allocation-failure injection harness
 #   make resource   run the timeout / unbounded-work tests
 #   make campaign   generate + run mutants until a reproducible crash is found
 #   make clean      remove binaries and generated corpora
@@ -27,7 +29,7 @@ SRC     := $(ROOT)/xml_parse.c $(ROOT)/xml_dom.c \
            $(ROOT)/svg_idmap.c $(ROOT)/svg_transform.c $(ROOT)/svg_geometry.c \
            $(ROOT)/svg_gradient.c $(ROOT)/svg_text.c $(ROOT)/svg_style.c \
            $(ROOT)/svg_build.c $(ROOT)/svg_refs.c $(ROOT)/svg_viewport.c \
-           $(ROOT)/svg_api.c \
+           $(ROOT)/svg_api.c $(ROOT)/svg_alloc.c \
            $(ROOT)/raster_util.c $(ROOT)/raster_canvas.c $(ROOT)/raster_blend.c $(ROOT)/raster_mask.c $(ROOT)/raster_gradient.c $(ROOT)/raster_fill.c $(ROOT)/raster_stroke.c $(ROOT)/raster_shape.c $(ROOT)/raster_clip.c $(ROOT)/raster_text.c $(ROOT)/raster_node.c \
            $(ROOT)/png_deflate.c $(ROOT)/png_write.c $(ROOT)/font.c
 INC     := -I$(ROOT)
@@ -38,7 +40,7 @@ PY      ?= python3
 # 0 = auto (online CPUs)
 JOBS    ?= 0
 
-.PHONY: all seeds gen gen-run raw raw-run feature grammar big run regress semantic resource resource-quick leak refdiff refdiff_rand campaign clean
+.PHONY: all seeds gen gen-run raw raw-run feature grammar big run regress semantic limits alloc alloc-run resource resource-quick leak refdiff refdiff_rand campaign clean
 
 all: fuzz_run one
 
@@ -88,6 +90,20 @@ grammar: fuzz_run
 # Pixel-oracle semantic tests (includes xfail markers for known gaps).
 semantic: $(ROOT)/svg2img
 	$(PY) semantic_cases.py $(ROOT)/svg2img
+
+# Configurable resource-limit behaviour.
+limits: $(ROOT)/svg2img
+	$(PY) limit_test.py $(ROOT)/svg2img
+
+# Allocation-failure injection: builds the library with
+# -DSVG2IMG_ALLOC_HOOKS and fails the Nth allocation for every N.
+alloc: alloc_run
+
+alloc_run: alloc_run.c $(SRC) $(ROOT)/internal.h
+	$(CC) $(CFLAGS) $(SAN) -DSVG2IMG_ALLOC_HOOKS $(INC) -o $@ alloc_run.c $(SRC) $(LIBS)
+
+alloc-run: alloc_run
+	$(PY) alloc_fail.py $(CURDIR)/alloc_run
 
 # Timeout / unbounded-work tests.
 resource: $(ROOT)/svg2img

@@ -27,6 +27,11 @@ Style style_default(void) {
 void style_copy(Style* dst, const Style* src) {
     *dst = *src;
 
+    /* saw_fill / saw_stroke mean "this element specified it", not "it was
+     * inherited", so they never propagate to a child. */
+    dst->saw_fill = 0;
+    dst->saw_stroke = 0;
+
     dst->dash = NULL;
     dst->ndash = 0;
     if (src->dash && src->ndash > 0) {
@@ -101,6 +106,7 @@ static void apply_one(void* ud, const char* k, const char* v) {
     Style* st = ac->st;
 
     if (!strcmp(k, "fill")) {
+        st->saw_fill = 1;
         free(st->fill.stops); st->fill.stops = NULL; st->fill.nstops = 0;
         free(st->fill.ref);   st->fill.ref = NULL;
         const char* p = v;
@@ -132,6 +138,7 @@ static void apply_one(void* ud, const char* k, const char* v) {
             else st->fill.type = PAINT_NONE;
         }
     } else if (!strcmp(k, "stroke")) {
+        st->saw_stroke = 1;
         free(st->stroke.stops); st->stroke.stops = NULL; st->stroke.nstops = 0;
         free(st->stroke.ref);   st->stroke.ref = NULL;
         const char* p = v;
@@ -229,9 +236,15 @@ static void apply_one(void* ud, const char* k, const char* v) {
     } else if (!strcmp(k, "letter-spacing")) {
         st->letterspacing = length_parse(v, ctx->vw, ctx->vh, ctx->em, 2, 0.0f);
     } else if (!strcmp(k, "display")) {
+        /* `display` is not inherited; the value only matters on the element
+         * it is written on.  "none" hides the element and its subtree
+         * (raster_node.c stops the traversal), so nothing to reset. */
         if (!strcmp(v, "none")) st->display_none = 1;
     } else if (!strcmp(k, "visibility")) {
-        if (!strcmp(v, "hidden") || !strcmp(v, "collapse")) st->visibility_hidden = 1;
+        /* `visibility` *is* inherited, but a descendant may override it, so
+         * an explicit value must clear the inherited flag in both
+         * directions (SVG 1.1 §11.4). */
+        st->visibility_hidden = (!strcmp(v, "hidden") || !strcmp(v, "collapse"));
     }
 }
 

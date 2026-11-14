@@ -1,0 +1,56 @@
+{
+  "bin": "svg2img",
+  "cases": [
+    {
+      "best": 0.13184,
+      "case": "circles_500",
+      "median": 0.13203,
+      "rss_kb": 61712
+    },
+    {
+      "best": 0.01139,
+      "case": "clip_300",
+      "median": 0.0116,
+      "rss_kb": 10656
+    },
+    {
+      "best": 0.01735,
+      "case": "dash_200",
+      "median": 0.01753,
+      "rss_kb": 11952
+    },
+    {
+      "best": 0.01364,
+      "case": "grad_400",
+      "median": 0.01378,
+      "rss_kb": 11968
+    },
+    {
+      "best": 0.00235,
+      "case": "opacity_300",
+      "median": 0.00245,
+      "rss_kb": 3280
+    },
+    {
+      "best": 0.0196,
+      "case": "paths_200x60",
+      "median": 0.01975,
+      "rss_kb": 9536
+    },
+    {
+      "best": 0.03261,
+      "case": "text_1500",
+      "median": 0.03294,
+      "rss_kb": 11360
+    }
+  ],
+  "machine": {
+    "cores": 10,
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.15.2",
+    "system": "Darwin"
+  },
+  "repeat": 7,
+  "version": 1
+}

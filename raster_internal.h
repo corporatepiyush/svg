@@ -20,6 +20,7 @@ Mask* mask_alloc(int x0, int y0, int x1, int y1);
 void  mask_free(Mask* m);
 float mask_get(const Mask* m, int x, int y);
 Mask* mask_shift(const Mask* m, int x0, int y0, int x1, int y1);
+Mask* mask_translate(const Mask* m, int dx, int dy);
 Mask* mask_intersect(const Mask* a, const Mask* b);
 
 #define GRAD_LUT_N 1024
@@ -33,6 +34,8 @@ typedef struct {
     float x1, y1, dx, dy, invlen2;
     float cx, cy, r, fx, fy;
     float rdx, rdy, rlen, r_inv;
+    int   has_inv;     /* userSpaceOnUse with an invertible CTM */
+    Mat   inv;         /* inverse of the CTM at the referencing element */
     Color lut[GRAD_LUT_N];
 } Grad;
 
@@ -52,6 +55,7 @@ void render_text(Canvas* c, Node* n, Mat world, float opacity,
 
 Mask* make_clip_mask(const Node* clipdef, Mat world, const float* obj_bbox,
                      int W, int H, int aa);
+Mask* make_rect_mask(const Node* n, Mat w, int W, int H, int aa);
 int node_bbox_world(Node* n, Mat full_w, float out[4]);
 
 #endif
