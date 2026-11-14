@@ -18,6 +18,21 @@ void svg_free(Node* n) {
     free(n);
 }
 
+/* Free a subtree that is being discarded while `ids` is still alive.  Every
+ * id registered inside the subtree must be dropped first: leaving it behind
+ * lets a later <use href="#id"> clone freed memory. */
+void svg_free_detached(Node* n, IdMap* ids) {
+    if (!n) return;
+    if (ids && n->id) idmap_remove(ids, n->id, n);
+    for (int i = 0; i < n->nkids; i++) svg_free_detached(n->kids[i], ids);
+    free(n->kids);
+    path_free(n->path);
+    free(n->fill.stops); free(n->fill.ref);
+    free(n->stroke.stops); free(n->stroke.ref);
+    free(n->dash); free(n->text); free(n->id); free(n->clip_ref); free(n->use_ref);
+    free(n);
+}
+
 /* ------------------------------------------------------------------ */
 /* Limits                                                              */
 /* ------------------------------------------------------------------ */

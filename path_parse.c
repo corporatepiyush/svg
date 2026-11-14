@@ -443,35 +443,39 @@ flatten: {
                 st[spn].c2 = g->c2; st[spn].p3 = g->p3; st[spn].depth = 0;
                 spn++;
                 while (spn > 0) {
-                    FlatEntry* e = &st[--spn];
-                    float dx = e->p3.x - e->p0.x, dy = e->p3.y - e->p0.y;
+                    /* Copy the entry out before pushing children: st[spn]
+                     * aliases this slot, so reading e->p0 after the first
+                     * push would read the right child instead of the
+                     * original segment and silently drop half the curve. */
+                    FlatEntry e = st[--spn];
+                    float dx = e.p3.x - e.p0.x, dy = e.p3.y - e.p0.y;
                     float l = sqrtf(dx * dx + dy * dy);
-                    float d1 = l > 1e-9f ? fabsf((e->c1.x - e->p0.x) * dy -
-                                                  (e->c1.y - e->p0.y) * dx) / l : 0.0f;
-                    float d2 = l > 1e-9f ? fabsf((e->c2.x - e->p0.x) * dy -
-                                                  (e->c2.y - e->p0.y) * dx) / l : 0.0f;
-                    if (e->depth >= 24 || (d1 <= tol && d2 <= tol)) {
-                        PUSH_PT(e->p3);
+                    float d1 = l > 1e-9f ? fabsf((e.c1.x - e.p0.x) * dy -
+                                                  (e.c1.y - e.p0.y) * dx) / l : 0.0f;
+                    float d2 = l > 1e-9f ? fabsf((e.c2.x - e.p0.x) * dy -
+                                                  (e.c2.y - e.p0.y) * dx) / l : 0.0f;
+                    if (e.depth >= 24 || (d1 <= tol && d2 <= tol)) {
+                        PUSH_PT(e.p3);
                         continue;
                     }
-                    Pt p01 = midpt(e->p0, e->c1);
-                    Pt p12 = midpt(e->c1, e->c2);
-                    Pt p23 = midpt(e->c2, e->p3);
+                    Pt p01 = midpt(e.p0, e.c1);
+                    Pt p12 = midpt(e.c1, e.c2);
+                    Pt p23 = midpt(e.c2, e.p3);
                     Pt p012 = midpt(p01, p12);
                     Pt p123 = midpt(p12, p23);
                     Pt p0123 = midpt(p012, p123);
                     /* push right half first so left is processed first */
                     if (spn + 2 < 64) {
                         st[spn].p0 = p0123; st[spn].c1 = p123;
-                        st[spn].c2 = p23;   st[spn].p3 = e->p3;
-                        st[spn].depth = e->depth + 1;
+                        st[spn].c2 = p23;   st[spn].p3 = e.p3;
+                        st[spn].depth = e.depth + 1;
                         spn++;
-                        st[spn].p0 = e->p0; st[spn].c1 = p01;
+                        st[spn].p0 = e.p0; st[spn].c1 = p01;
                         st[spn].c2 = p012;  st[spn].p3 = p0123;
-                        st[spn].depth = e->depth + 1;
+                        st[spn].depth = e.depth + 1;
                         spn++;
                     } else {
-                        PUSH_PT(e->p3);
+                        PUSH_PT(e.p3);
                     }
                 }
             }

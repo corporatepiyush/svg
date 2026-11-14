@@ -350,7 +350,9 @@ oom:
 
     for (int i = 0; i < xn->nkids; i++) {
         Node* c = build_node(ctx, xn->kids[i], &st, depth + 1);
-        if (c && !node_add_child(n, c)) svg_free(c);
+        /* A child that could not be attached is discarded; unregister its
+         * ids first or the map keeps a dangling pointer. */
+        if (c && !node_add_child(n, c)) svg_free_detached(c, ctx->ids);
     }
 
     style_free(&st);

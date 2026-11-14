@@ -104,6 +104,17 @@ EXPECT = {
     # Group opacity + transform must not double-apply the transform.
     "opacity_transform.svg": [((30, 30), (0, 0, 0, 128)),
                               ((130, 130), (0, 0, 0, 0))],
+    # The left half of a symmetric cubic must be present.  A flattening
+    # stack that aliases its own slot drops it, so the curve renders as a
+    # right-half-only sliver; Chrome agrees with these interior points.
+    "cubic_left_half.svg": [((50, 50), (220, 20, 60, 255)),
+                            ((16, 50), (220, 20, 60, 255)),
+                            ((30, 40), (220, 20, 60, 255)),
+                            ((50, 30), (220, 20, 60, 255))],
+    # A <use> child carrying an id is discarded when the use expands; the id
+    # map must drop it, otherwise a later <use href="#id"> reads freed memory.
+    # The reference is dropped safely (nothing renders, no crash).
+    "use_child_id.svg": [((50, 50), (0, 0, 0, 0))],
 }
 
 

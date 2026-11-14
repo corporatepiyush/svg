@@ -45,6 +45,26 @@ void idmap_put(IdMap* m, const char* k, Node* v) {
     m->n++;
 }
 
+/* Drop the entry for `k` when it maps to `v`.  A node that is freed must be
+ * unregistered first, otherwise the map keeps a dangling pointer that a later
+ * <use href="#id"> would clone (use-after-free). */
+void idmap_remove(IdMap* m, const char* k, const Node* v) {
+    if (!m || !m->e || !m->cap || !k) return;
+    unsigned h = hash_str(k) % (unsigned)m->cap;
+    while (m->e[h].key) {
+        if (!strcmp(m->e[h].key, k)) {
+            if (m->e[h].val == v) {
+                free(m->e[h].key);
+                m->e[h].key = NULL;
+                m->e[h].val = NULL;
+                m->n--;
+            }
+            return;
+        }
+        h = (h + 1) % (unsigned)m->cap;
+    }
+}
+
 Node* idmap_get(IdMap* m, const char* k) {
     if (!m->e || m->cap == 0) return NULL;
     unsigned h = hash_str(k) % (unsigned)m->cap;

@@ -14,7 +14,9 @@ struct IdMap { IdEntry* e; int n, cap; };
 
 void  idmap_put(IdMap* m, const char* k, Node* v);
 Node* idmap_get(IdMap* m, const char* k);
+void  idmap_remove(IdMap* m, const char* k, const Node* v);
 void  idmap_free(IdMap* m);
+void  svg_free_detached(Node* n, IdMap* ids);
 
 Mat   parse_transform(const char* s);
 Mat   transform_attr(const XMLNode* xn);

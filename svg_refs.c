@@ -189,13 +189,9 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
     return c;
 }
 
-/* Let the use site supply a property the referenced element did not specify.
- * `spec` records which inheritable properties the tree builder actually saw on
- * the element, so an explicit value on the target is never overwritten. */
-static void use_inherit_paint(Paint* dst, const Paint* src, unsigned spec_bit,
-                              unsigned* dst_spec) {
-    if (*dst_spec & spec_bit) return;    /* target specified it: keep it */
-    if (src->type == PAINT_NONE && !src->ref && src->nstops == 0) return;
+/* Deep-copy an inherited paint value (stops and href included). */
+static void paint_inherit_copy(Paint* dst, const Paint* src) {
+    if (dst == src) return;
     free(dst->stops);
     free(dst->ref);
     *dst = *src;
@@ -209,7 +205,35 @@ static void use_inherit_paint(Paint* dst, const Paint* src, unsigned spec_bit,
             dst->nstops = src->nstops;
         }
     }
+}
+
+/* Let the use site supply a property the referenced root did not specify.
+ * `spec` records which inheritable properties the element specified itself,
+ * so an explicit value on the target is never overwritten. */
+static void use_inherit_paint(Paint* dst, const Paint* src, unsigned spec_bit,
+                              unsigned* dst_spec) {
+    if (*dst_spec & spec_bit) return;    /* target specified it: keep it */
+    if (src->type == PAINT_NONE && !src->ref && src->nstops == 0) return;
+    paint_inherit_copy(dst, src);
     *dst_spec |= spec_bit;
+}
+
+/* Propagate already-resolved inherited values into a shadow-tree descendant
+ * that did not specify the property itself.  Descendants inherit from their
+ * shadow-tree parent, not directly from the use element: a target that sets
+ * fill="blue" must keep blue for its children even when the use site sets
+ * fill="red". */
+static void use_apply_child(Node* n, const Node* parent) {
+    if (!n || !parent) return;
+    if (!(n->spec & SPEC_FILL))   paint_inherit_copy(&n->fill, &parent->fill);
+    if (!(n->spec & SPEC_STROKE)) paint_inherit_copy(&n->stroke, &parent->stroke);
+    if (!(n->spec & SPEC_FONT_SIZE))   n->fontsize = parent->fontsize;
+    if (!(n->spec & SPEC_FONT_WEIGHT)) n->bold = parent->bold;
+    if (!(n->spec & SPEC_FONT_STYLE))  n->italic = parent->italic;
+    if (!(n->spec & SPEC_TEXT_ANCHOR)) n->anchor = parent->anchor;
+    if (!(n->spec & SPEC_LETTER_SP))   n->letterspacing = parent->letterspacing;
+    if (!(n->spec & SPEC_VISIBILITY))  n->visible = parent->visible;
+    for (int i = 0; i < n->nkids; i++) use_apply_child(n->kids[i], n);
 }
 
 static void use_apply_style(Node* n, const Node* use) {
@@ -218,8 +242,8 @@ static void use_apply_style(Node* n, const Node* use) {
     use_inherit_paint(&n->stroke, &use->stroke, (unsigned)SPEC_STROKE, &n->spec);
 
     /* SVG 1.1 §5.6: the use element's inherited properties supply any the
-     * referenced element did not set.  Only the properties the target did
-     * not specify are copied; a value on the target always wins. */
+     * referenced root did not set.  Only the root takes values from the use
+     * site; descendants inherit within the shadow tree. */
     if (!(n->spec & SPEC_FONT_SIZE) && (use->spec & SPEC_FONT_SIZE))
         n->fontsize = use->fontsize;
     if (!(n->spec & SPEC_FONT_WEIGHT) && (use->spec & SPEC_FONT_WEIGHT))
@@ -233,7 +257,7 @@ static void use_apply_style(Node* n, const Node* use) {
     if (!(n->spec & SPEC_VISIBILITY) && (use->spec & SPEC_VISIBILITY))
         n->visible = use->visible;
 
-    for (int i = 0; i < n->nkids; i++) use_apply_style(n->kids[i], use);
+    for (int i = 0; i < n->nkids; i++) use_apply_child(n->kids[i], n);
 }
 
 /* Drop any still-unresolved use ref (cycle, dangling id, or a truncated
@@ -297,8 +321,12 @@ static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
                 clone->tm = mat_mul(use_tm, clone->tm);
                 resolve_clip_refs(clone, ids);
                 /* A <use> never has children of its own: the shadow tree
-                 * replaces them.  Free each node, not just the array. */
-                for (int i = 0; i < n->nkids; i++) svg_free(n->kids[i]);
+                 * replaces them.  Free each node, not just the array, and
+                 * unregister their ids first so the map cannot hand out a
+                 * dangling pointer to a later <use href="#id">.
+                 * The use element itself keeps its own id (if any). */
+                for (int i = 0; i < n->nkids; i++)
+                    svg_free_detached(n->kids[i], ids);
                 free(n->kids);
                 n->kids = NULL;
                 n->nkids = 0;

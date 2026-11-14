@@ -33,6 +33,20 @@ CASES = [
     ("use_two_children", svg('<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
                              '<use href="#r"><rect width="5" height="5"/>'
                              '<circle cx="1" cy="1" r="2"/></use>'), None),
+    # A <use> child that carries an id is discarded when the use expands.  The
+    # id map must drop it: otherwise a later <use href="#id"> clones freed
+    # memory (heap-use-after-free, found by the external differential run).
+    ("use_child_id", svg('<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
+                         '<use href="#r"><g id="victim"><rect width="5" height="5"/></g></use>'
+                         '<use href="#victim" x="20" y="20"/>'), None),
+    ("use_grandchild_id", svg('<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
+                              '<use href="#r"><g id="a"><g id="b">'
+                              '<rect width="4" height="4"/></g></g></use>'
+                              '<use href="#b" x="10" y="10"/>'
+                              '<use href="#a" x="20" y="20"/>'), None),
+    ("use_dup_id", svg('<defs><rect id="d" width="10" height="10" fill="red"/></defs>'
+                       '<rect id="d" width="6" height="6" fill="blue"/>'
+                       '<use href="#d"/>'), None),
 ]
 
 
