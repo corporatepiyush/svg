@@ -239,11 +239,29 @@ static FBuf* fe_image(FilterCtx* fc, const FilterPrim* p) {
         if (!image_load_any(p->href, NULL, fc->aa, &raw, &sw, &sh)) return out;
         owned = 1;
     }
-    int dx = (int)floorf(fe_len(fc, p->num[0], 0) + 0.5f);
-    int dy = (int)floorf(fe_len(fc, p->num[1], 1) + 0.5f);
-    int dw = (int)floorf(fe_len(fc, p->num[2], 0) + 0.5f);
-    int dh = (int)floorf(fe_len(fc, p->num[3], 1) + 0.5f);
-    if (dw <= 0 || dh <= 0) { dw = out->w - dx; dh = out->h - dy; }
+    /* A primitive's subregion is expressed in the filter effects coordinate
+     * system, whose origin is the top-left of the filter region (SVG 1.1
+     * 15.1), so the buffer origin has to be subtracted. */
+    float ux = p->num[0], uy = p->num[1];
+    float uw = p->num[2], uh = p->num[3];
+    if (fc->prim_units_bbox && fc->has_bbox) {
+        float bw = fc->bbox[2] - fc->bbox[0];
+        float bh = fc->bbox[3] - fc->bbox[1];
+        ux = fc->bbox[0] + ux * bw;
+        uy = fc->bbox[1] + uy * bh;
+        uw *= bw;
+        uh *= bh;
+    }
+    Pt a = mat_apply(fc->world, (Pt){ux, uy});
+    Pt b = mat_apply(fc->world, (Pt){ux + uw, uy + uh});
+    int dx = (int)floorf(a.x + 0.5f) - fc->ox;
+    int dy = (int)floorf(a.y + 0.5f) - fc->oy;
+    int dw = (int)floorf(b.x + 0.5f) - (int)floorf(a.x + 0.5f);
+    int dh = (int)floorf(b.y + 0.5f) - (int)floorf(a.y + 0.5f);
+    if (!(p->num[2] > 0.0f) || !(p->num[3] > 0.0f) || dw <= 0 || dh <= 0) {
+        dw = out->w - dx;
+        dh = out->h - dy;
+    }
     if (dw > 0 && dh > 0) image_blit_fbuf(out, dx, dy, dw, dh, raw, sw, sh);
     if (owned) free(raw);
     if (fc->linear) fe_srgb_to_linear(out);

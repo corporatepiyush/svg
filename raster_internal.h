@@ -119,10 +119,12 @@ typedef struct FilterCtx {
     int   failed;
     /* Content subregion reported by the primitive that just ran. */
     int   last_sx, last_sy, last_sw, last_sh;
+    int   ox, oy;            /* device position of the buffer's top-left */
 } FilterCtx;
 
 FBuf* filter_execute(const Node* fdef, const FBuf* source, const float bbox[4],
-                     int has_bbox, Mat world, int aa, size_t max_bytes);
+                     int has_bbox, Mat world, int aa, size_t max_bytes,
+                     int origin_x, int origin_y);
 FBuf* fe_run(FilterCtx* fc, const FilterPrim* p);
 FBuf* fe_run_generic(FilterCtx* fc, const FilterPrim* p);
 size_t fb_bytes(int w, int h);

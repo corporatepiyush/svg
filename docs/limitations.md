@@ -37,7 +37,8 @@ is the contract between the library and its callers.
   `markerWidth`/`markerHeight` and `marker-start`/`mid`/`end`.
 - Images: `<image>` with embedded `data:image/png` and `data:image/svg+xml`
   URIs, and external PNG and baseline JPEG files (see below).  `feImage` takes
-  the same references.
+  the same references.  Images are sampled bilinearly with premultiplied
+  interpolation, which is what a browser does when scaling.
 - Filters: `<filter>` with `filterUnits`, `primitiveUnits`,
   `color-interpolation-filters`, `x`/`y`/`width`/`height`, href chaining, and
   all 24 `fe*` primitives — `feBlend`, `feColorMatrix`,
@@ -103,6 +104,9 @@ is the contract between the library and its callers.
   Progressive, arithmetic-coded and 12-bit JPEG are not supported (baseline
   sequential, Huffman, 8-bit only).  JPEG chroma is upsampled nearest-neighbour
   rather than with a triangle filter.
+- `feImage` positions its image in the filter effects coordinate system, whose
+  origin is the top-left of the filter region; the per-primitive subregion
+  attributes (`x`/`y`/`width`/`height`) are honoured only there.
 - Full `<use>` shadow-tree styling beyond the implemented inheritance rules.
 
 Unsupported elements are ignored rather than treated as errors, so a document

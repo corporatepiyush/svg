@@ -4127,6 +4127,80 @@
           "tol": 10
         }
       ]
+    },
+    {
+      "name": "filter_image_data",
+      "area": "filters",
+      "note": "feImage places its image in the filter effects coordinate system, whose origin is the top-left of the filter region: with the region at (10,10) and x=y=20, the 20x20 image lands at 20..40.  Images are sampled bilinearly, so the texel boundary at 30 is a blend of its neighbours.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 24,
+          "y": 24,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 36,
+          "y": 24,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 24,
+          "y": 36,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 36,
+          "y": 36,
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 22,
+          "rgba": [
+            115,
+            140,
+            0
+          ],
+          "tol": 20
+        },
+        {
+          "kind": "alpha",
+          "x": 15,
+          "y": 15,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        }
+      ]
     }
   ],
   "external_intentional": [],

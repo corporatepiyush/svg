@@ -449,7 +449,8 @@ static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
     size_t region_bytes = fb_bytes(iw, ih);
     size_t max_bytes = region_bytes * 6 + (8u << 20);
     if (max_bytes > (512u << 20)) max_bytes = 512u << 20;
-    FBuf* out = filter_execute(f, &src, lbb, has_bb, w, aa, max_bytes);
+    FBuf* out = filter_execute(f, &src, lbb, has_bb, w, aa, max_bytes,
+                               ix0, iy0);
     if (!out) out = fbuf_copy(&src);
     free(src.px);                          /* src is an embedded struct */
     src.px = NULL;

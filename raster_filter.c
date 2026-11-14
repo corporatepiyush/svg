@@ -215,7 +215,8 @@ static NamedBuf* fe_add(FilterCtx* fc, const char* name, FBuf* b) {
 /* ------------------------------------------------------------------ */
 
 FBuf* filter_execute(const Node* f, const FBuf* source, const float bbox[4],
-                     int has_bbox, Mat world, int aa, size_t max_bytes) {
+                     int has_bbox, Mat world, int aa, size_t max_bytes,
+                     int origin_x, int origin_y) {
     if (!f || !source || f->nprims <= 0 || !source->px) return NULL;
 
     FilterCtx fc;
@@ -229,6 +230,8 @@ FBuf* filter_execute(const Node* f, const FBuf* source, const float bbox[4],
     fc.world = world;
     fc.aa = aa;
     fc.max_bytes = max_bytes;
+    fc.ox = origin_x;
+    fc.oy = origin_y;
     fc.last = -1;
     fc.last_sx = fc.last_sy = 0;
     fc.last_sw = source->w;

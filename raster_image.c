@@ -6,26 +6,64 @@
  */
 #include "raster_internal.h"
 
-/* Nearest-neighbour RGBA8 blit into a straight-alpha RGBA float canvas. */
+
+/* Bilinear RGBA8 sampling with premultiplied interpolation, which avoids the
+ * dark or light fringes a straight-alpha interpolation would produce. */
+static void sample_bilinear8(const unsigned char* src, int sw, int sh, float fx,
+                             float fy, float* out) {
+    if (sw <= 0 || sh <= 0) { out[0] = out[1] = out[2] = out[3] = 0.0f; return; }
+    if (fx < 0.0f) fx = 0.0f;
+    if (fy < 0.0f) fy = 0.0f;
+    if (fx > (float)(sw - 1)) fx = (float)(sw - 1);
+    if (fy > (float)(sh - 1)) fy = (float)(sh - 1);
+    int x0 = (int)floorf(fx), y0 = (int)floorf(fy);
+    int x1 = (x0 + 1 < sw) ? x0 + 1 : sw - 1;
+    int y1 = (y0 + 1 < sh) ? y0 + 1 : sh - 1;
+    float tx = fx - (float)x0, ty = fy - (float)y0;
+    float acc[4] = {0, 0, 0, 0};
+    for (int j = 0; j < 2; j++) {
+        int yy = j ? y1 : y0;
+        float wy = j ? ty : 1.0f - ty;
+        for (int i = 0; i < 2; i++) {
+            int xx = i ? x1 : x0;
+            float w = (i ? tx : 1.0f - tx) * wy;
+            const unsigned char* p = src + ((size_t)yy * (size_t)sw + (size_t)xx) * 4;
+            float a = (float)p[3] / 255.0f;
+            acc[0] += (float)p[0] / 255.0f * a * w;
+            acc[1] += (float)p[1] / 255.0f * a * w;
+            acc[2] += (float)p[2] / 255.0f * a * w;
+            acc[3] += a * w;
+        }
+    }
+    if (acc[3] > 1e-6f) {
+        out[0] = acc[0] / acc[3];
+        out[1] = acc[1] / acc[3];
+        out[2] = acc[2] / acc[3];
+    } else {
+        out[0] = out[1] = out[2] = 0.0f;
+    }
+    out[3] = acc[3];
+}
+
+/* RGBA8 blit into a straight-alpha RGBA float canvas. */
 void image_blit_rgba8(Canvas* dst, int dx, int dy, int dw, int dh,
                       const unsigned char* src, int sw, int sh) {
     if (dw <= 0 || dh <= 0 || sw <= 0 || sh <= 0) return;
     for (int y = 0; y < dh; y++) {
-        int sy = (int)((int64_t)y * sh / dh);
-        if (sy >= sh) sy = sh - 1;
+        float fy = ((float)y + 0.5f) * (float)sh / (float)dh - 0.5f;
         int ty = dy + y;
         if (ty < 0 || ty >= dst->h) continue;
         for (int x = 0; x < dw; x++) {
-            int sx = (int)((int64_t)x * sw / dw);
-            if (sx >= sw) sx = sw - 1;
+            float fx = ((float)x + 0.5f) * (float)sw / (float)dw - 0.5f;
             int tx = dx + x;
             if (tx < 0 || tx >= dst->w) continue;
-            const unsigned char* s = src + ((size_t)sy * (size_t)sw + (size_t)sx) * 4;
+            float c[4];
+            sample_bilinear8(src, sw, sh, fx, fy, c);
             float* d = dst->px + ((size_t)ty * (size_t)dst->w + (size_t)tx) * 4;
-            d[0] = s[0] / 255.0f;
-            d[1] = s[1] / 255.0f;
-            d[2] = s[2] / 255.0f;
-            d[3] = s[3] / 255.0f;
+            d[0] = c[0];
+            d[1] = c[1];
+            d[2] = c[2];
+            d[3] = c[3];
         }
     }
 }
@@ -35,21 +73,20 @@ void image_blit_fbuf(FBuf* dst, int dx, int dy, int dw, int dh,
                      const unsigned char* src, int sw, int sh) {
     if (dw <= 0 || dh <= 0 || sw <= 0 || sh <= 0) return;
     for (int y = 0; y < dh; y++) {
-        int sy = (int)((int64_t)y * sh / dh);
-        if (sy >= sh) sy = sh - 1;
+        float fy = ((float)y + 0.5f) * (float)sh / (float)dh - 0.5f;
         int ty = dy + y;
         if (ty < 0 || ty >= dst->h) continue;
         for (int x = 0; x < dw; x++) {
-            int sx = (int)((int64_t)x * sw / dw);
-            if (sx >= sw) sx = sw - 1;
+            float fx = ((float)x + 0.5f) * (float)sw / (float)dw - 0.5f;
             int tx = dx + x;
             if (tx < 0 || tx >= dst->w) continue;
-            const unsigned char* s = src + ((size_t)sy * (size_t)sw + (size_t)sx) * 4;
+            float c[4];
+            sample_bilinear8(src, sw, sh, fx, fy, c);
             float* d = dst->px + ((size_t)ty * (size_t)dst->w + (size_t)tx) * 4;
-            d[0] = s[0] / 255.0f;
-            d[1] = s[1] / 255.0f;
-            d[2] = s[2] / 255.0f;
-            d[3] = s[3] / 255.0f;
+            d[0] = c[0];
+            d[1] = c[1];
+            d[2] = c[2];
+            d[3] = c[3];
         }
     }
 }

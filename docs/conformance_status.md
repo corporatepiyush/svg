@@ -25,7 +25,16 @@ output.
 The whole suite is the current figure: 525 tests, 512 comparable, 13 text-only.
 Filters moved from 4/39 to 7/39 and text from 25/52 to 28/52 after the feature
 batches; the largest remaining blocks are animation (73 tests, out of scope),
-filters (39), and text (62, of which 10 are font tests).
+filters (39) and text (62, of which 10 are font tests).
+
+**The suite under-reports external references.** Chrome is handed the SVG as an
+`<img>`, and a browser blocks external references in SVG-as-image mode, so a
+test that loads `../images/foo.png` or `../resources/font.svg` renders nothing
+for Chrome while this renderer loads the file and draws it.  That costs the
+linking and image tests, and the five `feImage` filter tests, which are counted
+as failures here even though both renderers agree about what the file contains.
+`conformance/verify_external.py` marks those cases `external_unverifiable` for
+the same reason.
 
 ## How the official suite is measured
 
@@ -138,11 +147,11 @@ Two readings matter:
    `color-rendering` and `image-rendering` are hints this rasteriser does not
    act on; `zoomAndPan` is ignored; per-primitive filter subregions are
    honoured only by `feImage`.
-3. **The official suite re-run.** The figures above for the whole suite predate
-   the feature batches; a 172-test subset covering the implemented chapters is
-   the current measurement (111/170 comparable, 65%).  Each test launches a
-   headless browser and several never exit, so the full run needs a quiet
-   machine.
+3. **The remaining filter failures.** 32 of 39 filter tests still differ:
+   `BackgroundAlpha`/`BackgroundImage` (5), `feImage` (5, a harness artefact),
+   lighting (7), turbulence (2, the reference noise is gradient noise), and
+   assorted `feComposite`, `feTile`, `feConvolveMatrix`, `feMorphology`,
+   `feDisplacementMap` and filter-element cases.
 
 ## What this measurement changed
 
