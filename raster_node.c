@@ -227,6 +227,10 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
     Mat w = mat_mul(world, n->tm);
     float op = opacity * n->opacity;
     if (op <= 0.0f) return;
+    /* shape-rendering="crispEdges" (or optimizeSpeed) asks for no
+     * antialiasing on this element; it is inherited, so each element carries
+     * its own resolved value. */
+    int aae = n->crisp ? 1 : aa;
 
     /* objectBoundingBox clip paths resolve against the element's own
      * bounding box, so compute it before building the mask. */
@@ -287,10 +291,10 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
 
     if (n->filter && (!rs->lim || rs->filters < rs->lim->max_layers)) {
         rs->filters++;
-        render_filtered(c, n, w, op, eff, aa, rs);
+        render_filtered(c, n, w, op, eff, aae, rs);
         rs->filters--;
     } else {
-        paint_self(c, n, w, op, eff, aa, rs);
+        paint_self(c, n, w, op, eff, aae, rs);
     }
     mask_free(own);
 }

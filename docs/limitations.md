@@ -47,6 +47,9 @@ is the contract between the library and its callers.
   `feMergeNode`, `feMorphology`, `feOffset`, `fePointLight`,
   `feSpecularLighting`, `feSpotLight`, `feTile`, `feTurbulence`.  The
   `filter` property accepts `url(#id)`; `none` disables it.
+- Rendering hints: `shape-rendering="crispEdges"` (and `optimizeSpeed`)
+  disables antialiasing for that element, and `color-interpolation` on a
+  gradient selects sRGB or linearRGB stop interpolation.
 - Colour: `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`,
   `hsl()`, `hsla()`, `transparent`, `currentColor`, 147 named colours.
 - Stroke: caps, joins, miter limit, dash arrays/offsets.
@@ -65,6 +68,11 @@ is the contract between the library and its callers.
   `points`, `transform`).  Use XML attributes.
 - `<foreignObject>`, `<view>`, SMIL animation, and `<script>` (which is not
   executed, correctly for a rasteriser).
+- `<color-profile>` and `cursor` are accepted but ignored: output is always
+  sRGB and there is no pointer.  `text-rendering`, `color-rendering` and
+  `image-rendering` are hints this rasteriser does not act on (text uses one
+  bitmap font, colour is always sRGB, and images are always sampled
+  nearest-neighbour).
 - Text details: no font selection or shaping, so `font-family`, `font-stretch`
   and `font-variant` are ignored and every glyph comes from the built-in
   5×7 font; `textLength` distributes spacing per glyph rather than per

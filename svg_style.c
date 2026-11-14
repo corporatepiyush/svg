@@ -313,6 +313,12 @@ static void apply_one(void* ud, const char* k, const char* v) {
             float f = length_parse(v, ctx->vw, ctx->vh, ctx->em, 1, 0.0f);
             st->baseline = ctx->em > 0.0f ? f / ctx->em : 0.0f;
         } else st->baseline = 0.0f;
+    } else if (!strcmp(k, "shape-rendering")) {
+        st->crisp = (!strcmp(v, "crispEdges") || !strcmp(v, "optimizeSpeed"));
+    } else if (!strcmp(k, "color-interpolation")) {
+        /* Only gradients use it here: linearRGB interpolates in linear light. */
+        st->fill.linear = !strcmp(v, "linearRGB");
+        st->stroke.linear = !strcmp(v, "linearRGB");
     } else if (!strcmp(k, "filter")) {
         free(st->filter);
         st->filter = NULL;

@@ -116,6 +116,23 @@ def check_alpha_range(px, w, h, c, tol):
     return True, "alpha range [%d,%d]" % (amin, amax)
 
 
+def check_partial_alpha(px, w, h, c, tol):
+    """Count antialiased pixels (partial alpha) in a rect."""
+    x, y, rw, rh = c["rect"] if "rect" in c else (c["x"], c["y"], c["w"], c["h"])
+    lo = c.get("lo", 4)
+    hi = c.get("hi", 251)
+    n = 0
+    for yy in range(max(0, y), min(h, y + rh)):
+        row = yy * w * 4
+        for xx in range(max(0, x), min(w, x + rw)):
+            a = px[row + xx * 4 + 3]
+            if lo < a < hi:
+                n += 1
+    if "min_count" in c and n < c["min_count"]:
+        return False, "partial pixels=%d want >= %d" % (n, c["min_count"])
+    return n <= c.get("max", 0), "partial pixels=%d want <= %d" % (n, c.get("max", 0))
+
+
 def check_bbox(px, w, h, c, tol):
     got = bbox(px, w, h)
     want = tuple(c["bbox"])
@@ -182,6 +199,7 @@ CHECKS = {
     "color_count": check_color_count,
     "alpha": check_alpha,
     "alpha_range": check_alpha_range,
+    "partial_alpha": check_partial_alpha,
     "bbox": check_bbox,
     "bbox_width": check_bbox_width,
     "bbox_center_x": check_bbox_center_x,

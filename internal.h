@@ -220,6 +220,7 @@ typedef struct Paint {
     Mat    tm;                  /* gradientTransform / patternTransform */
     char*  ref;                 /* referenced element id, without '#' */
     void*  pat;                 /* NODE_PATTERNDEF, when type == PAINT_PATTERN */
+    int    linear;              /* color-interpolation="linearRGB" */
 } Paint;
 
 /* One positioned run of text (a <text> or <tspan> fragment). */
@@ -357,6 +358,7 @@ struct Node {
     /* shape */
     Path* path;
     int   marker_ok;          /* markers apply to path/line/polyline/polygon */
+    int   crisp;              /* shape-rendering="crispEdges": no AA          */
     Paint fill, stroke;
     float sw;
     int   linecap;      /* 0 butt, 1 round, 2 square */
@@ -517,6 +519,7 @@ typedef struct Style {
     char* marker_mid;
     char* marker_end;
     char* filter;          /* filter: url(#id) -> id, or NULL                */
+    int   crisp;           /* shape-rendering: no antialiasing              */
     float textlen;         /* textLength (not inherited)                     */
     int   length_kind;     /* lengthAdjust: 0 spacing, 1 spacingAndGlyphs    */
     int   writing;         /* writing-mode: 0 horizontal, 1 vertical         */

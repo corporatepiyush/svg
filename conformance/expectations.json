@@ -4070,6 +4070,63 @@
           "tol": 40
         }
       ]
+    },
+    {
+      "name": "shape_rendering_crisp",
+      "area": "rendering hints",
+      "note": "shape-rendering=\"crispEdges\" turns antialiasing off for that element: the right square has almost no partially covered pixels, the left one has many.",
+      "checks": [
+        {
+          "kind": "partial_alpha",
+          "rect": [
+            0,
+            0,
+            40,
+            40
+          ],
+          "min_count": 8,
+          "max": 400
+        },
+        {
+          "kind": "partial_alpha",
+          "rect": [
+            40,
+            0,
+            40,
+            40
+          ],
+          "max": 6
+        }
+      ]
+    },
+    {
+      "name": "gradient_linear_rgb",
+      "area": "gradients",
+      "note": "color-interpolation=\"linearRGB\" on a gradient interpolates the stops in linear light, so the red-to-blue midpoint is much lighter than in sRGB.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 20,
+          "rgba": [
+            125,
+            0,
+            130
+          ],
+          "tol": 10
+        },
+        {
+          "kind": "rgba",
+          "x": 90,
+          "y": 20,
+          "rgba": [
+            186,
+            0,
+            189
+          ],
+          "tol": 10
+        }
+      ]
     }
   ],
   "external_intentional": [],

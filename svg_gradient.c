@@ -108,6 +108,14 @@ Node* build_gradient(Ctx* ctx, const XMLNode* xn, int radial) {
 
     p->type = radial ? PAINT_RADIAL : PAINT_LINEAR;
     p->units = UNITS_BBOX;
+    /* color-interpolation is a property of the gradient element; the default
+     * is sRGB, and linearRGB interpolates in linear light. */
+    const char* ci = xml_attr(xn, "color-interpolation");
+    char cival[64];
+    if (style_get_decl(xml_attr(xn, "style"), "color-interpolation", cival,
+                       sizeof cival))
+        ci = cival;
+    p->linear = (ci && !strcmp(ci, "linearRGB"));
     const char* gu = xml_attr(xn, "gradientUnits");
     if (gu && !strcmp(gu, "userSpaceOnUse")) p->units = UNITS_USER;
 

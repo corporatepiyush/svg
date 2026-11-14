@@ -445,6 +445,7 @@ oom:
     n->fillop = st.fillop;
     n->strokeop = st.strokeop;
     n->letterspacing = st.letterspacing;
+    n->crisp = st.crisp;
     if (n->type != NODE_MARKERDEF) {
         n->marker_start_ref = st.marker_start; st.marker_start = NULL;
         n->marker_mid_ref   = st.marker_mid;   st.marker_mid = NULL;

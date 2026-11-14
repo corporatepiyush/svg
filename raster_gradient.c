@@ -1,6 +1,19 @@
 /* raster_gradient.c - Gradient LUTs and evaluation. */
 #include "raster_internal.h"
 
+static float s2l(float c) {
+    if (c <= 0.0f) return 0.0f;
+    if (c >= 1.0f) return 1.0f;
+    return c <= 0.04045f ? c / 12.92f : powf((c + 0.055f) / 1.055f, 2.4f);
+}
+
+static float l2s(float c) {
+    if (c <= 0.0f) return 0.0f;
+    if (c >= 1.0f) return 1.0f;
+    return c <= 0.0031308f ? c * 12.92f
+                           : 1.055f * powf(c, 1.0f / 2.4f) - 0.055f;
+}
+
 /* ------------------------------------------------------------------ */
 /* Gradients                                                           */
 /* ------------------------------------------------------------------ */
@@ -130,6 +143,31 @@ void grad_build(Grad* g, const Paint* p, const float bbox[4], Mat world) {
                 g->rdx = ddx; g->rdy = ddy; g->rlen = sqrtf(dd2);
             } else {
                 g->rdx = 0.0f; g->rdy = 0.0f; g->rlen = 0.0f;
+            }
+        }
+    }
+    if (p->linear) {
+        /* Interpolate in linear light: convert the stops, build the LUT, then
+         * encode the LUT back to sRGB so evaluation stays a table lookup. */
+        Paint lin = *p;
+        lin.linear = 0;
+        if (lin.stops && lin.nstops > 0) {
+            Stop* s2 = (Stop*)svg_malloc((size_t)lin.nstops * sizeof(Stop));
+            if (s2) {
+                memcpy(s2, lin.stops, (size_t)lin.nstops * sizeof(Stop));
+                for (int i = 0; i < lin.nstops; i++) {
+                    Color c = s2[i].c;
+                    s2[i].c = (Color){s2l(c.r), s2l(c.g), s2l(c.b), c.a};
+                }
+                lin.stops = s2;
+                for (int i = 0; i < GRAD_LUT_N; i++)
+                    g->lut[i] = grad_sample(&lin, ((float)i + 0.5f) / (float)GRAD_LUT_N);
+                for (int i = 0; i < GRAD_LUT_N; i++) {
+                    Color c = g->lut[i];
+                    g->lut[i] = (Color){l2s(c.r), l2s(c.g), l2s(c.b), c.a};
+                }
+                free(s2);
+                return;
             }
         }
     }
