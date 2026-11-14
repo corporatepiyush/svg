@@ -387,6 +387,7 @@ int    style_get_decl(const char* decls, const char* key, char* out, size_t cap)
 
 int   color_parse(const char* s, Color* out);
 float length_parse(const char* s, float vw, float vh, float em, int axis, float def);
+float path_length(const Path* p);
 
 /* ------------------------------------------------------------------ */
 /* Render tree building (svg_*.c)                                      */

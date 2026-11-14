@@ -2461,6 +2461,152 @@
           "max": 8
         }
       ]
+    },
+    {
+      "name": "switch_requiredfeatures",
+      "area": "structure",
+      "note": "switch renders only the first child whose requiredFeatures are all supported: Filter is not implemented, Shape is, so the green child wins.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 45,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "switch_systemlanguage",
+      "area": "structure",
+      "note": "systemLanguage selects the English child (a rasteriser has no locale; English is assumed). The French child is skipped and the unconditioned third child never wins.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 45,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "nested_svg_overflow_visible",
+      "area": "structure",
+      "note": "A nested svg clips to its viewport by default; overflow=\"visible\" disables the clip (SVG 1.1 14.3).",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 10,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 40,
+          "y": 5,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 10,
+          "y": 45,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 40,
+          "y": 45,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "path_length_dash",
+      "area": "paths",
+      "note": "pathLength=50 on a 90-unit path scales the dash pattern by 1.8: 18 on, 18 off, so ink at 10/50/90 and gaps at 30/70.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 10,
+          "y": 10,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 30,
+          "y": 10,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 10,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 70,
+          "y": 10,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 90,
+          "y": 10,
+          "rgba": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
     }
   ],
   "external_intentional": [

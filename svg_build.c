@@ -31,6 +31,80 @@ int node_add_child(Node* parent, Node* child) {
     return 1;
 }
 
+/* ------------------------------------------------------------------ */
+/* <switch> conditions (SVG 1.1 §5.7 and Appendix O)                   */
+/* ------------------------------------------------------------------ */
+
+/* Feature strings whose fragment we actually implement.  A <switch> child
+ * with requiredFeatures naming anything else is not selected. */
+static int feature_supported(const char* uri) {
+    static const char* const frag[] = {
+        "SVG", "SVG-static", "Core", "BasicStructure", "Structure",
+        "Shape", "BasicShape", "Text", "BasicText", "Gradient", "Pattern",
+        "Clip", "BasicClip", "BasicPaint", "Color", "Linking",
+        "Image", "Marker", "Mask", "Style", "CSS", NULL
+    };
+    if (!uri) return 1;
+    if (!strcmp(uri, "org.w3c.svg") || !strcmp(uri, "org.w3c.svg.static"))
+        return 1;
+    const char* h = strrchr(uri, '#');
+    const char* name = h ? h + 1 : uri;
+    for (int i = 0; frag[i]; i++)
+        if (!strcmp(name, frag[i])) return 1;
+    return 0;
+}
+
+/* The user's language for systemLanguage matching.  A rasteriser has no
+ * locale, so English is assumed; a tag matches when it is a prefix of the
+ * user language on a language-range boundary. */
+static int language_matches(const char* list) {
+    const char* user = "en";
+    size_t ul = strlen(user);
+    const char* p = list;
+    while (*p) {
+        while (*p && (isspace((unsigned char)*p) || *p == ',')) p++;
+        const char* e = p;
+        while (*e && *e != ',') e++;
+        const char* te = e;
+        while (te > p && isspace((unsigned char)te[-1])) te--;
+        size_t n = (size_t)(te - p);
+        if (n >= ul && !strncmp(p, user, ul) && (n == ul || p[ul] == '-'))
+            return 1;
+        p = e;
+    }
+    return 0;
+}
+
+static int switch_child_ok(const XMLNode* xn) {
+    const char* rf = xml_attr(xn, "requiredFeatures");
+    if (rf && *rf) {
+        const char* p = rf;
+        while (*p) {
+            while (*p && isspace((unsigned char)*p)) p++;
+            const char* e = p;
+            while (*e && !isspace((unsigned char)*e)) e++;
+            if (e > p) {
+                char buf[256];
+                size_t n = (size_t)(e - p);
+                if (n >= sizeof buf) n = sizeof buf - 1;
+                memcpy(buf, p, n);
+                buf[n] = 0;
+                if (!feature_supported(buf)) return 0;
+            }
+            p = e;
+        }
+    }
+    const char* re = xml_attr(xn, "requiredExtensions");
+    if (re) {
+        const char* q = re;
+        while (*q && isspace((unsigned char)*q)) q++;
+        if (*q) return 0;              /* we implement no extensions */
+    }
+    const char* sl = xml_attr(xn, "systemLanguage");
+    if (sl && *sl && !language_matches(sl)) return 0;
+    return 1;
+}
+
 Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     if (depth > SVG2IMG_MAX_DEPTH) return NULL;
     /* Hard depth limit: refuse to build past max_depth.  The caller drops the
@@ -64,8 +138,17 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     const char* name = xn->name;
     Node* n = NULL;
     int in_defs = 0;
+    const XMLNode* switch_pick = NULL;
+    float path_scale = 1.0f;
 
-    if (!strcmp(name, "svg") || !strcmp(name, "g") || !strcmp(name, "a")) {
+    if (!strcmp(name, "switch")) {
+        /* Render only the first child whose conditions hold; the rest are
+         * not part of the rendered tree (SVG 1.1 §5.7). */
+        n = svg_node_new(NODE_GROUP);
+        if (!n) goto oom;
+        for (int i = 0; i < xn->nkids; i++)
+            if (switch_child_ok(xn->kids[i])) { switch_pick = xn->kids[i]; break; }
+    } else if (!strcmp(name, "svg") || !strcmp(name, "g") || !strcmp(name, "a")) {
         n = svg_node_new(NODE_GROUP);
         if (n && !strcmp(name, "svg")) {
             /* A nested <svg> establishes a new viewport: x/y/width/height
@@ -122,7 +205,16 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
              * on the outermost svg and on nested viewports).  The rectangle
              * is expressed in the node's own user space -- the space `w`
              * maps to device -- which starts at (0,0) and is vw x vh. */
-            n->vp_clip = 1;
+            /* overflow: the initial value is hidden, so a nested viewport
+             * clips unless it explicitly asks for `visible` (SVG 1.1 §14.3).
+             * `overflow` is not inherited, so it is read on this element
+             * only (presentation attribute or inline style). */
+            const char* ov = xml_attr(xn, "overflow");
+            char ovbuf[64];
+            if (style_get_decl(xml_attr(xn, "style"), "overflow",
+                               ovbuf, sizeof ovbuf))
+                ov = ovbuf;
+            n->vp_clip = !(ov && !strcmp(ov, "visible"));
             n->vp_x = 0.0f; n->vp_y = 0.0f; n->vp_w = vw; n->vp_h = vh;
         }
     } else if (!strcmp(name, "symbol")) {
@@ -208,6 +300,15 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         if (!n) goto oom;
         const char* d = xml_attr(xn, "d");
         n->path = path_parse_lim(d ? d : "", ctx->lim, &ctx->limit_hit);
+        /* pathLength calibrates the author's coordinate system for dash
+         * patterns and textPath distances: dash values are multiplied by
+         * (actual length / declared length) (SVG 1.1 §8.3). */
+        const char* pl = xml_attr(xn, "pathLength");
+        if (pl && n->path) {
+            float declared = strtof(pl, NULL);
+            float actual = path_length(n->path);
+            if (declared > 0.0f && actual > 0.0f) path_scale = actual / declared;
+        }
     } else if (!strcmp(name, "text")) {
         n = svg_node_new(NODE_TEXT);
         if (!n) goto oom;
@@ -303,6 +404,10 @@ oom:
     n->fillop = st.fillop;
     n->strokeop = st.strokeop;
     n->letterspacing = st.letterspacing;
+    if (path_scale != 1.0f && n->dash) {
+        for (int i = 0; i < n->ndash; i++) n->dash[i] *= path_scale;
+        n->dashoff *= path_scale;
+    }
 
     char style_val[256];
     const char* op = xml_attr(xn, "opacity");
@@ -348,11 +453,16 @@ oom:
         return n;
     }
 
-    for (int i = 0; i < xn->nkids; i++) {
-        Node* c = build_node(ctx, xn->kids[i], &st, depth + 1);
-        /* A child that could not be attached is discarded; unregister its
-         * ids first or the map keeps a dangling pointer. */
+    if (switch_pick) {
+        Node* c = build_node(ctx, switch_pick, &st, depth + 1);
         if (c && !node_add_child(n, c)) svg_free_detached(c, ctx->ids);
+    } else {
+        for (int i = 0; i < xn->nkids; i++) {
+            Node* c = build_node(ctx, xn->kids[i], &st, depth + 1);
+            /* A child that could not be attached is discarded; unregister its
+             * ids first or the map keeps a dangling pointer. */
+            if (c && !node_add_child(n, c)) svg_free_detached(c, ctx->ids);
+        }
     }
 
     style_free(&st);

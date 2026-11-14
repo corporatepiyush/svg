@@ -69,3 +69,25 @@ void path_bbox(const Path* p, float out[4]) {
     }
     if (out[0] > out[2]) { out[0] = out[1] = out[2] = out[3] = 0.0f; }
 }
+
+/* Total geometric length of a path, in user units.  Used by `pathLength`
+ * scaling: the dash pattern is expressed in the author's declared length,
+ * so it must be multiplied by (actual length / declared length). */
+float path_length(const Path* p) {
+    if (!p) return 0.0f;
+    float total = 0.0f;
+    for (int i = 0; i < p->n; i++) {
+        const SubPath* s = &p->s[i];
+        for (int k = 1; k < s->n; k++) {
+            float dx = s->p[k].x - s->p[k - 1].x;
+            float dy = s->p[k].y - s->p[k - 1].y;
+            total += sqrtf(dx * dx + dy * dy);
+        }
+        if (s->closed && s->n > 2) {
+            float dx = s->p[0].x - s->p[s->n - 1].x;
+            float dy = s->p[0].y - s->p[s->n - 1].y;
+            total += sqrtf(dx * dx + dy * dy);
+        }
+    }
+    return total;
+}
