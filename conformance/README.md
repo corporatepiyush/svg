@@ -16,6 +16,7 @@ Everything is stdlib-only Python. No packages, no network.
 | `run.py` | the runner: render, assert, scorecard, JSON summary |
 | `verify_external.py` | samples every assertion from an independent renderer |
 | `measure.py` | dev helper: samples current output into an expectations file (never the oracle) |
+| `w3c_chrome.py` | the official W3C SVG 1.1 test suite, compared with Chrome |
 | `baseline/` | generated visual baselines (not committed) |
 
 ## Run it
@@ -115,6 +116,31 @@ Rules it enforces:
 
 This check is what caught a miter join that asserted no ink where the spec
 requires the spike, and an `xfail` that was really a wrong expectation.
+
+## The official W3C test suite
+
+The hand-written corpus measures what we claim to support; it cannot measure
+what we do not. The W3C SVG 1.1 suite (525 accepted tests) can. It is not
+committed (14 MB of W3C material), so `w3c_chrome.py` downloads it on first
+use into `conformance/.w3c-suite` (override with `SVG11_CACHE`).
+
+```sh
+python3 conformance/w3c_chrome.py            # all 525 tests
+python3 conformance/w3c_chrome.py --limit 40 --json /tmp/w3c.json
+```
+
+It renders each test with this renderer and with Chrome, masks text (this
+renderer has a bitmap font, so glyphs cannot match), and reports the pass rate
+per specification chapter. Text-only tests are reported separately rather than
+counted as passes.
+
+Current result: **261 of 512 comparable tests match Chrome** (51%). The full
+breakdown and the list of what is missing are in
+[`docs/conformance_status.md`](../docs/conformance_status.md).
+
+The suite's own reference PNGs are not used: they come from a renderer whose
+strokes snap to the pixel grid, so comparing against them measures that
+renderer's antialiasing rather than conformance.
 
 ## Visual baseline (review aid)
 

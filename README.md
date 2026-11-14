@@ -210,6 +210,7 @@ Private headers: `svg_internal.h`, `raster_internal.h`, `png_internal.h`.
 | `fuzz/semantic_cases.py` | pixel-oracle tests: 32 controls + 12 fixed-gap regressions, 0 xfail |
 | `conformance/` | 85 spec-derived cases across 13 feature areas, scorecard, baseline workflow |
 | `conformance/verify_external.py` | validates every conformance assertion against an independent renderer |
+| `conformance/w3c_chrome.py` | the official 525-test W3C SVG 1.1 suite, compared with Chrome |
 | `fuzz/diff_external.py` | differential testing against Chrome/Inkscape/resvg/WebKit |
 | `fuzz/alloc_fail.py`, `fuzz/limit_test.py` | allocation-failure injection and configurable resource-limit tests |
 | `fuzz/grammar_fuzz.py` | XML/reference/numeric grammar: DOCTYPE, CDATA, entities, use/symbol graphs, extreme numbers |
@@ -267,6 +268,20 @@ python3 conformance/verify_external.py --backends chrome
 
 That is the check that caught expectations copied from our own output, and
 what makes the scorecard meaningful.
+
+The official W3C SVG 1.1 suite (525 tests) is measured separately in
+`conformance/w3c_chrome.py`, because the hand-written corpus only covers what
+we claim to support. It downloads the suite on first use and compares our
+output with Chrome:
+
+```sh
+python3 conformance/w3c_chrome.py
+525 tests: 261 match within 3% of pixels, 251 differ, 13 text-only
+comparable pass rate: 51.0%
+```
+
+`docs/conformance_status.md` records the full breakdown by specification
+chapter and the element/attribute coverage.
 
 ### Remaining gaps / TODO
 

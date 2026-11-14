@@ -47,6 +47,12 @@ CASES = [
     ("use_dup_id", svg('<defs><rect id="d" width="10" height="10" fill="red"/></defs>'
                        '<rect id="d" width="6" height="6" fill="blue"/>'
                        '<use href="#d"/>'), None),
+    # Inheriting a dash list into a shadow tree allocates a copy per node; a
+    # deep subtree must free every copy (and the target's own list).
+    ("use_dash_inherit", svg('<defs><g id="g"><rect width="4" height="4"/>'
+                             '<rect x="6" width="4" height="4"/></g></defs>'
+                             '<use href="#g" stroke="black" stroke-width="2"'
+                             ' stroke-dasharray="4 2 1"/>'), None),
 ]
 
 

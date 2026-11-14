@@ -67,6 +67,7 @@ fuzz/*.dSYM/
 # Measurement artifacts
 conformance/summary.json
 conformance/baseline/
+conformance/.w3c-suite/
 conformance/diff_external.md
 conformance/diff_external.json
 bench/cases/

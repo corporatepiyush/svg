@@ -2,46 +2,46 @@
   "bin": "svg2img",
   "cases": [
     {
-      "best": 0.13184,
+      "best": 0.14663,
       "case": "circles_500",
-      "median": 0.13203,
-      "rss_kb": 61712
+      "median": 0.14798,
+      "rss_kb": 62256
     },
     {
-      "best": 0.01139,
+      "best": 0.0142,
       "case": "clip_300",
-      "median": 0.0116,
-      "rss_kb": 10656
+      "median": 0.01441,
+      "rss_kb": 11152
     },
     {
-      "best": 0.01735,
+      "best": 0.02083,
       "case": "dash_200",
-      "median": 0.01753,
-      "rss_kb": 11952
+      "median": 0.02109,
+      "rss_kb": 12064
     },
     {
-      "best": 0.01364,
+      "best": 0.016,
       "case": "grad_400",
-      "median": 0.01378,
-      "rss_kb": 11968
+      "median": 0.01666,
+      "rss_kb": 12224
     },
     {
-      "best": 0.00235,
+      "best": 0.00307,
       "case": "opacity_300",
-      "median": 0.00245,
-      "rss_kb": 3280
+      "median": 0.00329,
+      "rss_kb": 3760
     },
     {
-      "best": 0.0196,
+      "best": 0.02659,
       "case": "paths_200x60",
-      "median": 0.01975,
-      "rss_kb": 9536
+      "median": 0.02681,
+      "rss_kb": 11136
     },
     {
-      "best": 0.03261,
+      "best": 0.04271,
       "case": "text_1500",
-      "median": 0.03294,
-      "rss_kb": 11360
+      "median": 0.0436,
+      "rss_kb": 13232
     }
   ],
   "machine": {
@@ -51,6 +51,6 @@
     "python": "3.15.2",
     "system": "Darwin"
   },
-  "repeat": 7,
+  "repeat": 5,
   "version": 1
 }
