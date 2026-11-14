@@ -61,6 +61,8 @@ int   pattern_build(Pattern* out, const void* patnode, const float bbox[4],
 Color pattern_eval(const Pattern* p, float x, float y);
 void  pattern_free(Pattern* p);
 void  render_subtree(Canvas* c, const Node* n, Mat world, int aa);
+void  render_children(Canvas* c, const Node* n, Mat world, float opacity,
+                      Mask* clip, int aa);
 
 void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                float opacity, const Mask* clip, const float bounds[4],

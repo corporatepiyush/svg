@@ -241,7 +241,8 @@ enum {
     NODE_TRANSPARENT = 7, /* unsupported element: no rendering, but its known
                            * children are still traversed */
     NODE_PATTERNDEF = 8, /* <pattern>: tile definition, never painted directly */
-    NODE_MASKDEF = 9     /* <mask>: luminance mask, never painted directly */
+    NODE_MASKDEF = 9,    /* <mask>: luminance mask, never painted directly */
+    NODE_MARKERDEF = 10  /* <marker>: vertex marker, never painted directly */
 };
 
 struct Node {
@@ -254,6 +255,7 @@ struct Node {
 
     /* shape */
     Path* path;
+    int   marker_ok;          /* markers apply to path/line/polyline/polygon */
     Paint fill, stroke;
     float sw;
     int   linecap;      /* 0 butt, 1 round, 2 square */
@@ -306,6 +308,16 @@ struct Node {
     float symbol_vb[4];     /* symbol viewBox (x,y,w,h) */
     int   symbol_vb_valid;
     int   symbol_par_none, symbol_par_slice, symbol_par_xa, symbol_par_ya;
+
+    /* <marker>: vertex marker (SVG 1.1 §11.6) */
+    Node* marker_start, * marker_mid, * marker_end;
+    char* marker_start_ref, * marker_mid_ref, * marker_end_ref;
+    int   mk_units;           /* 0 = strokeWidth (default), 1 = userSpaceOnUse */
+    float mk_w, mk_h, mk_refx, mk_refy;
+    int   mk_orient;          /* 0 = auto, 1 = angle, 2 = auto-start-reverse */
+    float mk_angle;
+    float mk_vb[4]; int mk_vb_valid;
+    int   mk_par_none, mk_par_slice, mk_par_xa, mk_par_ya;
 
     /* <mask>: luminance mask (SVG 1.1 §14.4) */
     Node* mask;               /* resolved <mask> definition, borrowed */
@@ -381,6 +393,9 @@ typedef struct Style {
     int   ndash;
     int   saw_fill;        /* the element specified fill (for <use> cloning) */
     int   saw_stroke;      /* the element specified stroke                    */
+    char* marker_start;    /* marker-start/mid/end: id without '#', or NULL   */
+    char* marker_mid;
+    char* marker_end;
 } Style;
 
 /* Evaluation context passed down the DOM while building the tree. */

@@ -2839,6 +2839,119 @@
           "tol": 20
         }
       ]
+    },
+    {
+      "name": "marker_start_end",
+      "area": "markers",
+      "note": "A marker with refX=refY=5 is centred on each vertex: red discs at (20,50) and (80,50), the path itself black between them.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 80,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            0,
+            128
+          ],
+          "tol": 20
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 40,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "marker_orient_auto",
+      "area": "markers",
+      "note": "orient=\"auto\" rotates the marker to the path direction: the triangle points up-right at the end of the -45 degree line, so its tip is near (87,13).",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 83,
+          "y": 17,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 86,
+          "y": 14,
+          "min": 50
+        },
+        {
+          "kind": "alpha",
+          "x": 70,
+          "y": 15,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "marker_stroke_width",
+      "area": "markers",
+      "note": "markerUnits=\"strokeWidth\" (the default) scales the marker by stroke-width: a 5x5 marker on a 4-unit stroke is 20 units long, so green reaches x=80.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 70,
+          "y": 50,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 78,
+          "y": 50,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ],
+          "min": 120
+        },
+        {
+          "kind": "alpha",
+          "x": 85,
+          "y": 50,
+          "max": 8
+        }
+      ]
     }
   ],
   "external_intentional": [

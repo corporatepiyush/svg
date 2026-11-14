@@ -69,6 +69,13 @@ CASES = [
                            '<rect width="1" height="1" fill="url(#g)"/></mask>'
                            '</defs>'
                            '<rect width="20" height="20" fill="red" mask="url(#m)"/>'), None),
+    # Every vertex allocates marker subtrees; they must all be released.
+    ("markers_all", svg('<defs><marker id="m" markerWidth="4" markerHeight="4"'
+                        ' refX="2" refY="2"><circle cx="2" cy="2" r="2"'
+                        ' fill="red"/></marker></defs>'
+                        '<path d="M2,2 L18,2 L18,18" fill="none" stroke="black"'
+                        ' marker-start="url(#m)" marker-mid="url(#m)"'
+                        ' marker-end="url(#m)"/>'), None),
 ]
 
 

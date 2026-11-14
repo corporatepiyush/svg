@@ -12,7 +12,7 @@ SRCS = \
 	path_parse.c path_util.c \
 	color.c length.c \
 	svg_idmap.c svg_transform.c svg_geometry.c svg_gradient.c svg_pattern.c \
-	svg_text.c svg_style.c svg_mask.c svg_build.c svg_refs.c svg_viewport.c svg_api.c svg_alloc.c \
+	svg_text.c svg_style.c svg_mask.c svg_marker.c svg_build.c svg_refs.c svg_viewport.c svg_api.c svg_alloc.c \
 	raster_util.c \
 	raster_canvas.c \
 	raster_blend.c \

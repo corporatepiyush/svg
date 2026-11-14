@@ -186,7 +186,7 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
     if (!n || n->hidden_subtree || n->type == NODE_SYMBOL ||
         n->type == NODE_IGNORE || n->type == NODE_PATTERNDEF ||
         n->type == NODE_GRADDEF || n->type == NODE_CLIPDEF ||
-        n->type == NODE_MASKDEF) return;
+        n->type == NODE_MASKDEF || n->type == NODE_MARKERDEF) return;
     /* visibility:hidden suppresses this element's own painting but is
      * inherited per element, so a descendant that sets visibility:visible is
      * still drawn: traversal continues, only the painting is skipped.  The
@@ -305,6 +305,19 @@ void render_subtree(Canvas* c, const Node* n, Mat world, int aa) {
     st.masks = 0;
     for (int i = 0; i < n->nkids; i++)
         render_node(c, n->kids[i], world, 1.0f, NULL, aa, &st);
+}
+
+/* Render a node's children with an explicit opacity and clip (markers). */
+void render_children(Canvas* c, const Node* n, Mat world, float opacity,
+                     Mask* clip, int aa) {
+    if (!c || !n) return;
+    RenderState st;
+    st.lim = NULL;
+    st.layers = 0;
+    st.clips = 0;
+    st.masks = 0;
+    for (int i = 0; i < n->nkids; i++)
+        render_node(c, n->kids[i], world, opacity, clip, aa, &st);
 }
 
 void render_document(Canvas* c, Node* root, Mat view_tm,

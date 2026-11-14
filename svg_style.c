@@ -21,6 +21,7 @@ Style style_default(void) {
     s.fillop = s.strokeop = 1.0f;
     s.color = (Color){0, 0, 0, 1};
     s.fontsize = 16.0f;
+    s.marker_start = s.marker_mid = s.marker_end = NULL;
     return s;
 }
 
@@ -36,6 +37,10 @@ void style_copy(Style* dst, const Style* src) {
 
     dst->dash = NULL;
     dst->ndash = 0;
+    free(dst->marker_start); free(dst->marker_mid); free(dst->marker_end);
+    dst->marker_start = src->marker_start ? svg_strdup(src->marker_start) : NULL;
+    dst->marker_mid   = src->marker_mid   ? svg_strdup(src->marker_mid)   : NULL;
+    dst->marker_end   = src->marker_end   ? svg_strdup(src->marker_end)   : NULL;
     if (src->dash && src->ndash > 0) {
         dst->dash = (float*)svg_malloc((size_t)src->ndash * sizeof(float));
         if (dst->dash) {
@@ -69,6 +74,9 @@ void style_free(Style* s) {
         free(p->stops); p->stops = NULL; p->nstops = 0;
         free(p->ref);   p->ref = NULL;
     }
+    free(s->marker_start); s->marker_start = NULL;
+    free(s->marker_mid);   s->marker_mid = NULL;
+    free(s->marker_end);   s->marker_end = NULL;
 }
 static void for_each_decl(const char* decls,
                           void (*fn)(void* ud, const char* k, const char* v),
@@ -252,6 +260,19 @@ static void apply_one(void* ud, const char* k, const char* v) {
     } else if (!strcmp(k, "letter-spacing")) {
         st->spec |= SPEC_LETTER_SP;
         st->letterspacing = length_parse(v, ctx->vw, ctx->vh, ctx->em, 2, 0.0f);
+    } else if (!strcmp(k, "marker-start") || !strcmp(k, "marker-mid") ||
+               !strcmp(k, "marker-end")) {
+        char** slot = !strcmp(k, "marker-start") ? &st->marker_start
+                      : !strcmp(k, "marker-mid") ? &st->marker_mid
+                                                 : &st->marker_end;
+        free(*slot);
+        *slot = NULL;
+        if (v && !strcmp(v, "none")) {
+            /* explicitly no marker */
+        } else if (v && !strncmp(v, "url(#", 5)) {
+            const char* e = strchr(v + 5, ')');
+            if (e) *slot = svg_strndup(v + 5, (size_t)(e - (v + 5)));
+        }
     } else if (!strcmp(k, "display")) {
         /* `display` is not inherited; the value only matters on the element
          * it is written on.  "none" hides the element and its subtree

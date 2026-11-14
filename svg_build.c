@@ -281,6 +281,7 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     } else if (!strcmp(name, "line")) {
         n = svg_node_new(NODE_SHAPE);
         if (!n) goto oom;
+        n->marker_ok = 1;
         n->path = path_from_line(len_attr(ctx, xn, "x1", 0, 0.0f),
                                  len_attr(ctx, xn, "y1", 1, 0.0f),
                                  len_attr(ctx, xn, "x2", 0, 0.0f),
@@ -288,16 +289,19 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     } else if (!strcmp(name, "polyline")) {
         n = svg_node_new(NODE_SHAPE);
         if (!n) goto oom;
+        n->marker_ok = 1;
         n->path = path_from_points_lim(xml_attr(xn, "points"), 0, ctx->lim,
                                        &ctx->limit_hit);
     } else if (!strcmp(name, "polygon")) {
         n = svg_node_new(NODE_SHAPE);
         if (!n) goto oom;
+        n->marker_ok = 1;
         n->path = path_from_points_lim(xml_attr(xn, "points"), 1, ctx->lim,
                                        &ctx->limit_hit);
     } else if (!strcmp(name, "path")) {
         n = svg_node_new(NODE_SHAPE);
         if (!n) goto oom;
+        n->marker_ok = 1;
         const char* d = xml_attr(xn, "d");
         n->path = path_parse_lim(d ? d : "", ctx->lim, &ctx->limit_hit);
         /* pathLength calibrates the author's coordinate system for dash
@@ -331,6 +335,8 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n = build_pattern(ctx, xn);
     } else if (!strcmp(name, "mask")) {
         n = build_mask(ctx, xn);
+    } else if (!strcmp(name, "marker")) {
+        n = build_marker(ctx, xn);
     } else if (!strcmp(name, "clipPath")) {
         n = svg_node_new(NODE_CLIPDEF);
         if (!n) goto oom;
@@ -408,6 +414,11 @@ oom:
     n->fillop = st.fillop;
     n->strokeop = st.strokeop;
     n->letterspacing = st.letterspacing;
+    if (n->type != NODE_MARKERDEF) {
+        n->marker_start_ref = st.marker_start; st.marker_start = NULL;
+        n->marker_mid_ref   = st.marker_mid;   st.marker_mid = NULL;
+        n->marker_end_ref   = st.marker_end;   st.marker_end = NULL;
+    }
     if (path_scale != 1.0f && n->dash) {
         for (int i = 0; i < n->ndash; i++) n->dash[i] *= path_scale;
         n->dashoff *= path_scale;

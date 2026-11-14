@@ -112,6 +112,21 @@ static void resolve_clip_refs(Node* n, IdMap* ids) {
         free(n->mask_ref);
         n->mask_ref = NULL;
     }
+    if (n->marker_start_ref) {
+        Node* m = idmap_get(ids, n->marker_start_ref);
+        if (m && m->type == NODE_MARKERDEF) n->marker_start = m;
+        free(n->marker_start_ref); n->marker_start_ref = NULL;
+    }
+    if (n->marker_mid_ref) {
+        Node* m = idmap_get(ids, n->marker_mid_ref);
+        if (m && m->type == NODE_MARKERDEF) n->marker_mid = m;
+        free(n->marker_mid_ref); n->marker_mid_ref = NULL;
+    }
+    if (n->marker_end_ref) {
+        Node* m = idmap_get(ids, n->marker_end_ref);
+        if (m && m->type == NODE_MARKERDEF) n->marker_end = m;
+        free(n->marker_end_ref); n->marker_end_ref = NULL;
+    }
     for (int i = 0; i < n->nkids; i++) resolve_clip_refs(n->kids[i], ids);
 }
 
