@@ -229,6 +229,29 @@ static FBuf* fe_displacement(FilterCtx* fc, const FilterPrim* p) {
 static FBuf* fe_image(FilterCtx* fc, const FilterPrim* p) {
     FBuf* out = fe_new(fc, fc->src.w, fc->src.h);
     if (!out) return NULL;
+    if (p->ref_node) {
+        /* The referenced element is rendered as an image in the filter's own
+         * user space.  The buffer's top-left is device (ox,oy), so a device
+         * point (X,Y) lands at (X-ox, Y-oy). */
+        Canvas* tmp = canvas_create(out->w, out->h);
+        if (!tmp) return out;
+        Mat buf = mat_mul(mat_translate(-(float)fc->ox, -(float)fc->oy),
+                          fc->world);
+        render_one(tmp, p->ref_node, buf, fc->aa);
+        size_t npix = (size_t)out->w * (size_t)out->h;
+        for (size_t i = 0; i < npix; i++) {
+            const float* s = tmp->px + i * 4;
+            float* d = out->px + i * 4;
+            d[0] = s[0]; d[1] = s[1]; d[2] = s[2]; d[3] = s[3];
+        }
+        canvas_free(tmp);
+        if (fc->linear) fe_srgb_to_linear(out);
+        fc->last_sx = 0;
+        fc->last_sy = 0;
+        fc->last_sw = out->w;
+        fc->last_sh = out->h;
+        return out;
+    }
     if (!p->href) return out;
     unsigned char* raw = p->px;
     int sw = p->pw, sh = p->ph;

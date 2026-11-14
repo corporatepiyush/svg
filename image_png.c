@@ -225,6 +225,15 @@ static int paeth(int a, int b, int c) {
     return c;
 }
 
+/* Read the x-th sample of a packed sub-byte row. */
+static int sample_bits(const unsigned char* row, unsigned x, int depth) {
+    size_t bit = (size_t)x * (size_t)depth;
+    size_t byte = bit >> 3;
+    int shift = 8 - depth - (int)(bit & 7);
+    unsigned mask = (1u << depth) - 1u;
+    return (row[byte] >> shift) & (int)mask;
+}
+
 /* Decode *d* to a freshly allocated RGBA8 buffer (w*h*4).  Returns NULL on
  * any unsupported or malformed input. */
 unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
@@ -237,6 +246,8 @@ unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
     Buf idat = {0};
     const unsigned char* plte = NULL;
     unsigned plte_n = 0;
+    const unsigned char* trns = NULL;
+    unsigned trns_len = 0;
 
     size_t p = 8;
     while (p + 12 <= n) {
@@ -253,6 +264,9 @@ unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
         } else if (!memcmp(type, "PLTE", 4)) {
             plte = data;
             plte_n = len / 3;
+        } else if (!memcmp(type, "tRNS", 4)) {
+            trns = data;
+            trns_len = len;
         } else if (!memcmp(type, "IDAT", 4)) {
             if (idat.n + len > idat.cap) {
                 size_t nc = idat.cap ? idat.cap : 4096;
@@ -270,17 +284,27 @@ unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
         p += 12 + (size_t)len;
     }
 
-    if (w == 0 || h == 0 || depth != 8 || interlace != 0) { free(idat.p); return NULL; }
+    if (w == 0 || h == 0 || interlace != 0) { free(idat.p); return NULL; }
+    if (depth != 1 && depth != 2 && depth != 4 && depth != 8) {
+        free(idat.p);
+        return NULL;
+    }
     int channels = (ctype == 0) ? 1 : (ctype == 2) ? 3 : (ctype == 4) ? 2 :
                    (ctype == 6) ? 4 : (ctype == 3) ? 1 : 0;
-    if (channels == 0 || ctype == 3) { free(idat.p); return NULL; }
+    /* Sub-byte depths are only legal for greyscale and palette images. */
+    if (channels == 0) { free(idat.p); return NULL; }
+    if (depth < 8 && ctype != 0 && ctype != 3) { free(idat.p); return NULL; }
+    if (ctype == 3 && (!plte || plte_n == 0)) { free(idat.p); return NULL; }
     if ((size_t)w > (size_t)-1 / (size_t)h / 4) { free(idat.p); return NULL; }
 
     Buf raw = {0};
     if (zlib_inflate(idat.p, idat.n, &raw)) { free(idat.p); free(raw.p); return NULL; }
     free(idat.p);
 
-    size_t stride = (size_t)w * (size_t)channels;
+    /* Packed rows for sub-byte depths: one filtering pass still uses the
+     * packed stride, then each row is expanded to one byte per sample. */
+    size_t packed = ((size_t)w * (size_t)channels * (size_t)depth + 7) / 8;
+    size_t stride = (depth == 8) ? (size_t)w * (size_t)channels : packed;
     if (raw.n < (stride + 1) * (size_t)h) { free(raw.p); return NULL; }
 
     unsigned char* img = (unsigned char*)svg_malloc((size_t)w * (size_t)h * 4);
@@ -317,16 +341,26 @@ unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
                 o[0] = cur[x * 3]; o[1] = cur[x * 3 + 1];
                 o[2] = cur[x * 3 + 2]; o[3] = 255;
             } else if (ctype == 0) {
-                o[0] = o[1] = o[2] = cur[x]; o[3] = 255;
-            } else {
+                int v = depth == 8 ? cur[x] : sample_bits(cur, x, depth);
+                v = depth == 8 ? v : v * 255 / ((1 << depth) - 1);
+                o[0] = o[1] = o[2] = (unsigned char)v;
+                o[3] = 255;
+            } else if (ctype == 4) {
                 o[0] = o[1] = o[2] = cur[x * 2];
                 o[3] = cur[x * 2 + 1];
+            } else {
+                int idx = depth == 8 ? cur[x] : sample_bits(cur, x, depth);
+                if ((unsigned)idx >= plte_n) idx = 0;
+                o[0] = plte[(size_t)idx * 3 + 0];
+                o[1] = plte[(size_t)idx * 3 + 1];
+                o[2] = plte[(size_t)idx * 3 + 2];
+                o[3] = (trns && (size_t)idx < trns_len) ? trns[idx] : 255;
             }
         }
         unsigned char* t = prev; prev = cur; cur = t;
     }
 
-    (void)plte; (void)plte_n;
+
     free(prev);
     free(cur);
     free(raw.p);

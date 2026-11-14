@@ -169,12 +169,50 @@ const NamedBuf* fe_lookup(FilterCtx* fc, const char* name) {
     return NULL;
 }
 
+/* A region-sized, fully transparent buffer (BackgroundAlpha / BackgroundImage
+ * without enable-background, FillPaint on a non-shape). */
+static FBuf* fe_transparent(FilterCtx* fc) {
+    if (fc->has_transparent) return &fc->transparent;
+    FBuf* b = fbuf_create(fc->src.w, fc->src.h);
+    if (!b) return NULL;
+    fc->transparent = *b;
+    free(b);
+    fc->has_transparent = 1;
+    fc->bytes += fb_bytes(fc->src.w, fc->src.h);
+    return &fc->transparent;
+}
+
+/* FillPaint / StrokePaint: the referencing shape's own fill or stroke, drawn
+ * into a region-sized buffer. */
+static FBuf* fe_paint(FilterCtx* fc, int want_stroke) {
+    if (want_stroke ? fc->has_stroke_paint : fc->has_fill_paint)
+        return (want_stroke ? &fc->stroke_paint : &fc->fill_paint);
+    if (!fc->src_node || fc->src_node->type != NODE_SHAPE)
+        return fe_transparent(fc);
+    FBuf* b = fbuf_create(fc->src.w, fc->src.h);
+    if (!b) return NULL;
+    if (fc->bytes + fb_bytes(b->w, b->h) > fc->max_bytes) { fbuf_free(b); return NULL; }
+    fc->bytes += fb_bytes(b->w, b->h);
+    Canvas tmp = { b->w, b->h, b->px };
+    Mat local = mat_mul(mat_translate(-(float)fc->ox, -(float)fc->oy),
+                        fc->world);
+    render_shape_into(&tmp, fc->src_node, local, fc->aa, want_stroke);
+    if (fc->linear) fe_srgb_to_linear(b);
+    if (want_stroke) { fc->stroke_paint = *b; fc->has_stroke_paint = 1; }
+    else             { fc->fill_paint = *b;   fc->has_fill_paint = 1; }
+    free(b);
+    return (want_stroke ? &fc->stroke_paint : &fc->fill_paint);
+}
+
 const FBuf* fe_input(FilterCtx* fc, const char* name) {
     if (!fc) return NULL;
     if (!name || !*name) return fc->last >= 0 ? &fc->bufs[fc->last].fb : &fc->src;
     if (!strcmp(name, "SourceGraphic")) return &fc->src;
     if (!strcmp(name, "SourceAlpha")) return &fc->alpha;
-    if (!strcmp(name, "FillPaint") || !strcmp(name, "StrokePaint")) return NULL;
+    if (!strcmp(name, "FillPaint")) return fe_paint(fc, 0);
+    if (!strcmp(name, "StrokePaint")) return fe_paint(fc, 1);
+    if (!strcmp(name, "BackgroundAlpha") || !strcmp(name, "BackgroundImage"))
+        return fe_transparent(fc);
     const NamedBuf* e = fe_lookup(fc, name);
     return e ? &e->fb : NULL;
 }
@@ -214,9 +252,9 @@ static NamedBuf* fe_add(FilterCtx* fc, const char* name, FBuf* b) {
 /* Chain execution                                                     */
 /* ------------------------------------------------------------------ */
 
-FBuf* filter_execute(const Node* f, const FBuf* source, const float bbox[4],
-                     int has_bbox, Mat world, int aa, size_t max_bytes,
-                     int origin_x, int origin_y) {
+FBuf* filter_execute(const Node* f, const Node* src_node, const FBuf* source,
+                     const float bbox[4], int has_bbox, Mat world, int aa,
+                     size_t max_bytes, int origin_x, int origin_y) {
     if (!f || !source || f->nprims <= 0 || !source->px) return NULL;
 
     FilterCtx fc;
@@ -232,6 +270,7 @@ FBuf* filter_execute(const Node* f, const FBuf* source, const float bbox[4],
     fc.max_bytes = max_bytes;
     fc.ox = origin_x;
     fc.oy = origin_y;
+    fc.src_node = src_node;
     fc.last = -1;
     fc.last_sx = fc.last_sy = 0;
     fc.last_sw = source->w;
@@ -278,6 +317,9 @@ FBuf* filter_execute(const Node* f, const FBuf* source, const float bbox[4],
      * only their pixel buffers are heap-allocated. */
     free(fc.src.px);
     free(fc.alpha.px);
+    if (fc.has_transparent) free(fc.transparent.px);
+    if (fc.has_fill_paint) free(fc.fill_paint.px);
+    if (fc.has_stroke_paint) free(fc.stroke_paint.px);
     for (int i = 0; i < fc.n; i++) {
         free(fc.bufs[i].name);
         free(fc.bufs[i].fb.px);
@@ -427,6 +469,8 @@ static FBuf* fe_flood(FilterCtx* fc, const FilterPrim* p) {
     if (c.a < 0.0f) c.a = 0.0f;
     if (c.a > 1.0f) c.a = 1.0f;
     if (fc->linear) c = fe_tolinear(c);
+    /* feFlood ignores `in` (SVG 1.1 15.2.15): it fills the filter region
+     * regardless of the input. */
     size_t n = (size_t)out->w * (size_t)out->h;
     for (size_t i = 0; i < n; i++) {
         float* d = out->px + i * 4;

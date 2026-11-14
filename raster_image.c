@@ -91,7 +91,7 @@ void image_blit_fbuf(FBuf* dst, int dx, int dy, int dw, int dh,
     }
 }
 
-void render_image(Canvas* c, Node* n, Mat world, float opacity,
+void render_image(Canvas* c, const Node* n, Mat world, float opacity,
                   Mask* clip, int aa) {
     if (!n || !n->image_href || !(n->img_w > 0.0f) || !(n->img_h > 0.0f)) return;
 

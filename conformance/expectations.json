@@ -4201,6 +4201,193 @@
           "max": 8
         }
       ]
+    },
+    {
+      "name": "filter_image_local_ref",
+      "area": "filters",
+      "note": "feImage can reference an element in the same document: the referenced triangle is rendered as the image, so the filtered rect shows the triangle rather than the rect.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 20,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 80,
+          "rgba": [
+            0,
+            170,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 5,
+          "y": 5,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 95,
+          "y": 5,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 95,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "filter_fill_paint",
+      "area": "filters",
+      "note": "FillPaint is the referencing element's own fill, so blurring it gives a soft red square that fades past the source edges.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 20,
+          "min": 80,
+          "max": 200
+        },
+        {
+          "kind": "alpha",
+          "x": 15,
+          "y": 15,
+          "max": 30
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 95,
+          "max": 30
+        }
+      ]
+    },
+    {
+      "name": "nested_svg_viewbox_clip",
+      "area": "structure",
+      "note": "A nested svg with a viewBox clips to its viewport after mapping the viewBox into it (meet, centred): the 200x100 viewBox fits a 50x50 viewport as a 50x25 band at y=22..47.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 30,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 40,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 30,
+          "y": 15,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 30,
+          "y": 55,
+          "max": 8
+        },
+        {
+          "kind": "rgba",
+          "x": 75,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "image_png_palette",
+      "area": "images",
+      "note": "A palette (colour type 3) PNG is decoded through its PLTE table: the four palette entries fill the quadrants of the image viewport.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 70,
+          "y": 20,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 70,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 70,
+          "y": 70,
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ]
+        }
+      ]
     }
   ],
   "external_intentional": [],

@@ -40,7 +40,7 @@ static void path_bbox_transformed(const Path* p, Mat m, float out[4]) {
 /* `full_w` is the node's complete transform (parent CTM * n->tm), not the
  * parent CTM.  Applying n->tm here as well would double-transform every
  * opacity layer that has its own transform. */
-int node_bbox_world(Node* n, Mat full_w, float out[4]) {
+int node_bbox_world(const Node* n, Mat full_w, float out[4]) {
     if (!n || !n->visible || n->hidden_subtree) return 0;
     if (n->type == NODE_SHAPE && n->path && n->path->n > 0) {
         path_bbox_transformed(n->path, full_w, out);
@@ -172,17 +172,17 @@ static Mask* node_clip_mask(const Node* n, Mat world, Canvas* c,
     return both;
 }
 
-static void render_node(Canvas* c, Node* n, Mat world, float opacity,
+static void render_node(Canvas* c, const Node* n, Mat world, float opacity,
                         Mask* clip, int aa, RenderState* rs);
-static void paint_self(Canvas* c, Node* n, Mat w, float op, Mask* eff, int aa,
-                       RenderState* rs);
-static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
-                            int aa, RenderState* rs);
+static void paint_self(Canvas* c, const Node* n, Mat w, float op,
+                       Mask* eff, int aa, RenderState* rs);
+static void render_filtered(Canvas* c, const Node* n, Mat w, float op,
+                            Mask* clip, int aa, RenderState* rs);
 
 /* Render a group's children into a temporary layer and composite it with
  * the group's opacity.  `op` is the already-composed opacity (group
  * opacity * inherited opacity), and must be < 1 for a layer to be needed. */
-static void render_group_layered(Canvas* c, Node* n, Mat w, float op,
+static void render_group_layered(Canvas* c, const Node* n, Mat w, float op,
                                  Mask* eff, int aa, RenderState* rs) {
     /* Layer budget: past the limit, draw straight into the parent instead of
      * allocating another full-canvas buffer.  The result is slightly wrong
@@ -226,7 +226,7 @@ static void render_group_layered(Canvas* c, Node* n, Mat w, float op,
     rs->layers--;
 }
 
-static void render_node(Canvas* c, Node* n, Mat world, float opacity,
+static void render_node(Canvas* c, const Node* n, Mat world, float opacity,
                         Mask* clip, int aa, RenderState* rs) {
     /* display:none stops the traversal; a NODE_SYMBOL is a definition that is
      * only ever rendered through a <use> clone (which is retagged NODE_GROUP),
@@ -318,8 +318,8 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
 
 /* Paint a node's own content, with no filter applied.  Group opacity and
  * clipping are already resolved by the caller. */
-static void paint_self(Canvas* c, Node* n, Mat w, float op, Mask* eff, int aa,
-                       RenderState* rs) {
+static void paint_self(Canvas* c, const Node* n, Mat w, float op,
+                       Mask* eff, int aa, RenderState* rs) {
     if (n->type == NODE_GROUP || n->type == NODE_SYMBOL ||
         n->type == NODE_TRANSPARENT) {
         /* Collapse a chain of single-child, unclipped groups into one layer.
@@ -328,10 +328,10 @@ static void paint_self(Canvas* c, Node* n, Mat w, float op, Mask* eff, int aa,
          * this a 300-deep chain allocates hundreds of full-canvas buffers. */
         if (op < 0.999f) {
             float c_op = op;
-            Node* g = n;
+            const Node* g = n;
             while (g->nkids == 1 && !g->clip && g->kids[0]->type == NODE_GROUP &&
                    !g->kids[0]->clip) {
-                Node* child = g->kids[0];
+                const Node* child = g->kids[0];
                 c_op *= child->opacity;
                 g = child;
                 if (c_op <= 0.0f) return;
@@ -341,7 +341,7 @@ static void paint_self(Canvas* c, Node* n, Mat w, float op, Mask* eff, int aa,
                  * layer using the composed opacity.  The chain's transforms
                  * are baked into `w` by walking them below. */
                 Mat chain_w = w;
-                for (Node* t = n->kids[0]; t != g; t = t->kids[0])
+                for (const Node* t = n->kids[0]; t != g; t = t->kids[0])
                     chain_w = mat_mul(chain_w, t->tm);
                 render_group_layered(c, g, chain_w, c_op, eff, aa, rs);
                 return;
@@ -414,8 +414,8 @@ static int filter_region(const Node* f, Mat w, const float* lbb, int has_bb,
  * The element is rendered without its clip: the specification applies filter,
  * then clipping, masking and opacity, so the clip and mask are applied to the
  * filtered result instead of to the source. */
-static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
-                            int aa, RenderState* rs) {
+static void render_filtered(Canvas* c, const Node* n, Mat w, float op,
+                            Mask* clip, int aa, RenderState* rs) {
     Node* f = n->filter;
     float lbb[4];
     int has_bb = node_bbox_world(n, mat_identity(), lbb);
@@ -449,7 +449,7 @@ static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
     size_t region_bytes = fb_bytes(iw, ih);
     size_t max_bytes = region_bytes * 6 + (8u << 20);
     if (max_bytes > (512u << 20)) max_bytes = 512u << 20;
-    FBuf* out = filter_execute(f, &src, lbb, has_bb, w, aa, max_bytes,
+    FBuf* out = filter_execute(f, n, &src, lbb, has_bb, w, aa, max_bytes,
                                ix0, iy0);
     if (!out) out = fbuf_copy(&src);
     free(src.px);                          /* src is an embedded struct */
@@ -481,6 +481,18 @@ void render_subtree(Canvas* c, const Node* n, Mat world, int aa) {
     st.filters = 0;
     for (int i = 0; i < n->nkids; i++)
         render_node(c, n->kids[i], world, 1.0f, NULL, aa, &st);
+}
+
+/* Render a single node (used by feImage referencing an element). */
+void render_one(Canvas* c, const Node* n, Mat world, int aa) {
+    if (!c || !n) return;
+    RenderState st;
+    st.lim = NULL;
+    st.layers = 0;
+    st.clips = 0;
+    st.masks = 0;
+    st.filters = 0;
+    render_node(c, n, world, 1.0f, NULL, aa, &st);
 }
 
 /* Render a node's children with an explicit opacity and clip (markers). */

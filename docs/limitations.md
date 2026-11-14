@@ -72,6 +72,8 @@ is the contract between the library and its callers.
   `!important` in inline `style` (author `!important` is honoured).
 - Geometry properties through CSS (`x`, `y`, `width`, `height`, `r`, `d`,
   `points`, `transform`).  Use XML attributes.
+- `enable-background` / `BackgroundAlpha` / `BackgroundImage`: the background
+  group is not accumulated, so those inputs are transparent.
 - `<foreignObject>`, `<view>`, SMIL animation, and `<script>` (which is not
   executed, correctly for a rasteriser).
 - `<color-profile>` and `cursor` are accepted but ignored: output is always
@@ -97,10 +99,20 @@ is the contract between the library and its callers.
   that the specification defines on premultiplied values do so here.
   `feConvolveMatrix` always premultiplies (it ignores `preserveAlpha`).  The
   filter output is clipped to the filter region.
+- Filter inputs: `SourceGraphic`, `SourceAlpha`, `FillPaint`, `StrokePaint`,
+  `BackgroundAlpha` and `BackgroundImage` are all understood.
+  `BackgroundAlpha`/`BackgroundImage` are transparent unless the document
+  establishes a background group with `enable-background`, which this
+  rasteriser does not implement.
+- `feImage` accepts a data URI, an external file (with a base path) or a
+  fragment reference to an element in the same document, which is rendered as
+  the image.
 - External image files need a base path: `svg2img_options.base_path` resolves
   a relative reference, and `svg2img_convert_file` defaults it to the input
   document's own directory.  `svg2img_convert` (a document in memory) has no
   default, so a relative reference is skipped unless the caller sets one.
+  PNG support is 8-bit greyscale, RGB, palette, grey+alpha and RGBA, with
+  sub-byte depths for greyscale and palette images; interlaced PNG is rejected.
   Progressive, arithmetic-coded and 12-bit JPEG are not supported (baseline
   sequential, Huffman, 8-bit only).  JPEG chroma is upsampled nearest-neighbour
   rather than with a triangle filter.

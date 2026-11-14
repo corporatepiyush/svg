@@ -547,6 +547,21 @@ static void resolve_text_paths(Node* n, IdMap* ids) {
     for (int i = 0; i < n->nkids; i++) resolve_text_paths(n->kids[i], ids);
 }
 
+/* feImage may reference an element in the same document (SVG 1.1 15.2.12):
+ * the referenced node is rendered as the image. */
+static void resolve_filter_image_refs(Node* n, IdMap* ids) {
+    if (!n) return;
+    if (n->type == NODE_FILTERDEF && n->prims) {
+        for (int i = 0; i < n->nprims; i++) {
+            FilterPrim* p = &n->prims[i];
+            if (p->type != FE_IMAGE || !p->href || p->href[0] != '#') continue;
+            Node* t = idmap_get(ids, p->href + 1);
+            if (t && t != n) p->ref_node = t;
+        }
+    }
+    for (int i = 0; i < n->nkids; i++) resolve_filter_image_refs(n->kids[i], ids);
+}
+
 int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
     if (!n) return 0;
     for (int pass = 0; pass < 8 && pattern_hrefs_pending(n); pass++)
@@ -554,6 +569,7 @@ int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
     resolve_gradient_hrefs(n, ids, 64);
     resolve_paint_refs(n, ids);
     resolve_text_paths(n, ids);
+    resolve_filter_image_refs(n, ids);
     resolve_clip_refs(n, ids);
 
     UseCtx uc;

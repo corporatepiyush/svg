@@ -46,7 +46,7 @@ static void draw_one_marker(Canvas* c, const Node* mk, Pt v, float angle,
     render_children(c, mk, m, opacity, clip, aa);
 }
 
-static void draw_markers(Canvas* c, Node* n, Mat world, float opacity,
+static void draw_markers(Canvas* c, const Node* n, Mat world, float opacity,
                          Mask* clip, int aa) {
     if (!n->marker_ok || !n->path) return;
     if (!n->marker_start && !n->marker_mid && !n->marker_end) return;
@@ -83,7 +83,7 @@ static void draw_markers(Canvas* c, Node* n, Mat world, float opacity,
     }
 }
 
-void render_shape(Canvas* c, Node* n, Mat world, float opacity,
+void render_shape(Canvas* c, const Node* n, Mat world, float opacity,
                          Mask* clip, int aa) {
     if (!n->path || n->path->n == 0) return;
 
@@ -136,4 +136,21 @@ void render_shape(Canvas* c, Node* n, Mat world, float opacity,
     }
     if (!identity) path_free(p);
     draw_markers(c, n, world, opacity, clip, aa);
+}
+
+/* ------------------------------------------------------------------ */
+/* FillPaint / StrokePaint (SVG 1.1 §15.2)                             */
+/* ------------------------------------------------------------------ */
+
+/* Render only the fill or only the stroke of a shape, for the FillPaint and
+ * StrokePaint filter inputs.  `n` is not modified. */
+void render_shape_into(Canvas* c, const Node* n, Mat world, int aa,
+                       int want_stroke) {
+    if (!c || !n || n->type != NODE_SHAPE || !n->path) return;
+    Node tmp = *n;
+    tmp.dash = NULL;
+    tmp.ndash = 0;
+    if (want_stroke) tmp.fill.type = PAINT_NONE;
+    else tmp.stroke.type = PAINT_NONE;
+    render_shape(c, &tmp, world, 1.0f, NULL, aa);
 }

@@ -63,6 +63,9 @@ void  pattern_free(Pattern* p);
 void  render_subtree(Canvas* c, const Node* n, Mat world, int aa);
 void  render_children(Canvas* c, const Node* n, Mat world, float opacity,
                       Mask* clip, int aa);
+void  render_shape_into(Canvas* c, const Node* n, Mat world, int aa,
+                        int want_stroke);
+void  render_one(Canvas* c, const Node* n, Mat world, int aa);
 
 void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
                float opacity, const Mask* clip, const float bounds[4],
@@ -70,11 +73,11 @@ void fill_path(Canvas* c, const Path* path, int rule, const Paint* paint,
 Path* build_stroke(const Path* path, float w, int cap, int join,
                    float miterlimit, const float* dash, int ndash, float dashoff);
 
-void render_shape(Canvas* c, Node* n, Mat world, float opacity,
+void render_shape(Canvas* c, const Node* n, Mat world, float opacity,
                   Mask* clip, int aa);
-void render_image(Canvas* c, Node* n, Mat world, float opacity,
+void render_image(Canvas* c, const Node* n, Mat world, float opacity,
                   Mask* clip, int aa);
-void render_text(Canvas* c, Node* n, Mat world, float opacity,
+void render_text(Canvas* c, const Node* n, Mat world, float opacity,
                  Mask* clip, int aa);
 
 Mask* make_clip_mask(const Node* clipdef, Mat world, const float* obj_bbox,
@@ -82,7 +85,7 @@ Mask* make_clip_mask(const Node* clipdef, Mat world, const float* obj_bbox,
 Mask* make_rect_mask(const Node* n, Mat w, int W, int H, int aa);
 Mask* make_mask_from_node(const Node* mn, Mat world, const float* bbox,
                           int W, int H, int aa);
-int node_bbox_world(Node* n, Mat full_w, float out[4]);
+int node_bbox_world(const Node* n, Mat full_w, float out[4]);
 
 /* ------------------------------------------------------------------ */
 /* Filter effects (SVG 1.1 §15)                                        */
@@ -120,11 +123,16 @@ typedef struct FilterCtx {
     /* Content subregion reported by the primitive that just ran. */
     int   last_sx, last_sy, last_sw, last_sh;
     int   ox, oy;            /* device position of the buffer's top-left */
+    const Node* src_node;    /* the element the filter is applied to */
+    FBuf  transparent;       /* lazily built, region-sized, all zero */
+    int   has_transparent;
+    FBuf  fill_paint, stroke_paint;   /* FillPaint / StrokePaint inputs */
+    int   has_fill_paint, has_stroke_paint;
 } FilterCtx;
 
-FBuf* filter_execute(const Node* fdef, const FBuf* source, const float bbox[4],
-                     int has_bbox, Mat world, int aa, size_t max_bytes,
-                     int origin_x, int origin_y);
+FBuf* filter_execute(const Node* fdef, const Node* src_node, const FBuf* source,
+                     const float bbox[4], int has_bbox, Mat world, int aa,
+                     size_t max_bytes, int origin_x, int origin_y);
 FBuf* fe_run(FilterCtx* fc, const FilterPrim* p);
 FBuf* fe_run_generic(FilterCtx* fc, const FilterPrim* p);
 size_t fb_bytes(int w, int h);

@@ -220,7 +220,18 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
                                ovbuf, sizeof ovbuf))
                 ov = ovbuf;
             n->vp_clip = !(ov && !strcmp(ov, "visible"));
-            n->vp_x = 0.0f; n->vp_y = 0.0f; n->vp_w = vw; n->vp_h = vh;
+            /* The clip rectangle lives in the node's own user space (the
+             * space its matrix maps to device).  With a viewBox that is the
+             * viewBox rectangle; without one it is the viewport rectangle at
+             * the origin, since the node's user space is the parent's and
+             * the translate(vx,vy) is already in the matrix. */
+            if (vbw > 0.0f && vbh > 0.0f) {
+                n->vp_x = vbx; n->vp_y = vby;
+                n->vp_w = vbw; n->vp_h = vbh;
+            } else {
+                n->vp_x = 0.0f; n->vp_y = 0.0f;
+                n->vp_w = vw;   n->vp_h = vh;
+            }
         }
     } else if (!strcmp(name, "symbol")) {
         /* <symbol> is never rendered directly: it is only instantiated by a

@@ -247,7 +247,7 @@ static void draw_chunk(Canvas* c, const TextChunk* ch, Mat world,
     path_free(p);
 }
 
-void render_text(Canvas* c, Node* n, Mat world, float opacity,
+void render_text(Canvas* c, const Node* n, Mat world, float opacity,
                         Mask* clip, int aa) {
     if (!n) return;
     if (n->nchunks > 0 && n->chunks) {

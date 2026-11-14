@@ -325,6 +325,7 @@ typedef struct FilterPrim {
 
     /* feImage */
     char* href;
+    Node* ref_node;          /* href="#id" resolved to a render node */
     unsigned char* px;       /* preloaded raster file, or NULL */
     int   pw, ph;
 

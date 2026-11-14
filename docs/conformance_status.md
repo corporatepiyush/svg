@@ -16,7 +16,7 @@ Appendix M. Test suite: the W3C SVG 1.1 test suite (525 accepted tests).
 | Official suite, before the feature batches | **261 / 512 comparable** (51%) |
 | Official suite, now | **278 / 512 comparable** (54%) |
 | Text-only tests (not comparable) | 13 full / 2 subset |
-| Conformance corpus (hand-written) | 125 / 125 |
+| Conformance corpus (hand-written) | 130 / 130 |
 
 The official-suite number is the honest one: it is measured against an
 independent implementation of the same specification, not against our own
@@ -31,10 +31,11 @@ filters (39) and text (62, of which 10 are font tests).
 `<img>`, and a browser blocks external references in SVG-as-image mode, so a
 test that loads `../images/foo.png` or `../resources/font.svg` renders nothing
 for Chrome while this renderer loads the file and draws it.  That costs the
-linking and image tests, and the five `feImage` filter tests, which are counted
-as failures here even though both renderers agree about what the file contains.
+linking and image tests, and 16 of the 39 filter tests, which are counted as
+failures here even though the renderers agree about what the file contains.
 `conformance/verify_external.py` marks those cases `external_unverifiable` for
-the same reason.
+the same reason.  For the same reason a filter test that starts passing after
+`feImage` learns to load files can look like a regression.
 
 ## How the official suite is measured
 
@@ -147,11 +148,12 @@ Two readings matter:
    `color-rendering` and `image-rendering` are hints this rasteriser does not
    act on; `zoomAndPan` is ignored; per-primitive filter subregions are
    honoured only by `feImage`.
-3. **The remaining filter failures.** 32 of 39 filter tests still differ:
-   `BackgroundAlpha`/`BackgroundImage` (5), `feImage` (5, a harness artefact),
-   lighting (7), turbulence (2, the reference noise is gradient noise), and
-   assorted `feComposite`, `feTile`, `feConvolveMatrix`, `feMorphology`,
-   `feDisplacementMap` and filter-element cases.
+3. **The remaining filter failures.** 33 of 39 filter tests differ, but 16 of
+   those are the external-reference artefact above.  The real gaps are:
+   `feTurbulence` (the reference implementation uses gradient noise), filter
+   regions with `BackgroundAlpha`/`BackgroundImage`, `feMorphology` sub-pixel
+   radii (we use an integer kernel), and one-pixel antialiasing differences on
+   diagonal edges in the `feComposite` examples.
 
 ## What this measurement changed
 
