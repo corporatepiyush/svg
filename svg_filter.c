@@ -16,6 +16,18 @@ static float fnum(const char* s, float def) {
     return v;
 }
 
+/* A filter region length: in objectBoundingBox units a percentage is a
+ * fraction of the bounding box, so "120%" is 1.2. */
+static float region_len(const XMLNode* xn, const char* name, float def) {
+    const char* s = xml_attr(xn, name);
+    if (!s) return def;
+    char* end = NULL;
+    float v = strtof(s, &end);
+    if (end == s) return def;
+    if (strchr(s, '%')) v /= 100.0f;
+    return v;
+}
+
 static char* attr_dup(const XMLNode* xn, const char* a, const char* b) {
     const char* v = a ? xml_attr(xn, a) : NULL;
     if (!v && b) v = xml_attr(xn, b);
@@ -404,10 +416,10 @@ Node* build_filter(Ctx* ctx, const XMLNode* xn) {
     float dw = (n->filt_units == UNITS_BBOX) ? 1.2f : 1.2f * ctx->vw;
     float dh = (n->filt_units == UNITS_BBOX) ? 1.2f : 1.2f * ctx->vh;
     if (n->filt_units == UNITS_BBOX) {
-        n->filt_x = fnum(xml_attr(xn, "x"), dx);
-        n->filt_y = fnum(xml_attr(xn, "y"), dy);
-        n->filt_w = fnum(xml_attr(xn, "width"), dw);
-        n->filt_h = fnum(xml_attr(xn, "height"), dh);
+        n->filt_x = region_len(xn, "x", dx);
+        n->filt_y = region_len(xn, "y", dy);
+        n->filt_w = region_len(xn, "width", dw);
+        n->filt_h = region_len(xn, "height", dh);
     } else {
         n->filt_x = len_attr(ctx, xn, "x", 0, dx);
         n->filt_y = len_attr(ctx, xn, "y", 1, dy);

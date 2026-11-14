@@ -441,11 +441,14 @@ static void render_filtered(Canvas* c, Node* n, Mat w, float op, Mask* clip,
     tmp->px = NULL;                       /* ownership moved to src */
     canvas_free(tmp);
 
-    /* Buffer budget: four copies of the region plus a little slack.  Past it
-     * the chain is skipped and the source is drawn unfiltered, which is the
-     * documented degradation for an oversized filter. */
+    /* Buffer budget: the source and its alpha copy plus several primitive
+     * results, with a fixed floor for small regions and an absolute cap so a
+     * filter on a huge area cannot exhaust memory.  Past the budget the chain
+     * is skipped and the source is drawn unfiltered, which is the documented
+     * degradation for an oversized filter. */
     size_t region_bytes = fb_bytes(iw, ih);
-    size_t max_bytes = region_bytes * 4 + (1u << 20);
+    size_t max_bytes = region_bytes * 6 + (8u << 20);
+    if (max_bytes > (512u << 20)) max_bytes = 512u << 20;
     FBuf* out = filter_execute(f, &src, lbb, has_bb, w, aa, max_bytes);
     if (!out) out = fbuf_copy(&src);
     free(src.px);                          /* src is an embedded struct */

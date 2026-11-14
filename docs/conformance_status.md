@@ -14,7 +14,7 @@ Appendix M. Test suite: the W3C SVG 1.1 test suite (525 accepted tests).
 | Elements instantiated | **53 / 80** (66%) |
 | Presentation attributes honoured | **26 / 59** (44%) |
 | Official suite, before the feature batches | **261 / 512 comparable** (51%) |
-| Official suite, implemented-area subset, after | **111 / 170 comparable** (65%) |
+| Official suite, now | **278 / 512 comparable** (54%) |
 | Text-only tests (not comparable) | 13 full / 2 subset |
 | Conformance corpus (hand-written) | 125 / 125 |
 
@@ -22,13 +22,10 @@ The official-suite number is the honest one: it is measured against an
 independent implementation of the same specification, not against our own
 output.
 
-The two suite rows are not directly comparable: the first is the whole suite,
-the second is a 172-test subset chosen from the chapters the later batches
-implemented (shapes, paths, structure, gradients, masking, styling, text,
-linking, coordinates).  A full re-run is expensive here — each test launches a
-headless browser and several tests never exit — so the subset is the current
-signal, not a new full-suite figure.  Re-run the full suite on a quieter
-machine to refresh the first row.
+The whole suite is the current figure: 525 tests, 512 comparable, 13 text-only.
+Filters moved from 4/39 to 7/39 and text from 25/52 to 28/52 after the feature
+batches; the largest remaining blocks are animation (73 tests, out of scope),
+filters (39), and text (62, of which 10 are font tests).
 
 ## How the official suite is measured
 
