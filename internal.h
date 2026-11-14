@@ -222,6 +222,16 @@ typedef struct Paint {
     void*  pat;                 /* NODE_PATTERNDEF, when type == PAINT_PATTERN */
 } Paint;
 
+/* One positioned run of text (a <text> or <tspan> fragment). */
+typedef struct {
+    char*  text;
+    float  x, y;
+    float  fontsize;
+    float  letterspacing;
+    int    bold, italic, anchor;
+    Paint  fill;
+} TextChunk;
+
 /* ------------------------------------------------------------------ */
 /* Render tree                                                         */
 /* ------------------------------------------------------------------ */
@@ -270,6 +280,8 @@ struct Node {
 
     /* text */
     char* text;
+    TextChunk* chunks;
+    int nchunks;
     float fontsize;
     float letterspacing;
     int   bold, italic;

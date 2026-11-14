@@ -138,8 +138,27 @@ def check_compare_ink(px, w, h, c, tol):
         ratio, c["min_ratio"], a, b)
 
 
+def check_color_count(px, w, h, c, tol):
+    """Count pixels in a rect whose colour is within tol of a target."""
+    x, y, rw, rh = c["rect"] if "rect" in c else (c["x"], c["y"], c["w"], c["h"])
+    want = c["rgba"]
+    t = c.get("tol", 30)
+    amin = c.get("alpha_min", 100)
+    n = 0
+    for yy in range(max(0, y), min(h, y + rh)):
+        row = yy * w * 4
+        for xx in range(max(0, x), min(w, x + rw)):
+            o = row + xx * 4
+            if px[o + 3] < amin:
+                continue
+            if all(abs(px[o + k] - want[k]) <= t for k in range(3)):
+                n += 1
+    return n >= c["min"], "colour pixels=%d want >= %d" % (n, c["min"])
+
+
 CHECKS = {
     "rgba": check_rgba,
+    "color_count": check_color_count,
     "alpha": check_alpha,
     "bbox": check_bbox,
     "bbox_width": check_bbox_width,

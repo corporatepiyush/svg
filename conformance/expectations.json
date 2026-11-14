@@ -3003,6 +3003,73 @@
           ]
         }
       ]
+    },
+    {
+      "name": "tspan_position",
+      "area": "text",
+      "note": "A tspan with x= places its run absolutely and may change fill; dx/dy offset a run from the current position. AB stays black at x=5, CD is red at x=40, GH sits 5 right and 5 above the end of EF.",
+      "checks": [
+        {
+          "kind": "color_count",
+          "rect": [
+            3,
+            8,
+            20,
+            14
+          ],
+          "rgba": [
+            0,
+            0,
+            0
+          ],
+          "min": 30
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            38,
+            8,
+            20,
+            14
+          ],
+          "rgba": [
+            255,
+            0,
+            0
+          ],
+          "min": 30
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            3,
+            33,
+            20,
+            14
+          ],
+          "rgba": [
+            0,
+            0,
+            0
+          ],
+          "min": 30
+        },
+        {
+          "kind": "color_count",
+          "rect": [
+            25,
+            28,
+            20,
+            14
+          ],
+          "rgba": [
+            0,
+            0,
+            255
+          ],
+          "min": 30
+        }
+      ]
     }
   ],
   "external_intentional": []

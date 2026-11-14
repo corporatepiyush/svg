@@ -81,6 +81,10 @@ CASES = [
     ("css_rules", svg('<style>.a { fill: red; } #b { stroke: blue !important; }'
                       ' g rect { fill: lime; }</style>'
                       '<g><rect class="a" width="10" height="10"/></g>'), None),
+    # Positioned text runs own their string and paint copies.
+    ("tspan_chunks", svg('<text x="5" y="20" font-size="10">AB'
+                         '<tspan x="40" fill="red">CD</tspan>'
+                         '<tspan dx="3" dy="-2" fill="blue">EF</tspan></text>'), None),
 ]
 
 

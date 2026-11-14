@@ -11,6 +11,12 @@ void svg_free(Node* n) {
     free(n->stroke.stops);
     free(n->stroke.ref);
     free(n->dash);
+    for (int i = 0; i < n->nchunks; i++) {
+        free(n->chunks[i].text);
+        free(n->chunks[i].fill.stops);
+        free(n->chunks[i].fill.ref);
+    }
+    free(n->chunks);
     free(n->text);
     free(n->id);
     free(n->clip_ref);

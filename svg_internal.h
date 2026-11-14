@@ -45,6 +45,7 @@ Node* build_mask(Ctx* ctx, const XMLNode* xn);
 Node* build_marker(Ctx* ctx, const XMLNode* xn);
 int   parse_stops(const XMLNode* xn, Paint* p, int max_stops);
 char* gather_text(const XMLNode* xn, int max_len, int* limit_hit);
+void  gather_chunks(const XMLNode* xn, Ctx* ctx, Node* out, int* limit_hit);
 
 int   node_add_child(Node* parent, Node* child);
 Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth);

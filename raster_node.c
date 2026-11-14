@@ -54,6 +54,32 @@ int node_bbox_world(Node* n, Mat full_w, float out[4]) {
         }
         return 1;
     }
+    if (n->type == NODE_TEXT && n->nchunks > 0 && n->chunks) {
+        out[0] = out[1] = 1e30f;
+        out[2] = out[3] = -1e30f;
+        int any = 0;
+        for (int ci = 0; ci < n->nchunks; ci++) {
+            const TextChunk* ch = &n->chunks[ci];
+            if (!ch->text || !*ch->text || !(ch->fontsize > 0.0f)) continue;
+            float scale = ch->fontsize / 7.0f;
+            float adv = 6.0f * scale + ch->letterspacing;
+            float total = (float)strlen(ch->text) * adv;
+            float x = ch->x;
+            if (ch->anchor == 1) x -= total * 0.5f;
+            else if (ch->anchor == 2) x -= total;
+            Pt c[4] = { {x, ch->y - 7.0f * scale}, {x + total, ch->y - 7.0f * scale},
+                        {x + total, ch->y}, {x, ch->y} };
+            for (int i = 0; i < 4; i++) {
+                Pt q = mat_apply(full_w, c[i]);
+                if (q.x < out[0]) out[0] = q.x;
+                if (q.y < out[1]) out[1] = q.y;
+                if (q.x > out[2]) out[2] = q.x;
+                if (q.y > out[3]) out[3] = q.y;
+                any = 1;
+            }
+        }
+        return any;
+    }
     if (n->type == NODE_TEXT && n->text && *n->text && n->fontsize > 0.0f) {
         float scale = n->fontsize / 7.0f;
         float adv = 6.0f * scale + n->letterspacing;

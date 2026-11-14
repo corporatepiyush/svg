@@ -193,6 +193,39 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
     c->text = n->text ? svg_strdup(n->text) : NULL;
     if (n->text && !c->text) uc->failed = 1;
 
+    /* Text runs own their string and paint copies; a shallow struct copy
+     * would leave the clone and the original freeing the same memory. */
+    c->chunks = NULL;
+    c->nchunks = 0;
+    if (n->nchunks > 0 && n->chunks) {
+        c->chunks = (TextChunk*)svg_malloc((size_t)n->nchunks * sizeof(TextChunk));
+        if (!c->chunks) {
+            uc->failed = 1;
+        } else {
+            memcpy(c->chunks, n->chunks, (size_t)n->nchunks * sizeof(TextChunk));
+            for (int i = 0; i < n->nchunks; i++) {
+                TextChunk* d = &c->chunks[i];
+                TextChunk* sc = &n->chunks[i];
+                d->text = sc->text ? svg_strdup(sc->text) : NULL;
+                d->fill.stops = NULL;
+                d->fill.nstops = 0;
+                d->fill.ref = sc->fill.ref ? svg_strdup(sc->fill.ref) : NULL;
+                if (sc->fill.stops && sc->fill.nstops > 0) {
+                    d->fill.stops = (Stop*)svg_malloc(
+                        (size_t)sc->fill.nstops * sizeof(Stop));
+                    if (d->fill.stops) {
+                        memcpy(d->fill.stops, sc->fill.stops,
+                               (size_t)sc->fill.nstops * sizeof(Stop));
+                        d->fill.nstops = sc->fill.nstops;
+                    }
+                }
+                if ((sc->text && !d->text) || (sc->fill.ref && !d->fill.ref))
+                    uc->failed = 1;
+            }
+            c->nchunks = n->nchunks;
+        }
+    }
+
     /* Keep the references (deep copies) so nested use/clip inside the
      * shadow tree still resolve; the caller re-runs clip resolution. */
     c->clip_ref = n->clip_ref ? svg_strdup(n->clip_ref) : NULL;
@@ -263,6 +296,13 @@ static void dash_inherit(Node* n, const Node* parent) {
  * shadow-tree parent, not directly from the use element: a target that sets
  * fill="blue" must keep blue for its children even when the use site sets
  * fill="red". */
+/* Text runs bake their style at build time, so an inherited text-anchor
+ * must be pushed into them when the shadow tree re-resolves it. */
+static void push_anchor(Node* n) {
+    if (!n || !n->chunks) return;
+    for (int i = 0; i < n->nchunks; i++) n->chunks[i].anchor = n->anchor;
+}
+
 static void use_apply_child(Node* n, const Node* parent) {
     if (!n || !parent) return;
     if (!(n->spec & SPEC_FILL))   paint_inherit_copy(&n->fill, &parent->fill);
@@ -283,6 +323,7 @@ static void use_apply_child(Node* n, const Node* parent) {
     if (!(n->spec & SPEC_STROKE_OPACITY)) n->strokeop = parent->strokeop;
     if (!(n->spec & SPEC_DASH))          dash_inherit(n, parent);
     if (!(n->spec & SPEC_DASH_OFFSET))   n->dashoff = parent->dashoff;
+    push_anchor(n);
     for (int i = 0; i < n->nkids; i++) use_apply_child(n->kids[i], n);
 }
 
@@ -312,6 +353,7 @@ static void use_apply_style(Node* n, const Node* use) {
     if (!(n->spec & SPEC_STROKE_OPACITY)) n->strokeop = use->strokeop;
     if (!(n->spec & SPEC_DASH))           dash_inherit(n, use);
     if (!(n->spec & SPEC_DASH_OFFSET))    n->dashoff = use->dashoff;
+    push_anchor(n);
 
     for (int i = 0; i < n->nkids; i++) use_apply_child(n->kids[i], n);
 }

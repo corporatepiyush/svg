@@ -325,6 +325,7 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         n->text = gather_text(xn, ctx->lim ? ctx->lim->max_text_length
                                            : SVG2IMG_LIMIT_MAX_TEXT_LENGTH,
                               &ctx->limit_hit);
+        gather_chunks(xn, ctx, n, &ctx->limit_hit);
         n->fontsize = st.fontsize;
         n->bold = st.bold;
         n->italic = st.italic;
