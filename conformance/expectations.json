@@ -1868,6 +1868,561 @@
           "rgb_max": 60
         }
       ]
+    },
+    {
+      "name": "use_text_size",
+      "area": "use",
+      "note": "<use font-size=24> supplies the text size to a <text> with no font-size",
+      "checks": [
+        {
+          "kind": "bbox_width",
+          "min": 20
+        },
+        {
+          "kind": "ink",
+          "x": 8,
+          "y": 20,
+          "w": 60,
+          "h": 36,
+          "min": 40,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "use_text_anchor",
+      "area": "use",
+      "note": "text-anchor on <use> is inherited by the referenced text",
+      "checks": [
+        {
+          "kind": "bbox_center_x",
+          "x": 50,
+          "tol": 6
+        },
+        {
+          "kind": "ink",
+          "x": 20,
+          "y": 30,
+          "w": 60,
+          "h": 30,
+          "min": 40,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "use_letter_spacing",
+      "area": "use",
+      "note": "letter-spacing on <use> widens the referenced text run",
+      "checks": [
+        {
+          "kind": "bbox_width",
+          "min": 30
+        },
+        {
+          "kind": "ink",
+          "x": 8,
+          "y": 30,
+          "w": 80,
+          "h": 30,
+          "min": 40,
+          "rgb_max": 60
+        }
+      ]
+    },
+    {
+      "name": "use_visibility_inherit",
+      "area": "use",
+      "note": "visibility:hidden on <use> hides the referenced subtree",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 20,
+          "y": 20,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_visibility_override",
+      "area": "use",
+      "note": "visibility:visible on the referenced rect overrides hidden on <use>",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 20,
+          "y": 20,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "grad_linear_transform",
+      "area": "gradients",
+      "note": "gradientTransform translate(50) shifts the ramp: red at x=50, purple at x=99.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 99,
+          "y": 50,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ],
+          "tol": 18
+        }
+      ]
+    },
+    {
+      "name": "grad_radial_transform",
+      "area": "gradients",
+      "note": "gradientTransform scale(2) doubles a userSpaceOnUse radial radius.",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 0,
+          "y": 0,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 99,
+          "y": 0,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "tol": 10
+        }
+      ]
+    },
+    {
+      "name": "grad_spread_reflect",
+      "area": "gradients",
+      "note": "spreadMethod=reflect mirrors the ramp outside [0,1]",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 0,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 99,
+          "y": 50,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "grad_focal_inside",
+      "area": "gradients",
+      "note": "focal point at 0.25,0.5 gives a hotter centre-left",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 25,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            128,
+            0,
+            128,
+            255
+          ]
+        }
+      ],
+      "xfail": "raster_gradient.c focal-point formula differs from browsers at the centre"
+    },
+    {
+      "name": "par_xmin_ymin",
+      "area": "viewport",
+      "note": "preserveAspectRatio xMinYMin meet aligns to the top-left",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 150,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "par_xmax_ymax",
+      "area": "viewport",
+      "note": "preserveAspectRatio xMaxYMax meet aligns to the bottom-right",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 150,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "nested_svg_par",
+      "area": "viewport",
+      "note": "nested svg viewBox+preserveAspectRatio maps into its viewport",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 100,
+          "y": 75,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 100,
+          "y": 55,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 100,
+          "y": 145,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "clip_transform",
+      "area": "clip",
+      "note": "clipPath with a transform clips in the transformed space",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 75,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 25,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_symbol_viewbox",
+      "area": "use",
+      "note": "<use> of a <symbol> establishes a viewport with width/height and viewBox",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 150,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_symbol_viewbox_par",
+      "area": "use",
+      "note": "<use> of a <symbol> honours preserveAspectRatio",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 100,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 25,
+          "y": 50,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 175,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_style_inherit_stroke",
+      "area": "use",
+      "note": "<use> supplies stroke to a referenced shape without one",
+      "checks": [
+        {
+          "kind": "alpha",
+          "x": 20,
+          "y": 50,
+          "min": 200
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 50,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "use_target_wins",
+      "area": "use",
+      "note": "explicit target style beats <use> inherited style",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 30,
+          "y": 30,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "use_nested_group",
+      "area": "use",
+      "note": "nested <use> inside a referenced group resolves at the use site offset",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 35,
+          "y": 35,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 60,
+          "y": 35,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 45,
+          "y": 45,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_rotate_cx_cy",
+      "area": "transforms",
+      "note": "rotate(a,cx,cy) rotates about the given point",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 70,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 50,
+          "y": 30,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "name": "transform_skew",
+      "area": "transforms",
+      "note": "skewX/skewY shear the coordinate system",
+      "checks": [
+        {
+          "kind": "bbox_width",
+          "min": 20
+        }
+      ]
+    },
+    {
+      "name": "viewbox_minx_miny",
+      "area": "viewport",
+      "note": "viewBox min-x/min-y offsets the user space origin; the rect fills the viewport",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 50,
+          "y": 50,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 5,
+          "y": 5,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "rgba",
+          "x": 95,
+          "y": 95,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nested_svg_overflow_hidden",
+      "area": "viewport",
+      "note": "nested svg clips overflow by default",
+      "checks": [
+        {
+          "kind": "rgba",
+          "x": 100,
+          "y": 100,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "kind": "alpha",
+          "x": 25,
+          "y": 25,
+          "max": 8
+        },
+        {
+          "kind": "alpha",
+          "x": 175,
+          "y": 175,
+          "max": 8
+        }
+      ]
     }
   ]
 }

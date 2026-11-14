@@ -31,6 +31,8 @@ void style_copy(Style* dst, const Style* src) {
      * inherited", so they never propagate to a child. */
     dst->saw_fill = 0;
     dst->saw_stroke = 0;
+    /* The child inherits computed values, not the "specified" bit. */
+    dst->spec = 0;
 
     dst->dash = NULL;
     dst->ndash = 0;
@@ -217,6 +219,7 @@ static void apply_one(void* ud, const char* k, const char* v) {
         Color c;
         if (color_parse(v, &c)) st->color = c;
     } else if (!strcmp(k, "font-size")) {
+        st->spec |= SPEC_FONT_SIZE;
         if (!strcmp(v, "xx-small")) st->fontsize = 8.0f;
         else if (!strcmp(v, "x-small")) st->fontsize = 10.0f;
         else if (!strcmp(v, "small")) st->fontsize = 13.0f;
@@ -226,14 +229,18 @@ static void apply_one(void* ud, const char* k, const char* v) {
         else if (!strcmp(v, "xx-large")) st->fontsize = 32.0f;
         else st->fontsize = length_parse(v, ctx->em, ctx->em, ctx->em, 2, 16.0f);
     } else if (!strcmp(k, "font-weight")) {
+        st->spec |= SPEC_FONT_WEIGHT;
         if (!strcmp(v, "bold") || !strcmp(v, "bolder")) st->bold = 1;
         else if (!strcmp(v, "normal") || !strcmp(v, "lighter")) st->bold = 0;
         else st->bold = ((int)strtof(v, NULL) >= 600);
     } else if (!strcmp(k, "font-style")) {
+        st->spec |= SPEC_FONT_STYLE;
         st->italic = (!strcmp(v, "italic") || !strcmp(v, "oblique"));
     } else if (!strcmp(k, "text-anchor")) {
+        st->spec |= SPEC_TEXT_ANCHOR;
         st->anchor = !strcmp(v, "middle") ? 1 : !strcmp(v, "end") ? 2 : 0;
     } else if (!strcmp(k, "letter-spacing")) {
+        st->spec |= SPEC_LETTER_SP;
         st->letterspacing = length_parse(v, ctx->vw, ctx->vh, ctx->em, 2, 0.0f);
     } else if (!strcmp(k, "display")) {
         /* `display` is not inherited; the value only matters on the element
@@ -244,6 +251,7 @@ static void apply_one(void* ud, const char* k, const char* v) {
         /* `visibility` *is* inherited, but a descendant may override it, so
          * an explicit value must clear the inherited flag in both
          * directions (SVG 1.1 §11.4). */
+        st->spec |= SPEC_VISIBILITY;
         st->visibility_hidden = (!strcmp(v, "hidden") || !strcmp(v, "collapse"));
     }
 }

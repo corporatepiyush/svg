@@ -176,7 +176,9 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
     if (n->use_ref && !c->use_ref) uc->failed = 1;
 
     /* A <symbol> is only instantiated by <use>, so a clone of one becomes a
-     * plain group that renders. */
+     * plain group that renders.  NODE_IGNORE (e.g. <defs>) stays
+     * non-rendering; its children are definitions, not the referenced
+     * content, and raster_node skips it. */
     if (c->type == NODE_SYMBOL) c->type = NODE_GROUP;
 
     for (int i = 0; i < n->nkids; i++) {
@@ -214,6 +216,23 @@ static void use_apply_style(Node* n, const Node* use) {
     if (!n || !use) return;
     use_inherit_paint(&n->fill, &use->fill, (unsigned)SPEC_FILL, &n->spec);
     use_inherit_paint(&n->stroke, &use->stroke, (unsigned)SPEC_STROKE, &n->spec);
+
+    /* SVG 1.1 §5.6: the use element's inherited properties supply any the
+     * referenced element did not set.  Only the properties the target did
+     * not specify are copied; a value on the target always wins. */
+    if (!(n->spec & SPEC_FONT_SIZE) && (use->spec & SPEC_FONT_SIZE))
+        n->fontsize = use->fontsize;
+    if (!(n->spec & SPEC_FONT_WEIGHT) && (use->spec & SPEC_FONT_WEIGHT))
+        n->bold = use->bold;
+    if (!(n->spec & SPEC_FONT_STYLE) && (use->spec & SPEC_FONT_STYLE))
+        n->italic = use->italic;
+    if (!(n->spec & SPEC_TEXT_ANCHOR) && (use->spec & SPEC_TEXT_ANCHOR))
+        n->anchor = use->anchor;
+    if (!(n->spec & SPEC_LETTER_SP) && (use->spec & SPEC_LETTER_SP))
+        n->letterspacing = use->letterspacing;
+    if (!(n->spec & SPEC_VISIBILITY) && (use->spec & SPEC_VISIBILITY))
+        n->visible = use->visible;
+
     for (int i = 0; i < n->nkids; i++) use_apply_style(n->kids[i], use);
 }
 
@@ -242,7 +261,40 @@ static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
             Node* clone = clone_node(target, uc);
             if (clone) {
                 use_apply_style(clone, n);
-                clone->tm = mat_mul(mat_translate(n->use_x, n->use_y), clone->tm);
+                /* The use's x/y translation applies to the whole shadow
+                 * tree.  For a symbol, the viewport mapping (viewBox ->
+                 * use width/height) is applied first, then x/y. */
+                Mat use_tm = mat_translate(n->use_x, n->use_y);
+                if (target->type == NODE_SYMBOL) {
+                    float vw = n->use_w > 0.0f ? n->use_w : 100.0f;
+                    float vh = n->use_h > 0.0f ? n->use_h : 100.0f;
+                    clone->vp_clip = 1;
+                    clone->vp_x = 0.0f; clone->vp_y = 0.0f;
+                    clone->vp_w = vw; clone->vp_h = vh;
+                    if (clone->symbol_vb_valid) {
+                        float sx = vw / clone->symbol_vb[2];
+                        float sy = vh / clone->symbol_vb[3];
+                        if (clone->symbol_par_none) {
+                            clone->tm = mat_mul(mat_scale(sx, sy),
+                                        mat_translate(-clone->symbol_vb[0],
+                                                      -clone->symbol_vb[1]));
+                        } else {
+                            float s = clone->symbol_par_slice ? (sx > sy ? sx : sy)
+                                                              : (sx < sy ? sx : sy);
+                            float ex = (float)vw - clone->symbol_vb[2] * s;
+                            float ey = (float)vh - clone->symbol_vb[3] * s;
+                            float ox = (clone->symbol_par_xa == 1) ? ex * 0.5f
+                                 : (clone->symbol_par_xa == 2 ? ex : 0.0f);
+                            float oy = (clone->symbol_par_ya == 1) ? ey * 0.5f
+                                 : (clone->symbol_par_ya == 2 ? ey : 0.0f);
+                            clone->tm = mat_mul(mat_translate(ox, oy),
+                                        mat_mul(mat_scale(s, s),
+                                        mat_translate(-clone->symbol_vb[0],
+                                                      -clone->symbol_vb[1])));
+                        }
+                    }
+                }
+                clone->tm = mat_mul(use_tm, clone->tm);
                 resolve_clip_refs(clone, ids);
                 /* A <use> never has children of its own: the shadow tree
                  * replaces them.  Free each node, not just the array. */

@@ -129,10 +129,33 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         /* <symbol> is never rendered directly: it is only instantiated by a
          * <use> reference, which clones it like any other subtree.  Building
          * it as a group but tagging it NODE_SYMBOL keeps the definition out
-         * of the render tree while still allowing clone_node() to copy it. */
+         * of the render tree while still allowing clone_node() to copy it.
+         * A symbol may establish a viewport via viewBox + width/height on
+         * the use site, so remember its viewBox here. */
         n = svg_node_new(NODE_SYMBOL);
         if (!n) goto oom;
+        if (svg_parse_viewbox(xml_attr(xn, "viewBox"),
+                              &n->symbol_vb[0], &n->symbol_vb[1],
+                              &n->symbol_vb[2], &n->symbol_vb[3]) &&
+            n->symbol_vb[2] > 0.0f && n->symbol_vb[3] > 0.0f)
+            n->symbol_vb_valid = 1;
+        n->symbol_par_xa = n->symbol_par_ya = 1;
+        const char* spar = xml_attr(xn, "preserveAspectRatio");
+        if (spar) {
+            if (strncmp(spar, "none", 4) == 0) n->symbol_par_none = 1;
+            else {
+                if (strstr(spar, "xMin")) n->symbol_par_xa = 0;
+                else if (strstr(spar, "xMax")) n->symbol_par_xa = 2;
+                if (strstr(spar, "YMin")) n->symbol_par_ya = 0;
+                else if (strstr(spar, "YMax")) n->symbol_par_ya = 2;
+                if (strstr(spar, "slice")) n->symbol_par_slice = 1;
+            }
+        }
     } else if (!strcmp(name, "defs")) {
+        /* Definitions are not rendered directly, but their ids must be
+         * registered so <use> can clone them.  Build them into an IGNORE
+         * container: raster_node skips IGNORE painting while clone_node can
+         * still reach the definition through the id map. */
         n = svg_node_new(NODE_IGNORE);
         if (!n) goto oom;
         in_defs = 1;
@@ -223,6 +246,15 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
         }
         n->use_x = len_attr(ctx, xn, "x", 0, 0.0f);
         n->use_y = len_attr(ctx, xn, "y", 1, 0.0f);
+        n->use_w = len_attr(ctx, xn, "width", 0, 0.0f);
+        n->use_h = len_attr(ctx, xn, "height", 1, 0.0f);
+        /* The use element's own computed style is the inherited-value source
+         * for the shadow tree, so keep the style values on the node. */
+        n->fontsize = st.fontsize;
+        n->bold = st.bold;
+        n->italic = st.italic;
+        n->anchor = st.anchor;
+        n->letterspacing = st.letterspacing;
     } else {
         /* Unsupported element.  Policy (see docs/limitations.md): unknown
          * elements are ignored, but they are treated as transparent
@@ -255,6 +287,11 @@ oom:
      * <use> can supply the ones it did not (shadow-tree inheritance). */
     if (st.saw_fill)   n->spec |= SPEC_FILL;
     if (st.saw_stroke) n->spec |= SPEC_STROKE;
+    /* Text/visibility properties are inherited too, and a <use> may supply
+     * them when the referenced element did not specify them.  Only the
+     * properties this element actually specified are recorded; the values
+     * themselves are already in the node. */
+    n->spec |= st.spec;
 
     n->sw = st.stroke_width;
     n->linecap = st.linecap;

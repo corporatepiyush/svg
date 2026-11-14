@@ -182,7 +182,8 @@ static void render_node(Canvas* c, Node* n, Mat world, float opacity,
     /* display:none stops the traversal; a NODE_SYMBOL is a definition that is
      * only ever rendered through a <use> clone (which is retagged NODE_GROUP),
      * so a symbol left in the tree paints nothing. */
-    if (!n || n->hidden_subtree || n->type == NODE_SYMBOL) return;
+    if (!n || n->hidden_subtree || n->type == NODE_SYMBOL ||
+        n->type == NODE_IGNORE) return;
     /* visibility:hidden suppresses this element's own painting but is
      * inherited per element, so a descendant that sets visibility:visible is
      * still drawn: traversal continues, only the painting is skipped.  The

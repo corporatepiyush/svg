@@ -186,9 +186,15 @@ enum { SPREAD_PAD = 0, SPREAD_REFLECT = 1, SPREAD_REPEAT = 2 };
  * paint properties are tracked; use_apply_style() in svg_refs.c consults
  * these so a <use> never overwrites a value the referenced element set. */
 enum {
-    SPEC_NONE   = 0u,
-    SPEC_FILL   = 1u << 0,
-    SPEC_STROKE = 1u << 1
+    SPEC_NONE        = 0u,
+    SPEC_FILL        = 1u << 0,
+    SPEC_STROKE      = 1u << 1,
+    SPEC_FONT_SIZE   = 1u << 2,
+    SPEC_FONT_WEIGHT = 1u << 3,
+    SPEC_FONT_STYLE  = 1u << 4,
+    SPEC_TEXT_ANCHOR = 1u << 5,
+    SPEC_LETTER_SP   = 1u << 6,
+    SPEC_VISIBILITY  = 1u << 7
 };
 
 typedef struct Paint {
@@ -267,6 +273,7 @@ struct Node {
     /* use */
     char* use_ref;
     float use_x, use_y;
+    float use_w, use_h;    /* width/height on <use> for <symbol>/<svg> */
 
     /* Bitmask of inheritable properties the element specified itself, used
      * only when cloning a <use> target: the use site may supply the rest
@@ -282,6 +289,9 @@ struct Node {
     float vp_x, vp_y, vp_w, vp_h;
     Mat   vp_matrix;        /* viewport mapping, combined with the transform */
     int   vp_matrix_valid;
+    float symbol_vb[4];     /* symbol viewBox (x,y,w,h) */
+    int   symbol_vb_valid;
+    int   symbol_par_none, symbol_par_slice, symbol_par_xa, symbol_par_ya;
 };
 
 struct Canvas { int w, h; float* px; };   /* RGBA, straight alpha */
@@ -336,6 +346,7 @@ typedef struct Style {
     float letterspacing;
     int   display_none;
     int   visibility_hidden;
+    unsigned spec;          /* which properties this element specified */
     float dashoff;
     float* dash;
     int   ndash;

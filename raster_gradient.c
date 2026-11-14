@@ -88,31 +88,29 @@ void grad_build(Grad* g, const Paint* p, const float bbox[4], Mat world) {
         g->invlen2 = len2 > 1e-12f ? 1.0f / len2 : 0.0f;
     } else {
         if (p->units == UNITS_BBOX) {
+            /* objectBoundingBox: the evaluator works in bbox-normalised
+             * coordinates, so transform the centre/focal and scale the
+             * radius by the local factor in that same space.  (A non-uniform
+             * or rotated gradientTransform cannot be represented exactly by
+             * a single radius; userSpaceOnUse is the exact path.) */
             Pt c = mat_apply(p->tm, (Pt){p->cx, p->cy});
             Pt f = mat_apply(p->tm, (Pt){p->fx, p->fy});
             g->cx = c.x; g->cy = c.y; g->fx = f.x; g->fy = f.y;
             g->r = p->r * mat_scale_factor(p->tm);
             g->normalized = 1;
         } else {
-            /* userSpaceOnUse radial: keep the definition in user space and
-             * invert the CTM per pixel, which is exact for a non-uniform
-             * transform (the circle becomes an ellipse in device space).
-             * Forward-transforming the centre and radius only works for a
-             * uniform scale. */
+            /* userSpaceOnUse: keep the definition in gradient space and
+             * invert the combined transform per pixel.  This is exact for
+             * non-uniform scale, shear and rotation, and it is also the
+             * only form that honours gradientTransform correctly: the
+             * evaluator maps device -> gradient space, so the radius must
+             * stay in gradient units. */
+            Mat gt = mat_mul(world, p->tm);
             g->cx = p->cx; g->cy = p->cy;
             g->fx = p->fx; g->fy = p->fy;
             g->r = p->r;
-            Mat gt = mat_mul(world, p->tm);
             g->normalized = 0;
             g->has_inv = mat_invert_checked(gt, &g->inv);
-            if (!g->has_inv) {
-                /* Singular transform: fall back to the device-space form so
-                 * the gradient still renders something sensible. */
-                Pt c = mat_apply(gt, (Pt){p->cx, p->cy});
-                Pt f = mat_apply(gt, (Pt){p->fx, p->fy});
-                g->cx = c.x; g->cy = c.y; g->fx = f.x; g->fy = f.y;
-                g->r = p->r * mat_scale_factor(gt);
-            }
         }
         /* SVG requires the focal point to lie inside the circle: if it is
          * outside, snap it to the circle along the centre->focal line. */
