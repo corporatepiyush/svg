@@ -137,8 +137,8 @@ void fe_unpremul(const float* in, FBuf* out) {
 
 int fe_chan(const FBuf* b, int x, int y, int c) {
     if (!b || x < 0 || y < 0 || x >= b->w || y >= b->h) return 0;
-    return (int)(b->px[((size_t)y * (size_t)b->w + (size_t)x) * 4 + (size_t)c]
-                 * 255.0f + 0.5f);
+    return svg_f2i(b->px[((size_t)y * (size_t)b->w + (size_t)x) * 4 + (size_t)c]
+                   * 255.0f + 0.5f, 0, 255, 0);
 }
 
 /* ------------------------------------------------------------------ */
@@ -173,6 +173,10 @@ const NamedBuf* fe_lookup(FilterCtx* fc, const char* name) {
  * without enable-background, FillPaint on a non-shape). */
 static FBuf* fe_transparent(FilterCtx* fc) {
     if (fc->has_transparent) return &fc->transparent;
+    if (fc->bytes + fb_bytes(fc->src.w, fc->src.h) > fc->max_bytes) {
+        fc->failed = 1;
+        return NULL;
+    }
     FBuf* b = fbuf_create(fc->src.w, fc->src.h);
     if (!b) return NULL;
     fc->transparent = *b;
@@ -230,12 +234,14 @@ static NamedBuf* fe_add(FilterCtx* fc, const char* name, FBuf* b) {
     if (fc->n == fc->cap) {
         int cap = fc->cap ? fc->cap * 2 : 8;
         NamedBuf* nb = (NamedBuf*)svg_realloc(fc->bufs, (size_t)cap * sizeof(NamedBuf));
-        if (!nb) return NULL;
+        if (!nb) { fe_release(fc, b); return NULL; }
         fc->bufs = nb;
         fc->cap = cap;
     }
+    char* nm = name ? svg_strdup(name) : NULL;
+    if (name && !nm) { fe_release(fc, b); return NULL; }
     NamedBuf* e = &fc->bufs[fc->n];
-    e->name = name ? svg_strdup(name) : NULL;
+    e->name = nm;
     e->fb = *b;
     e->sx = fc->last_sx;
     e->sy = fc->last_sy;
@@ -335,8 +341,10 @@ FBuf* filter_execute(const Node* f, const Node* src_node, const FBuf* source,
 static FBuf* fe_offset(FilterCtx* fc, const FilterPrim* p) {
     const FBuf* in = fe_input(fc, p->in);
     if (!in) in = &fc->src;
-    int dx = (int)floorf(fe_len(fc, p->num[0], 0) + 0.5f);
-    int dy = (int)floorf(fe_len(fc, p->num[1], 1) + 0.5f);
+    int dx = svg_f2i(floorf(fe_len(fc, p->num[0], 0) + 0.5f),
+                     -100000, 100000, 0);
+    int dy = svg_f2i(floorf(fe_len(fc, p->num[1], 1) + 0.5f),
+                     -100000, 100000, 0);
     FBuf* out = fe_new(fc, in->w, in->h);
     if (!out) return NULL;
     for (int y = 0; y < in->h; y++) {
@@ -360,11 +368,11 @@ static FBuf* fe_offset(FilterCtx* fc, const FilterPrim* p) {
 /* One box pass over premultiplied data.  left/right are the radii on each
  * side, which lets the even-size case place its boxes with a half-pixel
  * offset.  Outside the buffer is transparent black. */
-static void box_pass(float* a, int w, int h, int left, int right, int horiz) {
+static int box_pass(float* a, int w, int h, int left, int right, int horiz) {
     int r = left + right;
-    if (r <= 0) return;
+    if (r <= 0) return 1;
     float* tmp = (float*)svg_malloc((size_t)(horiz ? w : h) * 4 * sizeof(float));
-    if (!tmp) return;
+    if (!tmp) return 0;
     int lines = horiz ? h : w;
     int len = horiz ? w : h;
     for (int l = 0; l < lines; l++) {
@@ -412,6 +420,7 @@ static void box_pass(float* a, int w, int h, int left, int right, int horiz) {
         }
     }
     free(tmp);
+    return 1;
 }
 
 static FBuf* fe_blur(FilterCtx* fc, const FilterPrim* p) {
@@ -420,8 +429,13 @@ static FBuf* fe_blur(FilterCtx* fc, const FilterPrim* p) {
     float sx = fe_len(fc, p->num[0], 0);
     float sy = fe_len(fc, p->num[1], 1);
     if (!(sx > 0.0f) && !(sy > 0.0f)) return fe_offset(fc, p);   /* no blur */
-    int dx = (int)floorf(sx * 3.0f * 2.5066282746f / 4.0f + 0.5f);
-    int dy = (int)floorf(sy * 3.0f * 2.5066282746f / 4.0f + 0.5f);
+    /* The box radius is linear in the standard deviation.  Clamp it so a
+     * pathological stdDeviation cannot make the window-prime loop run for
+     * minutes; 1000px is far beyond any visible blur. */
+    int dx = svg_f2i(floorf(sx * 3.0f * 2.5066282746f / 4.0f + 0.5f),
+                     0, 1000, 0);
+    int dy = svg_f2i(floorf(sy * 3.0f * 2.5066282746f / 4.0f + 0.5f),
+                     0, 1000, 0);
 
     FBuf* out = fe_new(fc, in->w, in->h);
     if (!out) return NULL;
@@ -440,16 +454,23 @@ static FBuf* fe_blur(FilterCtx* fc, const FilterPrim* p) {
         int n = d[axis];
         if (n <= 0) continue;
         int horiz = (axis == 0);
+        int ok;
         if (n % 2 == 1) {
             int r = (n - 1) / 2;
-            box_pass(buf, in->w, in->h, r, r, horiz);
-            box_pass(buf, in->w, in->h, r, r, horiz);
-            box_pass(buf, in->w, in->h, r, r, horiz);
+            ok = box_pass(buf, in->w, in->h, r, r, horiz) &&
+                 box_pass(buf, in->w, in->h, r, r, horiz) &&
+                 box_pass(buf, in->w, in->h, r, r, horiz);
         } else {
             int a = n / 2, b = n / 2 - 1;
-            box_pass(buf, in->w, in->h, b, a, horiz);
-            box_pass(buf, in->w, in->h, a, b, horiz);
-            box_pass(buf, in->w, in->h, b, b, horiz);
+            ok = box_pass(buf, in->w, in->h, b, a, horiz) &&
+                 box_pass(buf, in->w, in->h, a, b, horiz) &&
+                 box_pass(buf, in->w, in->h, b, b, horiz);
+        }
+        if (!ok) {
+            free(buf);
+            fe_release(fc, out);
+            fc->failed = 1;
+            return NULL;
         }
     }
     fe_unpremul(buf, out);
@@ -548,6 +569,13 @@ static float comp_alpha(int mode, float sa, float da) {
     }
 }
 
+/* Filter results are defined in the [0,1] range; clamping also keeps a large
+ * arithmetic k-value from overflowing later float-to-int conversions. */
+static float clamp01(float v) {
+    if (!(v > 0.0f)) return 0.0f;        /* also maps NaN to zero */
+    return v > 1.0f ? 1.0f : v;
+}
+
 static FBuf* fe_composite(FilterCtx* fc, const FilterPrim* p) {
     const FBuf* a = fe_input(fc, p->in);
     const FBuf* b = fe_input(fc, p->in2);
@@ -568,7 +596,7 @@ static FBuf* fe_composite(FilterCtx* fc, const FilterPrim* p) {
             for (int c = 0; c < 4; c++) {
                 float sc = s[c] * sa, dc = d[c] * da;
                 if (c == 3) { sc = sa; dc = da; }
-                o[c] = k1 * sc * dc + k2 * sc + k3 * dc + k4;
+                o[c] = clamp01(k1 * sc * dc + k2 * sc + k3 * dc + k4);
             }
             continue;
         }
@@ -730,10 +758,11 @@ static float apply_transfer(const FilterPrim* p, int ch, float v) {
             if (n <= 0) return v;
             if (n == 1) return p->ct_table[ch][0];
             float x = v * (float)(n - 1);
-            int i = (int)floorf(x);
-            if (i < 0) { i = 0; x = 0.0f; }
+            int i = svg_f2i(floorf(x), 0, n - 1, 0);
             if (i >= n - 1) return p->ct_table[ch][n - 1];
             float f = x - (float)i;
+            if (!(f > 0.0f)) f = 0.0f;    /* NaN-safe */
+            if (f > 1.0f) f = 1.0f;
             return p->ct_table[ch][i] * (1.0f - f) + p->ct_table[ch][i + 1] * f;
         }
         default:
@@ -786,10 +815,17 @@ static FBuf* fe_morphology(FilterCtx* fc, const FilterPrim* p) {
     if (!in) in = &fc->src;
     float rx = fe_len(fc, p->num[0], 0);
     float ry = fe_len(fc, p->num[1], 1);
-    int irx = (int)floorf(rx + 0.5f);
-    int iry = (int)floorf(ry + 0.5f);
-    if (irx < 0) irx = 0;
-    if (iry < 0) iry = 0;
+    int irx = svg_f2i(floorf(rx + 0.5f), 0, 1000, 0);
+    int iry = svg_f2i(floorf(ry + 0.5f), 0, 1000, 0);
+    /* The naive kernel samples (2rx+1)*(2ry+1) pixels for every output pixel.
+     * Shrink a pathological radius until the total work is bounded. */
+    double budget = 200000000.0;
+    while ((irx > 0 || iry > 0) &&
+           (double)in->w * (double)in->h *
+               (2.0 * (double)irx + 1.0) * (2.0 * (double)iry + 1.0) > budget) {
+        if (irx >= iry) irx--;
+        else iry--;
+    }
     FBuf* out = fe_new(fc, in->w, in->h);
     if (!out) return NULL;
     if (irx == 0 && iry == 0) {
@@ -844,11 +880,15 @@ static FBuf* fe_morphology(FilterCtx* fc, const FilterPrim* p) {
     }
     /* Convert the premultiplied result back to straight alpha. */
     float* tmp = (float*)svg_malloc((size_t)out->w * (size_t)out->h * 4 * sizeof(float));
-    if (tmp) {
-        memcpy(tmp, out->px, fb_bytes(out->w, out->h));
-        fe_unpremul(tmp, out);
-        free(tmp);
+    if (!tmp) {
+        free(buf);
+        fe_release(fc, out);
+        fc->failed = 1;
+        return NULL;
     }
+    memcpy(tmp, out->px, fb_bytes(out->w, out->h));
+    fe_unpremul(tmp, out);
+    free(tmp);
     free(buf);
     return out;
 }

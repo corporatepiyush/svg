@@ -27,7 +27,10 @@ static float lattice_rand(int ix, int iy, int seed, int chan) {
 }
 
 static float vnoise(float x, float y, int seed, int chan) {
-    int xi = (int)floorf(x), yi = (int)floorf(y);
+    /* Lattice coordinates come from user-controlled base frequencies; clamp
+     * before the float-to-int conversion (the noise is flat at this scale). */
+    int xi = svg_f2i(floorf(x), -1073741824, 1073741824, 0);
+    int yi = svg_f2i(floorf(y), -1073741824, 1073741824, 0);
     float xf = x - (float)xi, yf = y - (float)yi;
     float u = xf * xf * (3.0f - 2.0f * xf);
     float v = yf * yf * (3.0f - 2.0f * yf);
@@ -125,12 +128,8 @@ static FBuf* fe_convolve(FilterCtx* fc, const FilterPrim* p) {
         for (int i = 0; i < n; i++) div += p->kernel[i];
         if (fabsf(div) < 1e-9f) div = 1.0f;
     }
-    int tx = (int)floorf(p->target_x + 0.5f);
-    int ty = (int)floorf(p->target_y + 0.5f);
-    if (tx < 0) tx = 0;
-    if (ty < 0) ty = 0;
-    if (tx >= ox) tx = ox - 1;
-    if (ty >= oy) ty = oy - 1;
+    int tx = svg_f2i(floorf(p->target_x + 0.5f), 0, ox - 1, 0);
+    int ty = svg_f2i(floorf(p->target_y + 0.5f), 0, oy - 1, 0);
 
     float* buf = (float*)svg_malloc((size_t)in->w * (size_t)in->h * 4 * sizeof(float));
     if (!buf) { fe_release(fc, out); fc->failed = 1; return NULL; }
@@ -161,11 +160,15 @@ static FBuf* fe_convolve(FilterCtx* fc, const FilterPrim* p) {
     }
     /* Convert premultiplied back to straight alpha. */
     float* tmp = (float*)svg_malloc((size_t)out->w * (size_t)out->h * 4 * sizeof(float));
-    if (tmp) {
-        memcpy(tmp, out->px, fb_bytes(out->w, out->h));
-        fe_unpremul(tmp, out);
-        free(tmp);
+    if (!tmp) {
+        free(buf);
+        fe_release(fc, out);
+        fc->failed = 1;
+        return NULL;
     }
+    memcpy(tmp, out->px, fb_bytes(out->w, out->h));
+    fe_unpremul(tmp, out);
+    free(tmp);
     free(buf);
     return out;
 }
@@ -179,7 +182,8 @@ static void sample_bilinear(const FBuf* b, float x, float y, float* out) {
         out[0] = out[1] = out[2] = out[3] = 0.0f;
         return;
     }
-    int x0 = (int)floorf(x), y0 = (int)floorf(y);
+    int x0 = svg_f2i(floorf(x), 0, b->w - 1, 0);
+    int y0 = svg_f2i(floorf(y), 0, b->h - 1, 0);
     int x1 = x0 + 1, y1 = y0 + 1;
     if (x1 >= b->w) x1 = b->w - 1;
     if (y1 >= b->h) y1 = b->h - 1;
@@ -202,8 +206,8 @@ static FBuf* fe_displacement(FilterCtx* fc, const FilterPrim* p) {
     FBuf* out = fe_new(fc, in->w, in->h);
     if (!out) return NULL;
     float scale = fe_len(fc, p->num[0], 2);
-    int xc = (int)p->num[1];
-    int yc = (int)p->num[2];
+    int xc = svg_f2i(p->num[1], 0, 3, 0);
+    int yc = svg_f2i(p->num[2], 0, 3, 0);
     for (int y = 0; y < out->h; y++) {
         for (int x = 0; x < out->w; x++) {
             float mx = (float)fe_chan(map, x, y, xc) / 255.0f - 0.5f;
@@ -277,13 +281,24 @@ static FBuf* fe_image(FilterCtx* fc, const FilterPrim* p) {
     }
     Pt a = mat_apply(fc->world, (Pt){ux, uy});
     Pt b = mat_apply(fc->world, (Pt){ux + uw, uy + uh});
-    int dx = (int)floorf(a.x + 0.5f) - fc->ox;
-    int dy = (int)floorf(a.y + 0.5f) - fc->oy;
-    int dw = (int)floorf(b.x + 0.5f) - (int)floorf(a.x + 0.5f);
-    int dh = (int)floorf(b.y + 0.5f) - (int)floorf(a.y + 0.5f);
+    /* Convert to buffer-relative coordinates and clamp the rectangle to the
+     * buffer.  A huge placed rect must not turn the blit loop into billions
+     * of iterations, and the clamps keep the int conversion defined. */
+    float ax = floorf(a.x + 0.5f) - (float)fc->ox;
+    float ay = floorf(a.y + 0.5f) - (float)fc->oy;
+    float bx = floorf(b.x + 0.5f) - (float)fc->ox;
+    float by = floorf(b.y + 0.5f) - (float)fc->oy;
+    int dx = svg_f2i(ax, -out->w - 1, out->w + 1, 0);
+    int dy = svg_f2i(ay, -out->h - 1, out->h + 1, 0);
+    int dw = svg_f2i(bx - ax, 0, out->w + 1, 0);
+    int dh = svg_f2i(by - ay, 0, out->h + 1, 0);
     if (!(p->num[2] > 0.0f) || !(p->num[3] > 0.0f) || dw <= 0 || dh <= 0) {
         dw = out->w - dx;
         dh = out->h - dy;
+        if (dw < 0) dw = 0;
+        if (dh < 0) dh = 0;
+        if (dw > out->w + 1) dw = out->w + 1;
+        if (dh > out->h + 1) dh = out->h + 1;
     }
     if (dw > 0 && dh > 0) image_blit_fbuf(out, dx, dy, dw, dh, raw, sw, sh);
     if (owned) free(raw);

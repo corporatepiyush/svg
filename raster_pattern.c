@@ -73,8 +73,8 @@ int pattern_build(Pattern* out, const void* patptr, const float bbox[4],
         use_pt = out->has_inv;
     }
     if (!(eff > 1e-6f) || !isfinite(eff)) eff = s;
-    int w = (int)ceilf(tw * eff - 1e-6f);
-    int h = (int)ceilf(th * eff - 1e-6f);
+    int w = svg_f2i(ceilf(tw * eff - 1e-6f), 1, 16 * 1024 * 1024, 1);
+    int h = svg_f2i(ceilf(th * eff - 1e-6f), 1, 16 * 1024 * 1024, 1);
     if (w < 1) w = 1;
     if (h < 1) h = 1;
     if ((size_t)w > (size_t)-1 / (size_t)h / 4 / sizeof(float)) return 0;

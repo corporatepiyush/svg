@@ -149,8 +149,10 @@ Mask* make_mask_from_node(const Node* mn, Mat world, const float* bbox,
         if (q.x > x1) x1 = q.x;
         if (q.y > y1) y1 = q.y;
     }
-    int ix0 = (int)floorf(x0), iy0 = (int)floorf(y0);
-    int ix1 = (int)ceilf(x1), iy1 = (int)ceilf(y1);
+    int ix0 = svg_f2i(floorf(x0), -1, W + 1, 0);
+    int iy0 = svg_f2i(floorf(y0), -1, H + 1, 0);
+    int ix1 = svg_f2i(ceilf(x1), -1, W + 1, 0);
+    int iy1 = svg_f2i(ceilf(y1), -1, H + 1, 0);
     if (ix0 < 0) ix0 = 0;
     if (iy0 < 0) iy0 = 0;
     if (ix1 > W) ix1 = W;

@@ -28,19 +28,21 @@ static unsigned char* b64decode(const char* s, size_t* outn) {
         else if (*p == '+') v = 62;
         else if (*p == '/') v = 63;
         else continue;
-        acc = (acc << 6) | v;
+        acc = ((acc << 6) | v) & 0xFFF;
         bits += 6;
         if (bits >= 8) {
             bits -= 8;
             if (n < cap) out[n++] = (unsigned char)((acc >> bits) & 0xFF);
+            acc &= (1 << bits) - 1;
         }
     }
     *outn = n;
     return out;
 }
 
-/* Decode %XX escapes; '+' becomes a space (the data URI convention). */
-static char* pctdecode(const char* s, size_t len) {
+/* Decode %XX escapes; '+' becomes a space (the data URI convention).  The
+ * decoded length is returned because a raster payload may contain NUL bytes. */
+static char* pctdecode(const char* s, size_t len, size_t* outn) {
     char* out = (char*)svg_malloc(len + 1);
     if (!out) return NULL;
     size_t n = 0;
@@ -57,7 +59,21 @@ static char* pctdecode(const char* s, size_t len) {
         else out[n++] = s[i];
     }
     out[n] = 0;
+    if (outn) *outn = n;
     return out;
+}
+
+/* The media type of a data URI is "image/svg+xml" (case-insensitive).  Only
+ * the MIME part is inspected: a raster base64 payload may happen to contain
+ * the letters "svg", and must not be routed to the SVG parser. */
+static int data_uri_is_svg(const char* href, size_t meta_len) {
+    static const char mime[] = "image/svg+xml";
+    const size_t off = 5;                 /* strlen("data:") */
+    if (meta_len < off + sizeof mime - 1) return 0;
+    for (size_t i = 0; i < sizeof mime - 1; i++)
+        if (tolower((unsigned char)href[off + i]) !=
+            (int)(unsigned char)mime[i]) return 0;
+    return 1;
 }
 
 static unsigned char* read_file(const char* path, size_t* out_n) {
@@ -99,15 +115,14 @@ int image_load_any(const char* href, const char* base_path, int aa,
         const char* data = comma + 1;
         size_t data_len = strlen(data);
         int is_b64 = meta_len >= 7 && !strncmp(comma - 7, ";base64", 7);
-        if (strstr(href, "svg")) {
+        if (data_uri_is_svg(href, meta_len)) {
             /* Embedded SVG: render it with the normal pipeline. */
             char* svg = NULL;
             size_t slen = 0;
             if (is_b64) {
                 svg = (char*)b64decode(data, &slen);
             } else {
-                svg = pctdecode(data, data_len);
-                if (svg) slen = strlen(svg);
+                svg = pctdecode(data, data_len, &slen);
             }
             if (!svg) return 0;
             svg2img_options o;
@@ -149,8 +164,8 @@ int image_load_any(const char* href, const char* base_path, int aa,
         size_t rawn = 0;
         if (is_b64) raw = b64decode(data, &rawn);
         else {
-            char* dec = pctdecode(data, data_len);
-            if (dec) { raw = b64decode(dec, &rawn); free(dec); }
+            char* dec = pctdecode(data, data_len, &rawn);
+            raw = (unsigned char*)dec;
         }
         if (!raw) return 0;
         unsigned char* px = decode_bytes(raw, rawn, out_w, out_h);

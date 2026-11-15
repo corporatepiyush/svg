@@ -16,6 +16,16 @@ static float fnum(const char* s, float def) {
     return v;
 }
 
+/* Integer attribute with a range clamp, evaluated before the cast so a huge
+ * or NaN value cannot overflow the conversion. */
+static int fint(const char* s, int def, int lo, int hi) {
+    float v = fnum(s, (float)def);
+    if (!(v == v)) return def;
+    if (v <= (float)lo) return lo;
+    if (v >= (float)hi) return hi;
+    return (int)v;
+}
+
 /* A filter region length: in objectBoundingBox units a percentage is a
  * fraction of the bounding box, so "120%" is 1.2. */
 static float region_len(const XMLNode* xn, const char* name, float def) {
@@ -214,12 +224,8 @@ static FilterPrim* parse_prim(Ctx* ctx, const XMLNode* xn, int bbox_units) {
         p->num[4] = fnum(xml_attr(xn, "k4"), 0.0f);
     } else if (!strcmp(nm, "feConvolveMatrix")) {
         p->type = FE_CONVOLVE_MATRIX;
-        p->order_x = (int)floorf(fnum(xml_attr(xn, "orderX"), 3.0f));
-        p->order_y = (int)floorf(fnum(xml_attr(xn, "orderY"), (float)p->order_x));
-        if (p->order_x < 1) p->order_x = 1;
-        if (p->order_y < 1) p->order_y = 1;
-        if (p->order_x > 8) p->order_x = 8;
-        if (p->order_y > 8) p->order_y = 8;
+        p->order_x = fint(xml_attr(xn, "orderX"), 3, 1, 8);
+        p->order_y = fint(xml_attr(xn, "orderY"), p->order_x, 1, 8);
         p->nkernel = 0;
         parse_floats(xml_attr(xn, "kernelMatrix"), p->kernel,
                      (int)(sizeof p->kernel / sizeof p->kernel[0]), &p->nkernel);
@@ -356,10 +362,8 @@ static FilterPrim* parse_prim(Ctx* ctx, const XMLNode* xn, int bbox_units) {
                 p->base_freq_x = p->base_freq_y = fnum(buf, 0.0f);
             }
         }
-        p->octaves = (int)fnum(xml_attr(xn, "numOctaves"), 1.0f);
-        if (p->octaves < 1) p->octaves = 1;
-        if (p->octaves > 8) p->octaves = 8;
-        p->seed = (int)fnum(xml_attr(xn, "seed"), 0.0f);
+        p->octaves = fint(xml_attr(xn, "numOctaves"), 1, 1, 8);
+        p->seed = fint(xml_attr(xn, "seed"), 0, 0, 65535);
         const char* st = xml_attr(xn, "stitchTiles");
         p->stitch = (st && !strcmp(st, "stitch")) ? 1 : 0;
     } else {

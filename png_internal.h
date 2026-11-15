@@ -9,6 +9,7 @@ typedef struct {
     size_t len, cap;
     unsigned bitbuf;
     int bitcnt;
+    int err;              /* set once a buffer allocation fails */
 } BW;
 
 void bw_init(BW* w);

@@ -2,8 +2,13 @@
 #include "svg_internal.h"
 #include <ctype.h>
 
+/* Text subtrees can be nested arbitrarily deep in the source document; cap the
+ * recursion so a hostile <tspan> chain cannot overflow the C stack. */
+#define TEXT_MAX_DEPTH 512
+
 static int collect_text(const XMLNode* xn, char** buf, size_t* len, size_t* cap,
-                        int max_len) {
+                        int max_len, int depth) {
+    if (!xn || depth > TEXT_MAX_DEPTH) return depth > TEXT_MAX_DEPTH;
     int truncated = 0;
     if (xn->text && *xn->text) {
         size_t tl = strlen(xn->text);
@@ -23,7 +28,8 @@ static int collect_text(const XMLNode* xn, char** buf, size_t* len, size_t* cap,
         }
     }
     for (int i = 0; i < xn->nkids; i++)
-        if (collect_text(xn->kids[i], buf, len, cap, max_len)) truncated = 1;
+        if (collect_text(xn->kids[i], buf, len, cap, max_len, depth + 1))
+            truncated = 1;
     return truncated;
 }
 
@@ -32,7 +38,7 @@ char* gather_text(const XMLNode* xn, int max_len, int* limit_hit) {
     if (max_len <= 0) max_len = SVG2IMG_LIMIT_MAX_TEXT_LENGTH;
     char* buf = NULL;
     size_t len = 0, cap = 0;
-    if (collect_text(xn, &buf, &len, &cap, max_len) && limit_hit) *limit_hit = 1;
+    if (collect_text(xn, &buf, &len, &cap, max_len, 0) && limit_hit) *limit_hit = 1;
     if (!buf) return svg_strdup("");
     return buf;
 }
@@ -96,8 +102,8 @@ static void push_chunk(Node* out, const char* s, float x, float y,
 
 /* Concatenate all character data below an element (textPath content). */
 static void collect_all_text(const XMLNode* xn, char** buf, size_t* len,
-                             size_t* cap, int max_len) {
-    if (!xn) return;
+                             size_t* cap, int max_len, int depth) {
+    if (!xn || depth > TEXT_MAX_DEPTH) return;
     if (xn->text && *xn->text) {
         size_t tl = strlen(xn->text);
         if (*len + tl > (size_t)max_len) tl = (size_t)max_len - *len;
@@ -113,13 +119,13 @@ static void collect_all_text(const XMLNode* xn, char** buf, size_t* len,
         (*buf)[*len] = 0;
     }
     for (int i = 0; i < xn->nkids; i++)
-        collect_all_text(xn->kids[i], buf, len, cap, max_len);
+        collect_all_text(xn->kids[i], buf, len, cap, max_len, depth + 1);
 }
 
 static char* all_text(const XMLNode* xn, int max_len) {
     char* buf = NULL;
     size_t len = 0, cap = 0;
-    collect_all_text(xn, &buf, &len, &cap, max_len);
+    collect_all_text(xn, &buf, &len, &cap, max_len, 0);
     if (!buf) return svg_strdup("");
     return buf;
 }
@@ -164,11 +170,14 @@ static void apply_rotate(Ctx* ctx, const XMLNode* xn, Style* st) {
 }
 
 static void walk_chunks(const XMLNode* xn, Ctx* ctx, Style* st,
-                        float* cx, float* cy, Node* out, int* limit_hit);
+                        float* cx, float* cy, Node* out, int* limit_hit,
+                        int depth);
 
 /* Place a child element's own text as one run. */
 static void run_element(const XMLNode* xn, Ctx* ctx, Style* parent,
-                        float* cx, float* cy, Node* out, int* limit_hit) {
+                        float* cx, float* cy, Node* out, int* limit_hit,
+                        int depth) {
+    if (depth > TEXT_MAX_DEPTH) { *limit_hit = 1; return; }
     Style child;
     style_copy(&child, parent);
     apply_text_style(ctx, xn, &child);
@@ -193,19 +202,23 @@ static void run_element(const XMLNode* xn, Ctx* ctx, Style* parent,
     *cx = nx + (float)strlen(xn->text ? xn->text : "") * (6.0f * scale +
                                                           child.letterspacing);
     *cy = ny;
-    walk_chunks(xn, ctx, &child, cx, cy, out, limit_hit);
+    walk_chunks(xn, ctx, &child, cx, cy, out, limit_hit, depth + 1);
     style_free(&child);
 }
 
 static void walk_chunks(const XMLNode* xn, Ctx* ctx, Style* st,
-                        float* cx, float* cy, Node* out, int* limit_hit) {
-    if (!xn) return;
+                        float* cx, float* cy, Node* out, int* limit_hit,
+                        int depth) {
+    if (!xn || depth > TEXT_MAX_DEPTH) {
+        if (xn) *limit_hit = 1;
+        return;
+    }
     for (int i = 0; i < xn->nkids; i++) {
         const XMLNode* k = xn->kids[i];
         const char* nm = k->name;
         if (!strcmp(nm, "tspan") || !strcmp(nm, "a") ||
             !strcmp(nm, "altGlyph")) {
-            run_element(k, ctx, st, cx, cy, out, limit_hit);
+            run_element(k, ctx, st, cx, cy, out, limit_hit, depth + 1);
         } else if (!strcmp(nm, "tref")) {
             const char* href = xml_attr(k, "href");
             if (!href) href = xml_attr(k, "xlink:href");
@@ -260,7 +273,7 @@ static void walk_chunks(const XMLNode* xn, Ctx* ctx, Style* st,
                    !strcmp(nm, "glyphRef")) {
             /* Definition only; the fallback is the altGlyph text. */
         } else {
-            walk_chunks(k, ctx, st, cx, cy, out, limit_hit);
+            walk_chunks(k, ctx, st, cx, cy, out, limit_hit, depth + 1);
         }
     }
 }
@@ -282,6 +295,6 @@ void gather_chunks(const XMLNode* xn, Ctx* ctx, Node* out, int* limit_hit) {
     float cx = x + (float)strlen(xn->text ? xn->text : "") *
                      (6.0f * scale + st.letterspacing);
     float cy = y;
-    walk_chunks(xn, ctx, &st, &cx, &cy, out, limit_hit);
+    walk_chunks(xn, ctx, &st, &cx, &cy, out, limit_hit, 0);
     style_free(&st);
 }

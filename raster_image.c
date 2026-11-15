@@ -108,8 +108,10 @@ void render_image(Canvas* c, const Node* n, Mat world, float opacity,
         if (p.x > x1) x1 = p.x;
         if (p.y > y1) y1 = p.y;
     }
-    int ix0 = (int)floorf(x0), iy0 = (int)floorf(y0);
-    int ix1 = (int)ceilf(x1), iy1 = (int)ceilf(y1);
+    int ix0 = svg_f2i(floorf(x0), -1, c->w + 1, 0);
+    int iy0 = svg_f2i(floorf(y0), -1, c->h + 1, 0);
+    int ix1 = svg_f2i(ceilf(x1), -1, c->w + 1, 0);
+    int iy1 = svg_f2i(ceilf(y1), -1, c->h + 1, 0);
     if (ix0 < 0) ix0 = 0;
     if (iy0 < 0) iy0 = 0;
     if (ix1 > c->w) ix1 = c->w;

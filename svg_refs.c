@@ -1,5 +1,6 @@
 /* svg_refs.c - Paint, clip and use reference resolution. */
 #include "svg_internal.h"
+#include <stdint.h>
 
 /* Deep-copy src into dst, releasing anything dst already owns. */
 static void paint_copy(Paint* dst, const Paint* src) {
@@ -142,6 +143,8 @@ static void resolve_clip_refs(Node* n, IdMap* ids) {
 
 typedef struct {
     IdMap* ids;
+    Node*  root;           /* tree root: adopted nodes are attached here */
+    Node*  grave;          /* lazily created NODE_IGNORE holder, or NULL */
     int    max_nodes;      /* total cloned nodes allowed */
     int    made;           /* clones created so far      */
     int    failed;         /* an allocation failed: stop expanding */
@@ -167,6 +170,34 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
     c->font_owned = NULL;
     c->path = n->path ? path_copy(n->path) : NULL;
     if (n->path && !c->path) uc->failed = 1;
+
+    /* Every owned string needs its own copy: a shallow struct copy would
+     * leave the clone and the original freeing the same buffer. */
+    c->image_href = n->image_href ? svg_strdup(n->image_href) : NULL;
+    c->filt_href = n->filt_href ? svg_strdup(n->filt_href) : NULL;
+    c->mask_ref = n->mask_ref ? svg_strdup(n->mask_ref) : NULL;
+    c->filter_ref = n->filter_ref ? svg_strdup(n->filter_ref) : NULL;
+    c->marker_start_ref = n->marker_start_ref ? svg_strdup(n->marker_start_ref) : NULL;
+    c->marker_mid_ref = n->marker_mid_ref ? svg_strdup(n->marker_mid_ref) : NULL;
+    c->marker_end_ref = n->marker_end_ref ? svg_strdup(n->marker_end_ref) : NULL;
+    if ((n->image_href && !c->image_href) || (n->filt_href && !c->filt_href) ||
+        (n->mask_ref && !c->mask_ref) || (n->filter_ref && !c->filter_ref) ||
+        (n->marker_start_ref && !c->marker_start_ref) ||
+        (n->marker_mid_ref && !c->marker_mid_ref) ||
+        (n->marker_end_ref && !c->marker_end_ref))
+        uc->failed = 1;
+
+    /* Preloaded raster pixels are owned by the node; deep-copy them so the
+     * clone can be freed independently (and still renders an external file
+     * without a base path). */
+    c->img_px = NULL;
+    if (n->img_px && n->img_iw > 0 && n->img_ih > 0 &&
+        (size_t)n->img_iw <= SIZE_MAX / (size_t)n->img_ih / 4) {
+        size_t nb = (size_t)n->img_iw * (size_t)n->img_ih * 4;
+        c->img_px = (unsigned char*)svg_malloc(nb);
+        if (c->img_px) memcpy(c->img_px, n->img_px, nb);
+        else uc->failed = 1;
+    }
 
     for (int k = 0; k < 2; k++) {
         Paint* d = (k == 0) ? &c->fill : &c->stroke;
@@ -262,6 +293,14 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
                 d->in2 = sc->in2 ? svg_strdup(sc->in2) : NULL;
                 d->result = sc->result ? svg_strdup(sc->result) : NULL;
                 d->href = sc->href ? svg_strdup(sc->href) : NULL;
+                d->px = NULL;
+                if (sc->px && sc->pw > 0 && sc->ph > 0 &&
+                    (size_t)sc->pw <= SIZE_MAX / (size_t)sc->ph / 4) {
+                    size_t nb = (size_t)sc->pw * (size_t)sc->ph * 4;
+                    d->px = (unsigned char*)svg_malloc(nb);
+                    if (d->px) memcpy(d->px, sc->px, nb);
+                    else uc->failed = 1;
+                }
                 d->nmerge = 0;
                 for (int m = 0; m < sc->nmerge && m < 8; m++)
                     d->merge_in[d->nmerge++] =
@@ -419,11 +458,66 @@ static void resolve_use_clear(Node* n) {
     for (int i = 0; i < n->nkids; i++) resolve_use_clear(n->kids[i]);
 }
 
+/* Drop a discarded subtree's ids from the map without freeing the nodes.
+ * The storage stays alive for borrowed pointers (see grave_adopt), but a
+ * later <use href="#id"> must not resolve an element the document no longer
+ * renders, matching the pre-graveyard behaviour. */
+static void unregister_ids(Node* n, IdMap* ids) {
+    if (!n) return;
+    if (ids && n->id) idmap_remove(ids, n->id, n);
+    for (int i = 0; i < n->nkids; i++) unregister_ids(n->kids[i], ids);
+}
+
+/* Move the literal children of a <use> out of the render tree without freeing
+ * them.  Already-resolved borrowed references (mask/filter/marker/pattern
+ * definitions, feImage ref_node) may still point into this subtree, so the
+ * storage must stay alive until the whole tree is torn down.  A hidden
+ * NODE_IGNORE holder on the root is never painted and keeps each node under
+ * exactly one parent. */
+static void grave_adopt(UseCtx* uc, Node* n) {
+    if (!n) return;
+    if (n->nkids <= 0) {
+        free(n->kids);
+        n->kids = NULL;
+        n->nkids = 0;
+        return;
+    }
+    if (!uc->grave) {
+        Node* g = svg_node_new(NODE_IGNORE);
+        if (!g || !node_add_child(uc->root, g)) {
+            svg_free(g);
+            uc->failed = 1;
+            return;
+        }
+        g->hidden_subtree = 1;
+        uc->grave = g;
+    }
+    int moved = 0;
+    while (moved < n->nkids &&
+           node_add_child(uc->grave, n->kids[moved])) {
+        unregister_ids(n->kids[moved], uc->ids);
+        moved++;
+    }
+    if (moved == n->nkids) {
+        free(n->kids);
+        n->kids = NULL;
+        n->nkids = 0;
+        return;
+    }
+    /* Out of memory: keep the unadopted tail attached; the caller aborts the
+     * parse because uc->failed is set. */
+    memmove(n->kids, n->kids + moved,
+            (size_t)(n->nkids - moved) * sizeof(Node*));
+    n->nkids -= moved;
+    uc->failed = 1;
+}
+
 /* Resolve every <use> in the subtree.  Returns 1 if any work was done, so the
  * driver can iterate to a fixed point (resolving one use can expose another).
  * The caller frees use_ref before recursing, so a use is expanded once. */
 static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
     if (!n || uc->failed) return 0;
+    if (n == uc->grave) return 0;        /* discarded nodes need no work */
     int used = 0;
     if (n->use_ref) {
         char* ref = n->use_ref;
@@ -468,17 +562,13 @@ static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
                 }
                 clone->tm = mat_mul(use_tm, clone->tm);
                 resolve_clip_refs(clone, ids);
-                /* A <use> never has children of its own: the shadow tree
-                 * replaces them.  Free each node, not just the array, and
-                 * unregister their ids first so the map cannot hand out a
-                 * dangling pointer to a later <use href="#id">.
-                 * The use element itself keeps its own id (if any). */
-                for (int i = 0; i < n->nkids; i++)
-                    svg_free_detached(n->kids[i], ids);
-                free(n->kids);
-                n->kids = NULL;
-                n->nkids = 0;
-                if (!node_add_child(n, clone)) svg_free(clone);
+                /* A <use> never renders its own children: the shadow tree
+                 * replaces them.  They cannot be freed here because the id
+                 * map and borrowed definition pointers may still reference
+                 * them, so park them on the hidden holder instead.  The use
+                 * element itself keeps its own id (if any). */
+                grave_adopt(uc, n);
+                if (uc->failed || !node_add_child(n, clone)) svg_free(clone);
             }
         }
         free(ref);
@@ -574,6 +664,8 @@ int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
 
     UseCtx uc;
     uc.ids = ids;
+    uc.root = n;
+    uc.grave = NULL;
     uc.max_nodes = lim ? lim->max_use_expansion : SVG2IMG_LIMIT_MAX_USE_EXPANSION;
     uc.made = 0;
     uc.failed = 0;

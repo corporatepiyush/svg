@@ -180,7 +180,10 @@ static void add_rule(Ctx* ctx, char* sel, char* decls, char* decls_imp) {
 /* Split a declaration block into normal and !important declaration lists. */
 static void parse_declarations(const char* body, char** out_normal,
                                char** out_imp) {
-    size_t cap = strlen(body) + 1;
+    /* Each copied declaration is followed by an appended ';' and the final
+     * NUL.  The declarations' own ';' separators already occupy the body's
+     * length, so two extra bytes cover the worst case. */
+    size_t cap = strlen(body) + 2;
     char* normal = (char*)svg_malloc(cap);
     char* imp = (char*)svg_malloc(cap);
     if (!normal || !imp) { free(normal); free(imp); *out_normal = NULL; *out_imp = NULL; return; }
@@ -270,12 +273,37 @@ static void collect_style_text(Ctx* ctx, const char* css) {
 
 void css_collect(Ctx* ctx, const XMLNode* root) {
     if (!ctx || !root) return;
-    for (int i = 0; i < root->nkids; i++) {
-        const XMLNode* k = root->kids[i];
+    /* Iterative pre-order walk: xml_parse accepts arbitrary nesting depth, so
+     * recursion here could overflow the C stack before the build-stage depth
+     * limit is ever consulted.  Children are pushed in reverse so they are
+     * popped in document order, which keeps the CSS cascade stable. */
+    const XMLNode** stack = NULL;
+    size_t n = 0, cap = 0;
+    if (root->nkids > 0) {
+        cap = 64;
+        while (cap < (size_t)root->nkids) cap *= 2;
+        stack = (const XMLNode**)svg_malloc(cap * sizeof(*stack));
+        if (!stack) return;
+        for (int i = root->nkids - 1; i >= 0; i--) stack[n++] = root->kids[i];
+    }
+    while (n > 0) {
+        const XMLNode* k = stack[--n];
         if (!strcmp(k->name, "style") && k->text && *k->text)
             collect_style_text(ctx, k->text);
-        css_collect(ctx, k);
+        if (k->nkids > 0) {
+            if (n + (size_t)k->nkids > cap) {
+                size_t nc = cap ? cap : 64;
+                while (nc < n + (size_t)k->nkids) nc *= 2;
+                const XMLNode** ns = (const XMLNode**)svg_realloc(
+                    stack, nc * sizeof(*stack));
+                if (!ns) { free(stack); return; }
+                stack = ns;
+                cap = nc;
+            }
+            for (int i = k->nkids - 1; i >= 0; i--) stack[n++] = k->kids[i];
+        }
     }
+    free(stack);
 }
 
 void css_free(Ctx* ctx) {

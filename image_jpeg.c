@@ -230,6 +230,8 @@ static int parse_sof(JDec* j, const unsigned char* d, size_t n, size_t* p,
     j->ncomp = rd_u8(d, n, p);
     if (j->ncomp < 1 || j->ncomp > 4) return -1;
     if (j->width <= 0 || j->height <= 0) return -1;
+    if ((size_t)j->width * (size_t)j->height > (size_t)SVG2IMG_LIMIT_MAX_PIXELS)
+        return -1;
     for (int i = 0; i < j->ncomp; i++) {
         j->comp[i].id = rd_u8(d, n, p);
         int hv = rd_u8(d, n, p);

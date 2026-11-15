@@ -112,7 +112,7 @@ int png_save(const char* path, const float* rgba, int w, int h) {
     bw_push(&bw, (unsigned char)(ad & 0xFF));
     free(raw);
 
-    if (!bw.buf) { free(bw.buf); return 0; }
+    if (!bw.buf || bw.err) { free(bw.buf); return 0; }
 
     FILE* f = fopen(path, "wb");
     if (!f) { free(bw.buf); return 0; }

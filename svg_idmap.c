@@ -30,6 +30,7 @@ void idmap_put(IdMap* m, const char* k, Node* v) {
         m->cap = nc;
     }
     unsigned h = hash_str(k) % (unsigned)m->cap;
+    int probes = 0;
     while (m->e[h].key) {
         if (!strcmp(m->e[h].key, k)) {
             /* Replacing an existing id: the key is shared with the old entry,
@@ -37,6 +38,7 @@ void idmap_put(IdMap* m, const char* k, Node* v) {
             m->e[h].val = v;
             return;
         }
+        if (++probes >= m->cap) return;   /* full table: do not spin */
         h = (h + 1) % (unsigned)m->cap;
     }
     m->e[h].key = svg_strdup(k);
@@ -51,6 +53,7 @@ void idmap_put(IdMap* m, const char* k, Node* v) {
 void idmap_remove(IdMap* m, const char* k, const Node* v) {
     if (!m || !m->e || !m->cap || !k) return;
     unsigned h = hash_str(k) % (unsigned)m->cap;
+    int probes = 0;
     while (m->e[h].key) {
         if (!strcmp(m->e[h].key, k)) {
             if (m->e[h].val == v) {
@@ -61,6 +64,7 @@ void idmap_remove(IdMap* m, const char* k, const Node* v) {
             }
             return;
         }
+        if (++probes >= m->cap) return;
         h = (h + 1) % (unsigned)m->cap;
     }
 }
@@ -68,8 +72,10 @@ void idmap_remove(IdMap* m, const char* k, const Node* v) {
 Node* idmap_get(IdMap* m, const char* k) {
     if (!m->e || m->cap == 0) return NULL;
     unsigned h = hash_str(k) % (unsigned)m->cap;
+    int probes = 0;
     while (m->e[h].key) {
         if (!strcmp(m->e[h].key, k)) return m->e[h].val;
+        if (++probes >= m->cap) return NULL;
         h = (h + 1) % (unsigned)m->cap;
     }
     return NULL;

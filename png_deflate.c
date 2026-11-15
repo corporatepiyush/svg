@@ -10,13 +10,15 @@
 
 void bw_init(BW* w) {
     w->buf = NULL; w->len = 0; w->cap = 0; w->bitbuf = 0; w->bitcnt = 0;
+    w->err = 0;
 }
 
 void bw_push(BW* w, unsigned char b) {
+    if (w->err) return;
     if (w->len == w->cap) {
         size_t nc = w->cap ? w->cap * 2 : 4096;
         unsigned char* nb = (unsigned char*)svg_realloc(w->buf, nc);
-        if (!nb) return;           /* keep the old buffer; drop this byte */
+        if (!nb) { w->err = 1; return; }
         w->buf = nb;
         w->cap = nc;
     }

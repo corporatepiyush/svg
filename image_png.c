@@ -78,11 +78,13 @@ static const unsigned char DIST_EXTRA[30] = {
     0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13
 };
 
-typedef struct { unsigned char* p; size_t n, cap; } Buf;
+typedef struct { unsigned char* p; size_t n, cap, limit; } Buf;
 
 static int buf_push(Buf* b, unsigned char c) {
+    if (b->limit && b->n >= b->limit) return -1;
     if (b->n == b->cap) {
         size_t nc = b->cap ? b->cap * 2 : 4096;
+        if (b->limit && nc > b->limit) nc = b->limit;
         unsigned char* np = (unsigned char*)svg_realloc(b->p, nc);
         if (!np) return -1;
         b->p = np;
@@ -295,17 +297,26 @@ unsigned char* png_decode_rgba(const unsigned char* d, size_t n,
     if (channels == 0) { free(idat.p); return NULL; }
     if (depth < 8 && ctype != 0 && ctype != 3) { free(idat.p); return NULL; }
     if (ctype == 3 && (!plte || plte_n == 0)) { free(idat.p); return NULL; }
-    if ((size_t)w > (size_t)-1 / (size_t)h / 4) { free(idat.p); return NULL; }
-
-    Buf raw = {0};
-    if (zlib_inflate(idat.p, idat.n, &raw)) { free(idat.p); free(raw.p); return NULL; }
-    free(idat.p);
+    /* Bound both the decoded size and the inflate output: a small deflate
+     * stream can otherwise expand to many gigabytes. */
+    if ((size_t)w > (size_t)SVG2IMG_LIMIT_MAX_PIXELS / (size_t)h ||
+        (size_t)w > (size_t)-1 / (size_t)h / 4) {
+        free(idat.p);
+        return NULL;
+    }
 
     /* Packed rows for sub-byte depths: one filtering pass still uses the
      * packed stride, then each row is expanded to one byte per sample. */
     size_t packed = ((size_t)w * (size_t)channels * (size_t)depth + 7) / 8;
     size_t stride = (depth == 8) ? (size_t)w * (size_t)channels : packed;
-    if (raw.n < (stride + 1) * (size_t)h) { free(raw.p); return NULL; }
+    if (h > ((size_t)-1 - 1) / (stride + 1)) { free(idat.p); return NULL; }
+    size_t need = (stride + 1) * (size_t)h;
+
+    Buf raw = {0};
+    raw.limit = need;
+    if (zlib_inflate(idat.p, idat.n, &raw)) { free(idat.p); free(raw.p); return NULL; }
+    free(idat.p);
+    if (raw.n < need) { free(raw.p); return NULL; }
 
     unsigned char* img = (unsigned char*)svg_malloc((size_t)w * (size_t)h * 4);
     if (!img) { free(raw.p); return NULL; }

@@ -93,7 +93,7 @@ static int cmap_lookup4(const unsigned char* t, unsigned len, unsigned c) {
     if (len < 14) return 0;
     unsigned segX2 = rd_u16(t + 6);
     unsigned seg = segX2 / 2;
-    if (seg == 0 || 14 + (size_t)seg * 8 > len) return 0;
+    if (seg == 0 || 16 + (size_t)seg * 8 > len) return 0;
     const unsigned char* end = t + 14;
     const unsigned char* start = end + segX2 + 2;
     const unsigned char* delta = start + segX2;
@@ -106,10 +106,12 @@ static int cmap_lookup4(const unsigned char* t, unsigned len, unsigned c) {
         int d = rd_i16(delta + i * 2);
         unsigned ro = rd_u16(range + i * 2);
         if (ro == 0) return (int)((c + (unsigned)d) & 0xFFFFu);
-        const unsigned char* addr = range + i * 2 + ro +
-                                    (unsigned)(c - s) * 2;
-        if ((size_t)(addr - t) + 2 > len) return 0;
-        unsigned g = rd_u16(addr);
+        /* Compute the target as an offset from the table start: forming a
+         * pointer far outside the object (ro is unbounded) is undefined. */
+        size_t off = (size_t)(range - t) + (size_t)i * 2 + (size_t)ro +
+                     (size_t)(c - s) * 2;
+        if (off + 2 > len) return 0;
+        unsigned g = rd_u16(t + off);
         return g ? (int)((g + (unsigned)d) & 0xFFFFu) : 0;
     }
     return 0;
@@ -158,7 +160,12 @@ static int cont_push(PtList* l, int n) {
     return 1;
 }
 
+#define FONT_MAX_POINTS (1 << 20)
+
 static int pt_push(PtList* l, float x, float y) {
+    /* A malicious composite glyph can reference many outline components; cap
+     * the total so a small file cannot make the point list grow without bound. */
+    if (l->n > FONT_MAX_POINTS - 2) return 0;
     if (l->n + 2 > l->cap) {
         int cap = l->cap ? l->cap * 2 : 64;
         while (cap < l->n + 2) cap *= 2;
@@ -437,16 +444,20 @@ FontFace* font_face_load(const char* path) {
     f->ascent = 800.0f;
     f->descent = -200.0f;
 
-    unsigned len = 0, head_len = 0;
+    unsigned head_len = 0, maxp_len = 0, hhea_len = 0;
     const unsigned char* head = find_table(&f->f, "head", &head_len);
-    const unsigned char* maxp = find_table(&f->f, "maxp", &len);
-    const unsigned char* hhea = find_table(&f->f, "hhea", &len);
+    const unsigned char* maxp = find_table(&f->f, "maxp", &maxp_len);
+    const unsigned char* hhea = find_table(&f->f, "hhea", &hhea_len);
     const unsigned char* loca = find_table(&f->f, "loca", &f->loca_len);
     const unsigned char* glyf = find_table(&f->f, "glyf", &f->glyf_len);
     const unsigned char* hmtx = find_table(&f->f, "hmtx", &f->hmtx_len);
     const unsigned char* cmap = find_table(&f->f, "cmap", &f->cmap_len);
     if (!head || !maxp || !loca || !glyf || !hhea) goto bad;
-    if (head_len < 54) goto bad;
+    /* The fields read below live at fixed offsets; a truncated table would
+     * otherwise be read past its end. */
+    if (head_len < 54 || maxp_len < 6 || hhea_len < 36) goto bad;
+    if (hmtx && f->hmtx_len < 4) goto bad;
+    if (cmap && f->cmap_len < 4) goto bad;
 
     f->unitsPerEm = (unsigned)rd_u16(head + 18);
     f->indexToLocFormat = rd_i16(head + 50);

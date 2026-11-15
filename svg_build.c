@@ -424,19 +424,6 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
 oom:
     if (!n) { style_free(&st); return NULL; }
 
-    /* Take ownership of the style's heap-owned fields. */
-    if (n->type != NODE_GRADDEF) {
-        n->fill = st.fill;
-        n->stroke = st.stroke;
-        n->dash = st.dash;
-        n->ndash = st.ndash;
-        st.fill.stops = NULL; st.fill.nstops = 0;
-        st.fill.ref = NULL;
-        st.stroke.stops = NULL; st.stroke.nstops = 0;
-        st.stroke.ref = NULL;
-        st.dash = NULL; st.ndash = 0;
-    }
-
     /* Record which paint properties this element specified itself, so a
      * <use> can supply the ones it did not (shadow-tree inheritance). */
     if (st.saw_fill)   n->spec |= SPEC_FILL;
@@ -467,11 +454,6 @@ oom:
     if (n->type != NODE_FILTERDEF) {
         n->filter_ref = st.filter; st.filter = NULL;
     }
-    if (path_scale != 1.0f && n->dash) {
-        for (int i = 0; i < n->ndash; i++) n->dash[i] *= path_scale;
-        n->dashoff *= path_scale;
-    }
-
     char style_val[256];
     const char* op = xml_attr(xn, "opacity");
     if (style_get_decl(xml_attr(xn, "style"), "opacity", style_val, sizeof style_val))
@@ -539,6 +521,27 @@ oom:
             /* A child that could not be attached is discarded; unregister its
              * ids first or the map keeps a dangling pointer. */
             if (c && !node_add_child(n, c)) svg_free_detached(c, ctx->ids);
+        }
+    }
+
+    /* Take ownership of the style's heap-owned fields only after the children
+     * are built: they inherit the *computed* style, so clearing the paint
+     * references here any earlier would strip an inherited gradient or marker
+     * from every descendant (SVG 1.1 6.3). */
+    if (n->type != NODE_GRADDEF) {
+        n->fill = st.fill;
+        n->stroke = st.stroke;
+        n->dash = st.dash;
+        n->ndash = st.ndash;
+        st.fill.stops = NULL; st.fill.nstops = 0;
+        st.fill.ref = NULL;
+        st.stroke.stops = NULL; st.stroke.nstops = 0;
+        st.stroke.ref = NULL;
+        st.dash = NULL; st.ndash = 0;
+        /* pathLength calibrates the dash values the node just took. */
+        if (path_scale != 1.0f && n->dash) {
+            for (int i = 0; i < n->ndash; i++) n->dash[i] *= path_scale;
+            n->dashoff *= path_scale;
         }
     }
 
