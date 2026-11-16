@@ -115,6 +115,24 @@ case("use_ok", '<defs><rect id="r" width="10" height="10" fill="red"/></defs>'
      '<use href="#r"/><use href="#r"/>',
      {"SVG2IMG_LIMIT_MAX_USE_EXPANSION": "64"}, True)
 
+# A <use> chain whose shadow trees nest deeper than max_depth must be reported
+# as a clean limit error, not crash: before the expansion depth cap this
+# overflowed the C stack in resolve_use (SIGSEGV) even at the default 8 MB.
+case("use_deep_chain",
+     '<defs>' + "".join(
+         '<g id="g%d"><use href="#g%d"/></g>' % (k, k + 1)
+         for k in range(59)) +
+     '<g id="g59"><rect width="10" height="10" fill="red"/></g></defs>'
+     '<use href="#g0"/>',
+     {"SVG2IMG_LIMIT_MAX_DEPTH": "32"}, False)
+case("use_deep_chain_ok",
+     '<defs>' + "".join(
+         '<g id="g%d"><use href="#g%d"/></g>' % (k, k + 1)
+         for k in range(9)) +
+     '<g id="g9"><rect width="10" height="10" fill="red"/></g></defs>'
+     '<use href="#g0"/>',
+     {"SVG2IMG_LIMIT_MAX_DEPTH": "64"}, True)
+
 # max_pixels: a 100x100 canvas.
 case("pixels_too_low", "", {"SVG2IMG_LIMIT_MAX_PIXELS": "100"}, False)
 case("pixels_ok", "", {"SVG2IMG_LIMIT_MAX_PIXELS": "1000000"}, True)

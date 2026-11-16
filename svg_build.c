@@ -2,6 +2,18 @@
 #include "svg_internal.h"
 #include <ctype.h>
 
+/* Keep selected helpers out of the recursive build_node() frame: that frame
+ * is allocated once per nesting level (up to max_depth), so a large local
+ * buffer there multiplies into a stack overflow on small (e.g. 512 KB)
+ * thread stacks.  These helpers do the same work with their own frame. */
+#if defined(__GNUC__) || defined(__clang__)
+#define SVG_NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+#define SVG_NOINLINE __declspec(noinline)
+#else
+#define SVG_NOINLINE
+#endif
+
 /* ------------------------------------------------------------------ */
 /* Tree building                                                       */
 /* ------------------------------------------------------------------ */
@@ -106,6 +118,55 @@ static int switch_child_ok(const XMLNode* xn) {
     return 1;
 }
 
+/* Apply an element's presentation attributes to `st`.  Kept out of the
+ * recursive build_node() frame so its 512-byte buffer does not multiply with
+ * nesting depth. */
+SVG_NOINLINE static void apply_attribute_decls(Ctx* ctx, const XMLNode* xn, Style* st) {
+    for (int i = 0; i < xn->nattrs; i++) {
+        char decl[512];
+        snprintf(decl, sizeof(decl), "%s:%s", xn->attrs[i * 2], xn->attrs[i * 2 + 1]);
+        style_apply_decls(ctx, st, decl);
+    }
+}
+
+/* Resolve a presentation attribute that the inline style may override,
+ * through a caller-owned buffer so the value's storage does not live in the
+ * recursive build_node() frame. */
+static const char* attr_or_style(const XMLNode* xn, const char* name,
+                                 char* buf, size_t cap) {
+    if (style_get_decl(xml_attr(xn, "style"), name, buf, cap)) return buf;
+    return xml_attr(xn, name);
+}
+
+/* Store a "url(#id)" reference from a presentation attribute or inline style,
+ * matching the way clip-path and mask are resolved. */
+static void apply_url_ref(const XMLNode* xn, const char* name, char** out) {
+    char buf[256];
+    const char* v = attr_or_style(xn, name, buf, sizeof buf);
+    if (v && strncmp(v, "url(#", 5) == 0) {
+        const char* e = strchr(v + 5, ')');
+        if (e) *out = svg_strndup(v + 5, (size_t)(e - (v + 5)));
+    }
+}
+
+/* opacity: presentation attribute or inline style, clamped to [0,1]. */
+static void apply_opacity(const XMLNode* xn, Node* n) {
+    char buf[256];
+    const char* op = attr_or_style(xn, "opacity", buf, sizeof buf);
+    if (op) {
+        float v = strtof(op, NULL);
+        n->opacity = v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v);
+    }
+}
+
+/* overflow on a nested <svg>: the initial value is hidden, so it clips unless
+ * it explicitly asks for `visible` (SVG 1.1 §14.3).  Not inherited. */
+static int overflow_is_visible(const XMLNode* xn) {
+    char buf[64];
+    const char* ov = attr_or_style(xn, "overflow", buf, sizeof buf);
+    return ov && !strcmp(ov, "visible");
+}
+
 Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     if (depth > SVG2IMG_MAX_DEPTH) return NULL;
     /* Hard depth limit: refuse to build past max_depth.  The caller drops the
@@ -119,12 +180,8 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
     ctx->em = st.fontsize;
 
     /* Cascades: presentation attributes, then CSS rules, then the inline
- * style attribute (later rules win). */
-    for (int i = 0; i < xn->nattrs; i++) {
-        char decl[512];
-        snprintf(decl, sizeof(decl), "%s:%s", xn->attrs[i * 2], xn->attrs[i * 2 + 1]);
-        style_apply_decls(ctx, &st, decl);
-    }
+     * style attribute (later rules win). */
+    apply_attribute_decls(ctx, xn, &st);
     /* Author stylesheet rules come before the inline style (which is a
      * later, more specific origin), except for !important declarations. */
     css_apply(ctx, xn, &st);
@@ -214,12 +271,7 @@ Node* build_node(Ctx* ctx, const XMLNode* xn, const Style* parent, int depth) {
              * clips unless it explicitly asks for `visible` (SVG 1.1 §14.3).
              * `overflow` is not inherited, so it is read on this element
              * only (presentation attribute or inline style). */
-            const char* ov = xml_attr(xn, "overflow");
-            char ovbuf[64];
-            if (style_get_decl(xml_attr(xn, "style"), "overflow",
-                               ovbuf, sizeof ovbuf))
-                ov = ovbuf;
-            n->vp_clip = !(ov && !strcmp(ov, "visible"));
+            n->vp_clip = !overflow_is_visible(xn);
             /* The clip rectangle lives in the node's own user space (the
              * space its matrix maps to device).  With a viewBox that is the
              * viewBox rectangle; without one it is the viewport rectangle at
@@ -454,14 +506,7 @@ oom:
     if (n->type != NODE_FILTERDEF) {
         n->filter_ref = st.filter; st.filter = NULL;
     }
-    char style_val[256];
-    const char* op = xml_attr(xn, "opacity");
-    if (style_get_decl(xml_attr(xn, "style"), "opacity", style_val, sizeof style_val))
-        op = style_val;
-    if (op) {
-        float v = strtof(op, NULL);
-        n->opacity = v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v);
-    }
+    apply_opacity(xn, n);
     /* visibility:hidden suppresses this element's own painting but is
      * inherited per element; a descendant that sets visibility:visible must
      * still draw, so this is not a subtree flag.  display:none, by contrast,
@@ -481,20 +526,8 @@ oom:
         n->id = svg_strdup(id);
         idmap_put(ctx->ids, id, n);
     }
-    const char* clip = xml_attr(xn, "clip-path");
-    if (style_get_decl(xml_attr(xn, "style"), "clip-path", style_val, sizeof style_val))
-        clip = style_val;
-    if (clip && strncmp(clip, "url(#", 5) == 0) {
-        const char* e = strchr(clip + 5, ')');
-        if (e) n->clip_ref = svg_strndup(clip + 5, (size_t)(e - (clip + 5)));
-    }
-    const char* mk = xml_attr(xn, "mask");
-    if (style_get_decl(xml_attr(xn, "style"), "mask", style_val, sizeof style_val))
-        mk = style_val;
-    if (mk && strncmp(mk, "url(#", 5) == 0) {
-        const char* e = strchr(mk + 5, ')');
-        if (e) n->mask_ref = svg_strndup(mk + 5, (size_t)(e - (mk + 5)));
-    }
+    apply_url_ref(xn, "clip-path", &n->clip_ref);
+    apply_url_ref(xn, "mask", &n->mask_ref);
 
     if (n->type == NODE_FILTERDEF) {
         /* Filter primitives are not render nodes; build_filter already

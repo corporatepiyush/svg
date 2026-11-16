@@ -149,6 +149,7 @@ typedef struct {
     int    made;           /* clones created so far      */
     int    failed;         /* an allocation failed: stop expanding */
     int    truncated;      /* the node budget ran out    */
+    int    max_depth;      /* deepest node depth a clone may reach */
 } UseCtx;
 
 /* Deep-copy a subtree.  The copy keeps the referenced element's own style;
@@ -156,9 +157,15 @@ typedef struct {
  * specify, which is what SVG's shadow-tree inheritance requires.  use_ref and
  * clip_ref are carried over so uses and clips nested inside the target still
  * resolve on a later pass. */
-static Node* clone_node(const Node* n, UseCtx* uc) {
+static Node* clone_node(const Node* n, UseCtx* uc, int depth) {
     if (!n || uc->failed) return NULL;
     if (uc->made >= uc->max_nodes) { uc->truncated = 1; return NULL; }
+    /* A <use> clone is attached below the use element, so its depth grows
+     * with every expansion.  Without this bound a chain of <use> elements
+     * builds a tree deeper than max_depth and the recursive traversals below
+     * (resolve_use, render, teardown) overflow the C stack.  Stop cloning
+     * past the depth limit and report it as a resource limit. */
+    if (depth > uc->max_depth) { uc->truncated = 1; return NULL; }
     Node* c = (Node*)svg_malloc(sizeof(Node));
     if (!c) { uc->failed = 1; return NULL; }
     *c = *n;
@@ -329,7 +336,7 @@ static Node* clone_node(const Node* n, UseCtx* uc) {
     if (c->type == NODE_SYMBOL) c->type = NODE_GROUP;
 
     for (int i = 0; i < n->nkids; i++) {
-        Node* kid = clone_node(n->kids[i], uc);
+        Node* kid = clone_node(n->kids[i], uc, depth + 1);
         if (kid && !node_add_child(c, kid)) svg_free(kid);
         if (uc->failed) break;
     }
@@ -515,7 +522,7 @@ static void grave_adopt(UseCtx* uc, Node* n) {
 /* Resolve every <use> in the subtree.  Returns 1 if any work was done, so the
  * driver can iterate to a fixed point (resolving one use can expose another).
  * The caller frees use_ref before recursing, so a use is expanded once. */
-static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
+static int resolve_use(Node* n, IdMap* ids, UseCtx* uc, int depth) {
     if (!n || uc->failed) return 0;
     if (n == uc->grave) return 0;        /* discarded nodes need no work */
     int used = 0;
@@ -524,7 +531,9 @@ static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
         n->use_ref = NULL;               /* take ownership before recursing */
         Node* target = idmap_get(ids, ref);
         if (target && target != n) {
-            Node* clone = clone_node(target, uc);
+            /* The clone becomes a child of this use element, so its root sits
+             * one level deeper; clone_node() enforces the depth ceiling. */
+            Node* clone = clone_node(target, uc, depth + 1);
             if (clone) {
                 use_apply_style(clone, n);
                 /* The use's x/y translation applies to the whole shadow
@@ -575,7 +584,7 @@ static int resolve_use(Node* n, IdMap* ids, UseCtx* uc) {
         used = 1;
     }
     for (int i = 0; i < n->nkids; i++)
-        if (resolve_use(n->kids[i], ids, uc)) used = 1;
+        if (resolve_use(n->kids[i], ids, uc, depth + 1)) used = 1;
     return used;
 }
 
@@ -670,6 +679,15 @@ int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
     uc.made = 0;
     uc.failed = 0;
     uc.truncated = 0;
+    /* Clones grow the tree, so cap their depth at the same ceiling the tree
+     * builder uses; otherwise a <use> chain could nest past max_depth and
+     * overflow the stack in the recursive traversals.  The hard
+     * SVG2IMG_MAX_DEPTH ceiling applies even when the caller raises
+     * max_depth, because every recursive traversal (render, teardown, bbox)
+     * is sized for that bound. */
+    uc.max_depth = lim ? lim->max_depth : SVG2IMG_LIMIT_MAX_DEPTH;
+    if (uc.max_depth > SVG2IMG_MAX_DEPTH) uc.max_depth = SVG2IMG_MAX_DEPTH;
+    if (uc.max_depth < 1) uc.max_depth = 1;
 
     /* A use can reference a group that contains another use, and forward
      * references mean order alone is not enough, so iterate.  Each pass either
@@ -677,7 +695,7 @@ int svg_resolve(Node* n, IdMap* ids, const svg2img_limits* lim) {
      * the total work. */
     for (int pass = 0; pass < 64; pass++) {
         int before = uc.made;
-        if (!resolve_use(n, ids, &uc)) break;
+        if (!resolve_use(n, ids, &uc, 0)) break;
         if (uc.failed || uc.made == before) break;
     }
     /* Anything left with an unresolved ref (cycle, dangling id, or a truncated
