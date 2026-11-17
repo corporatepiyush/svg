@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <svg id="s" x="0" y="0" width="20" height="20" viewBox="0 0 10 10">
+      <rect x="0" y="0" width="10" height="10" fill="#ff0000"/>
+    </svg>
+  </defs>
+  <!-- SVG 1.1 §5.6: width/height on <use> override the referenced <svg> -->
+  <use href="#s" x="10" y="10" width="80" height="80"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="50" viewBox="0 0 100 50">
+  <filter id="a" x="0" y="0" width="50" height="50" filterUnits="userSpaceOnUse">
+    <feConvolveMatrix order="5" kernelMatrix="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0"/>
+  </filter>
+  <filter id="b" x="50" y="0" width="50" height="50" filterUnits="userSpaceOnUse">
+    <feConvolveMatrix order="3" kernelMatrix="1 1"/>
+  </filter>
+  <rect width="50" height="50" fill="#ff0000" filter="url(#a)"/>
+  <rect x="50" width="50" height="50" fill="#0000ff" filter="url(#b)"/>
+</svg>

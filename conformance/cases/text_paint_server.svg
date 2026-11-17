@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60" viewBox="0 0 120 60">
+  <linearGradient id="g"><stop offset="0" stop-color="#008000"/><stop offset="1" stop-color="#008000"/></linearGradient>
+  <text x="5" y="50" font-size="50" fill="url(#g)">H</text>
+  <text x="45" y="50" font-size="50"><tspan fill="url(#missing) #0000ff">H</tspan></text>
+  <defs><text id="t" x="85" y="50" font-size="50" fill="url(#g)">H</text></defs>
+  <use href="#t"/>
+</svg>

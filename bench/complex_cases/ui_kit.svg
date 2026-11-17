@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1500" height="1100" viewBox="0 0 1500 1100">
+<title>UI kit</title>
+<defs>
+  <symbol id="sy1" viewBox="0 0 24 24">
+    <path d="M12,2 L17,12 L16,22 L3,10 z" fill="#470433"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#ef66d0" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy2" viewBox="0 0 24 24">
+    <path d="M12,2 L20,12 L11,22 L6,12 z" fill="#efa000"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#9ee12f" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy3" viewBox="0 0 24 24">
+    <path d="M12,2 L21,8 L13,22 L2,10 z" fill="#716f61"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#3d4875" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy4" viewBox="0 0 24 24">
+    <path d="M12,2 L21,12 L15,22 L6,7 z" fill="#8f89a2"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#205fda" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy5" viewBox="0 0 24 24">
+    <path d="M12,2 L19,6 L8,22 L4,12 z" fill="#7f8a78"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#a090ef" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy6" viewBox="0 0 24 24">
+    <path d="M12,2 L20,11 L9,22 L7,11 z" fill="#431434"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#a271fe" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy7" viewBox="0 0 24 24">
+    <path d="M12,2 L21,10 L11,22 L2,6 z" fill="#5a38dd"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#bc9235" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy8" viewBox="0 0 24 24">
+    <path d="M12,2 L16,7 L11,22 L7,6 z" fill="#4fdab3"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#4085e1" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy9" viewBox="0 0 24 24">
+    <path d="M12,2 L21,7 L10,22 L4,12 z" fill="#f86eae"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#b33504" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy10" viewBox="0 0 24 24">
+    <path d="M12,2 L17,6 L8,22 L6,9 z" fill="#71a9f5"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#8ed916" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy11" viewBox="0 0 24 24">
+    <path d="M12,2 L19,10 L11,22 L8,8 z" fill="#19097d"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#3f41b8" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy12" viewBox="0 0 24 24">
+    <path d="M12,2 L19,9 L14,22 L7,12 z" fill="#264026"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#c12fa3" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy13" viewBox="0 0 24 24">
+    <path d="M12,2 L18,9 L16,22 L8,7 z" fill="#97f220"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#5efd2f" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy14" viewBox="0 0 24 24">
+    <path d="M12,2 L22,7 L8,22 L8,8 z" fill="#895565"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#57d125" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy15" viewBox="0 0 24 24">
+    <path d="M12,2 L18,10 L10,22 L5,8 z" fill="#4d8f8f"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#8a13c1" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy16" viewBox="0 0 24 24">
+    <path d="M12,2 L17,10 L8,22 L6,7 z" fill="#b8f664"/>
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#5fe418" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy17" viewBox="0 0 24 24">
+    <path d="M12,2 L21,7 L9,22 L4,6 z" fill="#8587ce"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#84d245" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy18" viewBox="0 0 24 24">
+    <path d="M12,2 L20,10 L10,22 L6,10 z" fill="#d03222"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#4a0b1a" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy19" viewBox="0 0 24 24">
+    <path d="M12,2 L19,9 L12,22 L5,9 z" fill="#f9d8ed"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#abb925" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy20" viewBox="0 0 24 24">
+    <path d="M12,2 L18,10 L9,22 L5,8 z" fill="#7615ac"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#475e52" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy21" viewBox="0 0 24 24">
+    <path d="M12,2 L16,11 L12,22 L2,8 z" fill="#663717"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#e54e84" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy22" viewBox="0 0 24 24">
+    <path d="M12,2 L18,7 L9,22 L8,7 z" fill="#eef3f8"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#3da6d7" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy23" viewBox="0 0 24 24">
+    <path d="M12,2 L16,11 L16,22 L3,9 z" fill="#adc5ac"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#1f4f75" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy24" viewBox="0 0 24 24">
+    <path d="M12,2 L17,6 L10,22 L8,9 z" fill="#cb05c5"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#44fa2f" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy25" viewBox="0 0 24 24">
+    <path d="M12,2 L21,8 L9,22 L6,7 z" fill="#841671"/>
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#4d293e" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy26" viewBox="0 0 24 24">
+    <path d="M12,2 L17,12 L11,22 L8,9 z" fill="#215294"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#be9bdf" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy27" viewBox="0 0 24 24">
+    <path d="M12,2 L21,9 L15,22 L6,8 z" fill="#ba7dca"/>
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#0bc6b1" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy28" viewBox="0 0 24 24">
+    <path d="M12,2 L17,10 L9,22 L7,10 z" fill="#52edab"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#f32a06" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy29" viewBox="0 0 24 24">
+    <path d="M12,2 L22,8 L10,22 L5,9 z" fill="#05b70e"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#c3a98d" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy30" viewBox="0 0 24 24">
+    <path d="M12,2 L19,7 L15,22 L5,8 z" fill="#69802e"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#442e09" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy31" viewBox="0 0 24 24">
+    <path d="M12,2 L16,10 L10,22 L3,6 z" fill="#63d8df"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#6657f7" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy32" viewBox="0 0 24 24">
+    <path d="M12,2 L22,11 L15,22 L5,6 z" fill="#ff2541"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#efe256" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy33" viewBox="0 0 24 24">
+    <path d="M12,2 L19,10 L9,22 L8,7 z" fill="#129598"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#ba15ff" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy34" viewBox="0 0 24 24">
+    <path d="M12,2 L17,10 L10,22 L2,7 z" fill="#bb963e"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#5d5f2d" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy35" viewBox="0 0 24 24">
+    <path d="M12,2 L22,6 L13,22 L5,7 z" fill="#0ad1ce"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#2ef233" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy36" viewBox="0 0 24 24">
+    <path d="M12,2 L20,7 L12,22 L5,7 z" fill="#55a3fe"/>
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#060a7d" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy37" viewBox="0 0 24 24">
+    <path d="M12,2 L16,12 L12,22 L4,9 z" fill="#1187d8"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#442349" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy38" viewBox="0 0 24 24">
+    <path d="M12,2 L22,8 L12,22 L7,11 z" fill="#32032a"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#e05ad5" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy39" viewBox="0 0 24 24">
+    <path d="M12,2 L16,12 L9,22 L5,8 z" fill="#60f873"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#91afd0" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy40" viewBox="0 0 24 24">
+    <path d="M12,2 L21,10 L14,22 L3,10 z" fill="#906ba3"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#64ec5f" stroke-width="2"/>
+  </symbol>
+  <clipPath id="cp41" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.40"/>
+  </clipPath>
+  <clipPath id="cp42" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.31"/>
+  </clipPath>
+  <clipPath id="cp43" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.48"/>
+  </clipPath>
+  <clipPath id="cp44" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.39"/>
+  </clipPath>
+  <clipPath id="cp45" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.33"/>
+  </clipPath>
+  <clipPath id="cp46" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.46"/>
+  </clipPath>
+  <clipPath id="cp47" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.34"/>
+  </clipPath>
+  <clipPath id="cp48" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.38"/>
+  </clipPath>
+  <clipPath id="cp49" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.39"/>
+  </clipPath>
+  <clipPath id="cp50" clipPathUnits="objectBoundingBox">
+    <circle cx=".5" cy=".5" r="0.35"/>
+  </clipPath>
+  <clipPath id="cp51">
+    <path d="M614,1071 l94,-5 l-70,177 z" clip-rule="evenodd"/>
+  </clipPath>
+  <clipPath id="cp52">
+    <path d="M628,257 l299,75 l-118,72 z" clip-rule="evenodd"/>
+  </clipPath>
+  <clipPath id="cp53">
+    <path d="M1346,1025 l199,-26 l-14,210 z" clip-rule="evenodd"/>
+  </clipPath>
+  <clipPath id="cp54">
+    <path d="M605,655 l267,-25 l-78,79 z" clip-rule="evenodd"/>
+  </clipPath>
+  <clipPath id="cp55">
+    <path d="M353,448 l208,51 l-121,63 z" clip-rule="evenodd"/>
+  </clipPath>
+  <linearGradient id="lg56" x1="0.23" y1="0.09" x2="0.64" y2="0.97">
+    <stop offset="0.00" stop-color="#fdf317" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#6f07cf" stop-opacity="0.50"/>
+  </linearGradient>
+  <linearGradient id="lg58" x1="0.15" y1="0.28" x2="0.96" y2="0.96">
+    <stop offset="0.00" stop-color="#489ad7" stop-opacity="0.72"/>
+    <stop offset="1.00" stop-color="#c2b0d2" stop-opacity="0.55"/>
+  </linearGradient>
+  <linearGradient id="lg60" x1="0.08" y1="0.01" x2="0.71" y2="0.99">
+    <stop offset="0.00" stop-color="#2626c0" stop-opacity="0.83"/>
+    <stop offset="1.00" stop-color="#a5289b" stop-opacity="0.64"/>
+  </linearGradient>
+  <linearGradient id="lg62" x1="0.17" y1="0.15" x2="0.91" y2="0.77">
+    <stop offset="0.00" stop-color="#e2e0e4" stop-opacity="0.99"/>
+    <stop offset="1.00" stop-color="#57ba20" stop-opacity="0.66"/>
+  </linearGradient>
+  <linearGradient id="lg64" x1="0.10" y1="0.12" x2="0.96" y2="0.67">
+    <stop offset="0.00" stop-color="#8d84ff" stop-opacity="0.90"/>
+    <stop offset="1.00" stop-color="#704952" stop-opacity="0.83"/>
+  </linearGradient>
+  <linearGradient id="lg66" x1="0.22" y1="0.22" x2="0.74" y2="1.00">
+    <stop offset="0.00" stop-color="#86bc9c" stop-opacity="0.99"/>
+    <stop offset="1.00" stop-color="#57feea" stop-opacity="0.57"/>
+  </linearGradient>
+  <linearGradient id="lg68" x1="0.08" y1="0.12" x2="0.93" y2="0.87">
+    <stop offset="0.00" stop-color="#598b33" stop-opacity="0.73"/>
+    <stop offset="1.00" stop-color="#bceef3" stop-opacity="0.96"/>
+  </linearGradient>
+  <linearGradient id="lg70" x1="0.05" y1="0.17" x2="0.70" y2="0.68">
+    <stop offset="0.00" stop-color="#025b3b" stop-opacity="0.59"/>
+    <stop offset="1.00" stop-color="#14dcf0" stop-opacity="0.98"/>
+  </linearGradient>
+  <linearGradient id="lg72" x1="0.05" y1="0.06" x2="0.72" y2="0.85">
+    <stop offset="0.00" stop-color="#9a48d1" stop-opacity="0.75"/>
+    <stop offset="1.00" stop-color="#f939e1" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg74" x1="0.26" y1="0.25" x2="0.75" y2="0.79">
+    <stop offset="0.00" stop-color="#be8aea" stop-opacity="0.69"/>
+    <stop offset="1.00" stop-color="#7ed237" stop-opacity="0.73"/>
+  </linearGradient>
+  <linearGradient id="lg76" x1="0.24" y1="0.17" x2="0.61" y2="0.97">
+    <stop offset="0.00" stop-color="#12b1fd" stop-opacity="0.87"/>
+    <stop offset="1.00" stop-color="#800694" stop-opacity="0.83"/>
+  </linearGradient>
+  <linearGradient id="lg78" x1="0.28" y1="0.18" x2="0.93" y2="0.64">
+    <stop offset="0.00" stop-color="#bc4d42" stop-opacity="0.95"/>
+    <stop offset="1.00" stop-color="#fb5f30" stop-opacity="0.70"/>
+  </linearGradient>
+  <linearGradient id="lg80" x1="0.06" y1="0.02" x2="0.86" y2="0.68">
+    <stop offset="0.00" stop-color="#5ee6e4" stop-opacity="0.62"/>
+    <stop offset="1.00" stop-color="#1116f9" stop-opacity="0.60"/>
+  </linearGradient>
+  <linearGradient id="lg82" x1="0.22" y1="0.28" x2="0.72" y2="0.90">
+    <stop offset="0.00" stop-color="#9f14d0" stop-opacity="0.69"/>
+    <stop offset="1.00" stop-color="#909a37" stop-opacity="0.86"/>
+  </linearGradient>
+  <linearGradient id="lg84" x1="0.18" y1="0.15" x2="0.69" y2="0.68">
+    <stop offset="0.00" stop-color="#97d788" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#c37912" stop-opacity="0.69"/>
+  </linearGradient>
+  <linearGradient id="lg86" x1="0.00" y1="0.15" x2="0.88" y2="0.73">
+    <stop offset="0.00" stop-color="#ddbe5b" stop-opacity="0.78"/>
+    <stop offset="1.00" stop-color="#002d97" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg88" x1="0.07" y1="0.28" x2="0.97" y2="0.78">
+    <stop offset="0.00" stop-color="#f1b704" stop-opacity="0.59"/>
+    <stop offset="1.00" stop-color="#b5865a" stop-opacity="0.74"/>
+  </linearGradient>
+  <linearGradient id="lg90" x1="0.04" y1="0.14" x2="0.79" y2="0.81">
+    <stop offset="0.00" stop-color="#307558" stop-opacity="0.99"/>
+    <stop offset="1.00" stop-color="#1e66a3" stop-opacity="0.61"/>
+  </linearGradient>
+  <linearGradient id="lg92" x1="0.19" y1="0.29" x2="0.70" y2="0.73">
+    <stop offset="0.00" stop-color="#ad990b" stop-opacity="0.78"/>
+    <stop offset="1.00" stop-color="#f1f4e0" stop-opacity="0.80"/>
+  </linearGradient>
+  <linearGradient id="lg94" x1="0.06" y1="0.27" x2="0.61" y2="1.00">
+    <stop offset="0.00" stop-color="#5314e0" stop-opacity="0.96"/>
+    <stop offset="1.00" stop-color="#e364a9" stop-opacity="0.94"/>
+  </linearGradient>
+  <linearGradient id="lg96" x1="0.28" y1="0.02" x2="0.77" y2="0.81">
+    <stop offset="0.00" stop-color="#38e7a1" stop-opacity="0.95"/>
+    <stop offset="1.00" stop-color="#993f15" stop-opacity="0.70"/>
+  </linearGradient>
+  <linearGradient id="lg98" x1="0.00" y1="0.14" x2="1.00" y2="0.89">
+    <stop offset="0.00" stop-color="#cac2e1" stop-opacity="0.99"/>
+    <stop offset="1.00" stop-color="#3cb216" stop-opacity="0.78"/>
+  </linearGradient>
+  <linearGradient id="lg100" x1="0.08" y1="0.28" x2="0.64" y2="0.91">
+    <stop offset="0.00" stop-color="#9c7ce3" stop-opacity="0.50"/>
+    <stop offset="1.00" stop-color="#193d1c" stop-opacity="0.64"/>
+  </linearGradient>
+  <linearGradient id="lg102" x1="0.20" y1="0.16" x2="0.95" y2="0.85">
+    <stop offset="0.00" stop-color="#8c54b5" stop-opacity="0.65"/>
+    <stop offset="1.00" stop-color="#62921a" stop-opacity="0.66"/>
+  </linearGradient>
+  <linearGradient id="lg104" x1="0.27" y1="0.20" x2="0.94" y2="0.81">
+    <stop offset="0.00" stop-color="#7121e9" stop-opacity="0.72"/>
+    <stop offset="1.00" stop-color="#8351b9" stop-opacity="0.82"/>
+  </linearGradient>
+  <linearGradient id="lg106" x1="0.18" y1="0.30" x2="0.93" y2="0.63">
+    <stop offset="0.00" stop-color="#3e7bbb" stop-opacity="0.67"/>
+    <stop offset="1.00" stop-color="#4414ce" stop-opacity="0.90"/>
+  </linearGradient>
+  <linearGradient id="lg108" x1="0.02" y1="0.06" x2="0.64" y2="0.90">
+    <stop offset="0.00" stop-color="#68a613" stop-opacity="0.61"/>
+    <stop offset="1.00" stop-color="#e4f757" stop-opacity="0.96"/>
+  </linearGradient>
+  <linearGradient id="lg110" x1="0.22" y1="0.10" x2="0.69" y2="0.62">
+    <stop offset="0.00" stop-color="#4c20ac" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#3bd804" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg112" x1="0.05" y1="0.21" x2="0.85" y2="0.78">
+    <stop offset="0.00" stop-color="#5aa793" stop-opacity="0.56"/>
+    <stop offset="1.00" stop-color="#a70faa" stop-opacity="0.71"/>
+  </linearGradient>
+  <linearGradient id="lg114" x1="0.20" y1="0.06" x2="0.91" y2="0.66">
+    <stop offset="0.00" stop-color="#2c5e38" stop-opacity="0.98"/>
+    <stop offset="1.00" stop-color="#46190b" stop-opacity="0.80"/>
+  </linearGradient>
+</defs>
+  <rect width="1500" height="1100" fill="#f7f7fb"/>
+  <use xlink:href="#sy1" x="30" y="30" width="45" height="87"/>
+  <use xlink:href="#sy2" x="170" y="30" width="32" height="90"/>
+  <use xlink:href="#sy3" x="310" y="30" width="96" height="82"/>
+  <use xlink:href="#sy4" x="450" y="30" width="74" height="39"/>
+  <use xlink:href="#sy5" x="590" y="30" width="47" height="66"/>
+  <use xlink:href="#sy6" x="730" y="30" width="61" height="75"/>
+  <use xlink:href="#sy7" x="870" y="30" width="74" height="76"/>
+  <use xlink:href="#sy8" x="1010" y="30" width="60" height="59"/>
+  <use xlink:href="#sy9" x="1150" y="30" width="88" height="64"/>
+  <use xlink:href="#sy10" x="1290" y="30" width="83" height="39"/>
+  <use xlink:href="#sy11" x="30" y="150" width="49" height="35"/>
+  <use xlink:href="#sy12" x="170" y="150" width="43" height="75"/>
+  <use xlink:href="#sy13" x="310" y="150" width="41" height="83"/>
+  <use xlink:href="#sy14" x="450" y="150" width="94" height="94"/>
+  <use xlink:href="#sy15" x="590" y="150" width="56" height="34"/>
+  <use xlink:href="#sy16" x="730" y="150" width="85" height="62"/>
+  <use xlink:href="#sy17" x="870" y="150" width="94" height="74"/>
+  <use xlink:href="#sy18" x="1010" y="150" width="44" height="94"/>
+  <use xlink:href="#sy19" x="1150" y="150" width="51" height="69"/>
+  <use xlink:href="#sy20" x="1290" y="150" width="66" height="54"/>
+  <use xlink:href="#sy21" x="30" y="270" width="39" height="37"/>
+  <use xlink:href="#sy22" x="170" y="270" width="52" height="60"/>
+  <use xlink:href="#sy23" x="310" y="270" width="40" height="88"/>
+  <use xlink:href="#sy24" x="450" y="270" width="43" height="38"/>
+  <use xlink:href="#sy25" x="590" y="270" width="95" height="63"/>
+  <use xlink:href="#sy26" x="730" y="270" width="88" height="39"/>
+  <use xlink:href="#sy27" x="870" y="270" width="46" height="76"/>
+  <use xlink:href="#sy28" x="1010" y="270" width="71" height="80"/>
+  <use xlink:href="#sy29" x="1150" y="270" width="42" height="56"/>
+  <use xlink:href="#sy30" x="1290" y="270" width="41" height="78"/>
+  <use xlink:href="#sy31" x="30" y="390" width="90" height="88"/>
+  <use xlink:href="#sy32" x="170" y="390" width="83" height="44"/>
+  <use xlink:href="#sy33" x="310" y="390" width="84" height="35"/>
+  <use xlink:href="#sy34" x="450" y="390" width="91" height="33"/>
+  <use xlink:href="#sy35" x="590" y="390" width="64" height="90"/>
+  <use xlink:href="#sy36" x="730" y="390" width="83" height="45"/>
+  <use xlink:href="#sy37" x="870" y="390" width="89" height="65"/>
+  <use xlink:href="#sy38" x="1010" y="390" width="96" height="62"/>
+  <use xlink:href="#sy39" x="1150" y="390" width="79" height="62"/>
+  <use xlink:href="#sy40" x="1290" y="390" width="59" height="45"/>
+  <g id="w57" transform="translate(30.0,520.0)" clip-path="url(#cp47)">
+    <rect width="220.0" height="90.0" rx="10" fill="#1243b9"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#4f1ae2"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">0</tspan></text>
+    <rect x="80" y="55" width="72" height="10" rx="5" fill="url(#lg56)"/>
+  </g>
+  <g id="w59" transform="translate(270.0,520.0)" clip-path="url(#cp47)">
+    <rect width="220.0" height="90.0" rx="12" fill="#82dced"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#7a298e"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">1</tspan></text>
+    <rect x="80" y="55" width="96" height="10" rx="5" fill="url(#lg58)"/>
+  </g>
+  <g id="w61" transform="translate(510.0,520.0)" clip-path="url(#cp44)">
+    <rect width="220.0" height="90.0" rx="11" fill="#477bd2"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#ed5420"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">2</tspan></text>
+    <rect x="80" y="55" width="44" height="10" rx="5" fill="url(#lg60)"/>
+  </g>
+  <g id="w63" transform="translate(750.0,520.0)" clip-path="url(#cp48)">
+    <rect width="220.0" height="90.0" rx="4" fill="#41c389"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#464cd6"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">3</tspan></text>
+    <rect x="80" y="55" width="92" height="10" rx="5" fill="url(#lg62)"/>
+  </g>
+  <g id="w65" transform="translate(990.0,520.0)" clip-path="url(#cp54)">
+    <rect width="220.0" height="90.0" rx="3" fill="#c29e01"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#e3b481"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">4</tspan></text>
+    <rect x="80" y="55" width="69" height="10" rx="5" fill="url(#lg64)"/>
+  </g>
+  <g id="w67" transform="translate(1230.0,520.0)" clip-path="url(#cp55)">
+    <rect width="220.0" height="90.0" rx="9" fill="#31674d"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#6565de"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">5</tspan></text>
+    <rect x="80" y="55" width="94" height="10" rx="5" fill="url(#lg66)"/>
+  </g>
+  <g id="w69" transform="translate(30.0,630.0)" clip-path="url(#cp44)">
+    <rect width="220.0" height="90.0" rx="0" fill="#2b88bc"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#8a9e3a"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">6</tspan></text>
+    <rect x="80" y="55" width="106" height="10" rx="5" fill="url(#lg68)"/>
+  </g>
+  <g id="w71" transform="translate(270.0,630.0)" clip-path="url(#cp50)">
+    <rect width="220.0" height="90.0" rx="7" fill="#8e7b89"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#133f45"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">7</tspan></text>
+    <rect x="80" y="55" width="85" height="10" rx="5" fill="url(#lg70)"/>
+  </g>
+  <g id="w73" transform="translate(510.0,630.0)" clip-path="url(#cp41)">
+    <rect width="220.0" height="90.0" rx="5" fill="#b4b48e"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#13120c"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">8</tspan></text>
+    <rect x="80" y="55" width="76" height="10" rx="5" fill="url(#lg72)"/>
+  </g>
+  <g id="w75" transform="translate(750.0,630.0)" clip-path="url(#cp41)">
+    <rect width="220.0" height="90.0" rx="8" fill="#74023a"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#8babac"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">9</tspan></text>
+    <rect x="80" y="55" width="69" height="10" rx="5" fill="url(#lg74)"/>
+  </g>
+  <g id="w77" transform="translate(990.0,630.0)" clip-path="url(#cp43)">
+    <rect width="220.0" height="90.0" rx="3" fill="#765d89"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#8c7988"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">10</tspan></text>
+    <rect x="80" y="55" width="116" height="10" rx="5" fill="url(#lg76)"/>
+  </g>
+  <g id="w79" transform="translate(1230.0,630.0)" clip-path="url(#cp41)">
+    <rect width="220.0" height="90.0" rx="7" fill="#43c74d"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#da393c"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">11</tspan></text>
+    <rect x="80" y="55" width="120" height="10" rx="5" fill="url(#lg78)"/>
+  </g>
+  <g id="w81" transform="translate(30.0,740.0)" clip-path="url(#cp52)">
+    <rect width="220.0" height="90.0" rx="11" fill="#d69a4e"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#fce0da"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">12</tspan></text>
+    <rect x="80" y="55" width="113" height="10" rx="5" fill="url(#lg80)"/>
+  </g>
+  <g id="w83" transform="translate(270.0,740.0)" clip-path="url(#cp52)">
+    <rect width="220.0" height="90.0" rx="8" fill="#ce7ad1"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#8ef864"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">13</tspan></text>
+    <rect x="80" y="55" width="41" height="10" rx="5" fill="url(#lg82)"/>
+  </g>
+  <g id="w85" transform="translate(510.0,740.0)" clip-path="url(#cp42)">
+    <rect width="220.0" height="90.0" rx="11" fill="#427f0f"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#4c12ae"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">14</tspan></text>
+    <rect x="80" y="55" width="48" height="10" rx="5" fill="url(#lg84)"/>
+  </g>
+  <g id="w87" transform="translate(750.0,740.0)" clip-path="url(#cp44)">
+    <rect width="220.0" height="90.0" rx="2" fill="#29f16d"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#ec1ee8"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">15</tspan></text>
+    <rect x="80" y="55" width="67" height="10" rx="5" fill="url(#lg86)"/>
+  </g>
+  <g id="w89" transform="translate(990.0,740.0)" clip-path="url(#cp43)">
+    <rect width="220.0" height="90.0" rx="8" fill="#141d1e"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#2b2743"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">16</tspan></text>
+    <rect x="80" y="55" width="70" height="10" rx="5" fill="url(#lg88)"/>
+  </g>
+  <g id="w91" transform="translate(1230.0,740.0)" clip-path="url(#cp46)">
+    <rect width="220.0" height="90.0" rx="2" fill="#4f1667"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#543252"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">17</tspan></text>
+    <rect x="80" y="55" width="120" height="10" rx="5" fill="url(#lg90)"/>
+  </g>
+  <g id="w93" transform="translate(30.0,850.0)" clip-path="url(#cp47)">
+    <rect width="220.0" height="90.0" rx="8" fill="#f00098"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#308f3d"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">18</tspan></text>
+    <rect x="80" y="55" width="85" height="10" rx="5" fill="url(#lg92)"/>
+  </g>
+  <g id="w95" transform="translate(270.0,850.0)" clip-path="url(#cp51)">
+    <rect width="220.0" height="90.0" rx="12" fill="#962890"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#fb2191"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">19</tspan></text>
+    <rect x="80" y="55" width="45" height="10" rx="5" fill="url(#lg94)"/>
+  </g>
+  <g id="w97" transform="translate(510.0,850.0)" clip-path="url(#cp46)">
+    <rect width="220.0" height="90.0" rx="2" fill="#0f5d36"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#d7aabb"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">20</tspan></text>
+    <rect x="80" y="55" width="78" height="10" rx="5" fill="url(#lg96)"/>
+  </g>
+  <g id="w99" transform="translate(750.0,850.0)" clip-path="url(#cp54)">
+    <rect width="220.0" height="90.0" rx="12" fill="#42648f"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#78dde8"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">21</tspan></text>
+    <rect x="80" y="55" width="72" height="10" rx="5" fill="url(#lg98)"/>
+  </g>
+  <g id="w101" transform="translate(990.0,850.0)" clip-path="url(#cp46)">
+    <rect width="220.0" height="90.0" rx="6" fill="#e73f7d"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#c40032"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">22</tspan></text>
+    <rect x="80" y="55" width="94" height="10" rx="5" fill="url(#lg100)"/>
+  </g>
+  <g id="w103" transform="translate(1230.0,850.0)" clip-path="url(#cp46)">
+    <rect width="220.0" height="90.0" rx="11" fill="#e3c3be"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#e4c0e8"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">23</tspan></text>
+    <rect x="80" y="55" width="54" height="10" rx="5" fill="url(#lg102)"/>
+  </g>
+  <g id="w105" transform="translate(30.0,960.0)" clip-path="url(#cp48)">
+    <rect width="220.0" height="90.0" rx="11" fill="#ad7a57"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#34812b"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">24</tspan></text>
+    <rect x="80" y="55" width="72" height="10" rx="5" fill="url(#lg104)"/>
+  </g>
+  <g id="w107" transform="translate(270.0,960.0)" clip-path="url(#cp51)">
+    <rect width="220.0" height="90.0" rx="11" fill="#bda425"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#132341"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">25</tspan></text>
+    <rect x="80" y="55" width="55" height="10" rx="5" fill="url(#lg106)"/>
+  </g>
+  <g id="w109" transform="translate(510.0,960.0)" clip-path="url(#cp50)">
+    <rect width="220.0" height="90.0" rx="11" fill="#f6f0e8"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#69eeb4"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">26</tspan></text>
+    <rect x="80" y="55" width="50" height="10" rx="5" fill="url(#lg108)"/>
+  </g>
+  <g id="w111" transform="translate(750.0,960.0)" clip-path="url(#cp42)">
+    <rect width="220.0" height="90.0" rx="1" fill="#9689fd"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#d11bd7"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">27</tspan></text>
+    <rect x="80" y="55" width="62" height="10" rx="5" fill="url(#lg110)"/>
+  </g>
+  <g id="w113" transform="translate(990.0,960.0)" clip-path="url(#cp49)">
+    <rect width="220.0" height="90.0" rx="8" fill="#d551db"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#9b5cdf"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">28</tspan></text>
+    <rect x="80" y="55" width="41" height="10" rx="5" fill="url(#lg112)"/>
+  </g>
+  <g id="w115" transform="translate(1230.0,960.0)" clip-path="url(#cp54)">
+    <rect width="220.0" height="90.0" rx="2" fill="#5b05eb"/>
+    <svg x="10" y="10" width="60" height="60" viewBox="0 0 10 10"><circle cx="5" cy="5" r="6" fill="#77a28d"/></svg>
+    <text x="80" y="40" font-size="16"><tspan font-weight="bold">Button</tspan><tspan dx="6" fill="#666">29</tspan></text>
+    <rect x="80" y="55" width="83" height="10" rx="5" fill="url(#lg114)"/>
+  </g>
+</svg>

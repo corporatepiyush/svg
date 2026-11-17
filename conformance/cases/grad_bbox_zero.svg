@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80" viewBox="0 0 120 80">
+  <defs>
+    <!-- objectBoundingBox percentages: 0% -> 100% across the referencing rect -->
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0" stop-color="#ff0000"/>
+      <stop offset="1" stop-color="#0000ff"/>
+    </linearGradient>
+  </defs>
+  <!-- zero-width / zero-height bounding boxes disable the gradient fill -->
+  <rect x="0"  y="0" width="0"   height="80" fill="url(#g)"/>
+  <rect x="20" y="0" width="100" height="0"  fill="url(#g)"/>
+  <!-- normal objectBoundingBox gradient: red at the left, blue at the right -->
+  <rect x="40" y="10" width="60" height="60" fill="url(#g)"/>
+</svg>

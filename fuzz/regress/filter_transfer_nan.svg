@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+<defs>
+<filter id="f" x="0" y="0" width="10" height="10" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
+<feTurbulence type="turbulence" baseFrequency="NaN 1" numOctaves="1" seed="0" result="t"/>
+<feComponentTransfer in="t"><feFuncR type="discrete" tableValues="0 1"/></feComponentTransfer>
+</filter>
+</defs>
+<rect width="10" height="10" fill="green" filter="url(#f)"/>
+</svg>

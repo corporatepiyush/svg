@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8000" height="2">
+<defs>
+<pattern id="p" patternUnits="userSpaceOnUse" width="8000" height="0.0000010000001" patternTransform="scale(0)">
+<rect width="1" height="1" fill="red"/>
+</pattern>
+</defs>
+<rect x="0" y="0" width="8000" height="2" fill="url(#p)" transform="scale(1000000)"/>
+</svg>

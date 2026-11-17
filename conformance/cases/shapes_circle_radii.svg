@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="40" viewBox="0 0 120 40">
+  <!-- In unit space these radii leave the arc radicand of a circle's two
+       half-arcs a hair below zero; a NaN guard used to turn each arc into a
+       chord, so the circle (or the clip built from it) vanished. -->
+  <g transform="scale(40)">
+    <circle cx=".5" cy=".5" r=".45" fill="#f00"/>
+    <ellipse cx="1.5" cy=".5" rx=".35" ry=".15" fill="#0f0"/>
+  </g>
+  <defs><clipPath id="c" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".45"/></clipPath></defs>
+  <rect x="82" y="2" width="36" height="36" fill="#00f" clip-path="url(#c)"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100">
+  <style>
+    .rule   { fill: #0000ff; }
+    #imp    { fill: #0000ff !important; }
+  </style>
+  <!-- 1: author rule beats a presentation attribute -->
+  <rect class="rule" x="0"   y="0" width="40" height="40" fill="#ff0000"/>
+  <!-- 2: inline style beats a normal author rule -->
+  <rect class="rule" x="40"  y="0" width="40" height="40" fill="#ff0000"
+        style="fill:#00ff00"/>
+  <!-- 3: !important author rule beats inline style -->
+  <rect id="imp" class="rule" x="80" y="0" width="40" height="40"
+        fill="#00ff00" style="fill:#00ff00"/>
+  <!-- 4: inherit resolves to the parent's computed value, not the attribute -->
+  <g fill="#00ff00">
+    <rect x="120" y="0" width="40" height="40" fill="#ff0000"
+          style="fill:inherit"/>
+  </g>
+</svg>

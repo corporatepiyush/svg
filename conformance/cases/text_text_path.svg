@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="60" viewBox="0 0 160 60">
+  <defs>
+    <path id="c" d="M10,45 C50,5 110,55 150,15"/>
+  </defs>
+  <text font-size="12" fill="#0000aa">
+    <textPath href="#c" startOffset="10%">ALONG</textPath>
+  </text>
+</svg>

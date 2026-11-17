@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="100" viewBox="0 0 220 100">
+  <!-- SVG 1.1 §5.10.2: xml:space="preserve" keeps a whitespace-only tspan -->
+  <text x="10" y="70" font-size="40" fill="#ff0000">A<tspan xml:space="preserve">   </tspan>B</text>
+</svg>

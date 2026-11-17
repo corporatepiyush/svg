@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <path d="M20,20 C60,0 100,0 140,20 S200,60 160,80 Q120,100 80,80 T20,60 Z"
+        fill="tomato" stroke="darkred" stroke-width="2"/>
+  <path d="M200,20 A30,30 0 1,0 260,80 A30,30 0 1,0 200,140 Z" fill="gold"/>
+  <path d="M40,160 h120 v60 h-120 z M70,180 h60 v20 h-60 z" fill="steelblue" fill-rule="evenodd"/>
+  <path d="M220,160 h120 v60 h-120 z M250,180 h60 v20 h-60 z" fill="steelblue" fill-rule="nonzero"/>
+  <path d="M20,260 C100,220 200,300 300,240" fill="none" stroke="black"
+        stroke-width="3" stroke-linecap="round"/>
+  <path d="M320,200 q20,-40 40,0 t40,0" fill="none" stroke="purple" stroke-width="3"/>
+</svg>

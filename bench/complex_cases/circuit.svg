@@ -1,0 +1,954 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1200" viewBox="0 0 1600 1200">
+<title>Circuit board</title>
+<defs>
+  <symbol id="sy1" viewBox="0 0 24 24">
+    <path d="M12,2 L17,11 L13,22 L7,10 z" fill="#ae1eae"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#597493" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy2" viewBox="0 0 24 24">
+    <path d="M12,2 L20,12 L16,22 L3,8 z" fill="#922a3f"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#410732" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy3" viewBox="0 0 24 24">
+    <path d="M12,2 L21,12 L14,22 L3,10 z" fill="#5e1de5"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#b5f936" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy4" viewBox="0 0 24 24">
+    <path d="M12,2 L20,8 L12,22 L7,6 z" fill="#ec0a02"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#170b03" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy5" viewBox="0 0 24 24">
+    <path d="M12,2 L16,12 L8,22 L5,6 z" fill="#53d6bd"/>
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#566508" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy6" viewBox="0 0 24 24">
+    <path d="M12,2 L22,7 L9,22 L4,8 z" fill="#e899d5"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#cfc8a0" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy7" viewBox="0 0 24 24">
+    <path d="M12,2 L19,9 L12,22 L8,9 z" fill="#458da4"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#0edaa0" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy8" viewBox="0 0 24 24">
+    <path d="M12,2 L18,11 L10,22 L7,9 z" fill="#b3f08d"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#a8cda1" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy9" viewBox="0 0 24 24">
+    <path d="M12,2 L18,11 L16,22 L3,11 z" fill="#b2ae79"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#8dc350" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy10" viewBox="0 0 24 24">
+    <path d="M12,2 L19,7 L15,22 L2,8 z" fill="#86b51a"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#7cd64f" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy11" viewBox="0 0 24 24">
+    <path d="M12,2 L17,11 L12,22 L2,12 z" fill="#f24908"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#9b8c76" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy12" viewBox="0 0 24 24">
+    <path d="M12,2 L22,11 L14,22 L8,10 z" fill="#90bf0a"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#3c2a7d" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy13" viewBox="0 0 24 24">
+    <path d="M12,2 L20,9 L10,22 L7,6 z" fill="#6d660d"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#5d2b5f" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy14" viewBox="0 0 24 24">
+    <path d="M12,2 L21,11 L14,22 L8,9 z" fill="#e59599"/>
+    <circle cx="12" cy="12" r="8" fill="none" stroke="#7ccaf7" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy15" viewBox="0 0 24 24">
+    <path d="M12,2 L16,7 L8,22 L6,9 z" fill="#d222d3"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#aa75b7" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy16" viewBox="0 0 24 24">
+    <path d="M12,2 L20,8 L12,22 L2,7 z" fill="#8caf54"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#167471" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy17" viewBox="0 0 24 24">
+    <path d="M12,2 L19,6 L11,22 L3,10 z" fill="#679d5d"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#6f498a" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy18" viewBox="0 0 24 24">
+    <path d="M12,2 L20,12 L10,22 L3,7 z" fill="#8c8d47"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#d16d1c" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy19" viewBox="0 0 24 24">
+    <path d="M12,2 L16,9 L14,22 L4,7 z" fill="#69bd1c"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#2784d9" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy20" viewBox="0 0 24 24">
+    <path d="M12,2 L16,11 L10,22 L3,12 z" fill="#19a7c4"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#2525b8" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy21" viewBox="0 0 24 24">
+    <path d="M12,2 L17,7 L9,22 L2,8 z" fill="#76bb3c"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#5fccb7" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy22" viewBox="0 0 24 24">
+    <path d="M12,2 L19,9 L8,22 L3,11 z" fill="#c118b0"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="#03a341" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy23" viewBox="0 0 24 24">
+    <path d="M12,2 L20,8 L11,22 L3,11 z" fill="#0a857c"/>
+    <circle cx="12" cy="12" r="6" fill="none" stroke="#4c23fe" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy24" viewBox="0 0 24 24">
+    <path d="M12,2 L18,10 L14,22 L3,10 z" fill="#bc3167"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#b4c724" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy25" viewBox="0 0 24 24">
+    <path d="M12,2 L16,7 L11,22 L8,11 z" fill="#11ea98"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#71538c" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy26" viewBox="0 0 24 24">
+    <path d="M12,2 L21,11 L9,22 L6,12 z" fill="#38ca2a"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#ca5c11" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy27" viewBox="0 0 24 24">
+    <path d="M12,2 L16,6 L8,22 L3,12 z" fill="#7f9b42"/>
+    <circle cx="12" cy="12" r="3" fill="none" stroke="#52231b" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy28" viewBox="0 0 24 24">
+    <path d="M12,2 L20,6 L8,22 L8,8 z" fill="#c46a26"/>
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#17ee4a" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy29" viewBox="0 0 24 24">
+    <path d="M12,2 L20,12 L14,22 L2,6 z" fill="#02fdac"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#3e5f9d" stroke-width="2"/>
+  </symbol>
+  <symbol id="sy30" viewBox="0 0 24 24">
+    <path d="M12,2 L19,12 L9,22 L8,8 z" fill="#c34000"/>
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#c08796" stroke-width="2"/>
+  </symbol>
+  <marker id="mr31" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#bddd3d"/>
+  </marker>
+  <marker id="mr32" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#32f0bd"/>
+  </marker>
+  <marker id="mr33" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#c5a1a2"/>
+  </marker>
+  <marker id="mr34" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#20b131"/>
+  </marker>
+  <marker id="mr35" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#5c70ac"/>
+  </marker>
+  <marker id="mr36" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#349cf4"/>
+  </marker>
+  <marker id="mr37" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#ecfd68"/>
+  </marker>
+  <marker id="mr38" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto" markerUnits="strokeWidth">
+    <circle cx="4" cy="4" r="3" fill="#5a21b3"/>
+  </marker>
+  <pattern id="pt39" width="13" height="13" patternUnits="userSpaceOnUse">
+    <circle cx="6.5" cy="6.5" r="3.25" fill="#b413ae"/>
+  </pattern>
+  <linearGradient id="lg40" x1="0.15" y1="0.07" x2="0.89" y2="0.98">
+    <stop offset="0.00" stop-color="#741884" stop-opacity="0.51"/>
+    <stop offset="1.00" stop-color="#b8a66a" stop-opacity="0.66"/>
+  </linearGradient>
+  <linearGradient id="lg42" x1="0.22" y1="0.11" x2="0.83" y2="0.69">
+    <stop offset="0.00" stop-color="#a90465" stop-opacity="0.68"/>
+    <stop offset="1.00" stop-color="#9908d3" stop-opacity="0.84"/>
+  </linearGradient>
+  <linearGradient id="lg44" x1="0.10" y1="0.22" x2="0.70" y2="0.99">
+    <stop offset="0.00" stop-color="#01c0cb" stop-opacity="0.54"/>
+    <stop offset="1.00" stop-color="#cc6b82" stop-opacity="0.65"/>
+  </linearGradient>
+  <linearGradient id="lg46" x1="0.10" y1="0.13" x2="0.90" y2="0.86">
+    <stop offset="0.00" stop-color="#dadaed" stop-opacity="0.88"/>
+    <stop offset="1.00" stop-color="#ef2020" stop-opacity="0.81"/>
+  </linearGradient>
+  <linearGradient id="lg48" x1="0.01" y1="0.16" x2="0.95" y2="0.63">
+    <stop offset="0.00" stop-color="#65bc84" stop-opacity="0.67"/>
+    <stop offset="1.00" stop-color="#27279f" stop-opacity="0.92"/>
+  </linearGradient>
+  <linearGradient id="lg50" x1="0.19" y1="0.19" x2="0.68" y2="0.98">
+    <stop offset="0.00" stop-color="#47f135" stop-opacity="0.74"/>
+    <stop offset="1.00" stop-color="#2ee16d" stop-opacity="0.69"/>
+  </linearGradient>
+  <linearGradient id="lg52" x1="0.18" y1="0.07" x2="0.97" y2="0.63">
+    <stop offset="0.00" stop-color="#bcb2c1" stop-opacity="0.51"/>
+    <stop offset="1.00" stop-color="#b929bd" stop-opacity="0.99"/>
+  </linearGradient>
+  <linearGradient id="lg54" x1="0.15" y1="0.20" x2="0.82" y2="0.82">
+    <stop offset="0.00" stop-color="#e9d00f" stop-opacity="0.78"/>
+    <stop offset="1.00" stop-color="#23a72a" stop-opacity="0.89"/>
+  </linearGradient>
+  <linearGradient id="lg56" x1="0.09" y1="0.27" x2="0.89" y2="0.72">
+    <stop offset="0.00" stop-color="#08a81a" stop-opacity="0.51"/>
+    <stop offset="1.00" stop-color="#b6d1cb" stop-opacity="0.88"/>
+  </linearGradient>
+  <linearGradient id="lg58" x1="0.13" y1="0.13" x2="0.95" y2="0.85">
+    <stop offset="0.00" stop-color="#491c6f" stop-opacity="0.84"/>
+    <stop offset="1.00" stop-color="#bb72a6" stop-opacity="0.83"/>
+  </linearGradient>
+  <linearGradient id="lg60" x1="0.21" y1="0.08" x2="0.84" y2="0.65">
+    <stop offset="0.00" stop-color="#8ec60c" stop-opacity="0.82"/>
+    <stop offset="1.00" stop-color="#93643d" stop-opacity="0.82"/>
+  </linearGradient>
+  <linearGradient id="lg62" x1="0.16" y1="0.11" x2="0.97" y2="0.76">
+    <stop offset="0.00" stop-color="#bfe52b" stop-opacity="0.97"/>
+    <stop offset="1.00" stop-color="#fe9dd2" stop-opacity="0.55"/>
+  </linearGradient>
+  <linearGradient id="lg64" x1="0.16" y1="0.19" x2="0.74" y2="0.82">
+    <stop offset="0.00" stop-color="#1a540d" stop-opacity="0.76"/>
+    <stop offset="1.00" stop-color="#089d36" stop-opacity="0.51"/>
+  </linearGradient>
+  <linearGradient id="lg66" x1="0.08" y1="0.12" x2="0.78" y2="0.67">
+    <stop offset="0.00" stop-color="#22fb0e" stop-opacity="0.63"/>
+    <stop offset="1.00" stop-color="#210512" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg68" x1="0.23" y1="0.02" x2="0.71" y2="0.92">
+    <stop offset="0.00" stop-color="#9d4a9f" stop-opacity="0.86"/>
+    <stop offset="1.00" stop-color="#5f115e" stop-opacity="0.73"/>
+  </linearGradient>
+  <linearGradient id="lg70" x1="0.00" y1="0.10" x2="1.00" y2="0.83">
+    <stop offset="0.00" stop-color="#8ba8ac" stop-opacity="0.63"/>
+    <stop offset="1.00" stop-color="#cab8c3" stop-opacity="0.82"/>
+  </linearGradient>
+  <linearGradient id="lg72" x1="0.19" y1="0.14" x2="0.96" y2="0.69">
+    <stop offset="0.00" stop-color="#8eaa28" stop-opacity="0.80"/>
+    <stop offset="1.00" stop-color="#0785e1" stop-opacity="0.78"/>
+  </linearGradient>
+  <linearGradient id="lg74" x1="0.12" y1="0.18" x2="0.66" y2="0.82">
+    <stop offset="0.00" stop-color="#2d7652" stop-opacity="0.87"/>
+    <stop offset="1.00" stop-color="#955ef5" stop-opacity="0.75"/>
+  </linearGradient>
+  <linearGradient id="lg76" x1="0.16" y1="0.05" x2="0.77" y2="0.87">
+    <stop offset="0.00" stop-color="#f0f8eb" stop-opacity="0.95"/>
+    <stop offset="1.00" stop-color="#9af042" stop-opacity="0.51"/>
+  </linearGradient>
+  <linearGradient id="lg78" x1="0.17" y1="0.15" x2="0.61" y2="0.85">
+    <stop offset="0.00" stop-color="#8afa15" stop-opacity="0.62"/>
+    <stop offset="1.00" stop-color="#12484b" stop-opacity="0.78"/>
+  </linearGradient>
+  <linearGradient id="lg80" x1="0.09" y1="0.10" x2="0.88" y2="0.99">
+    <stop offset="0.00" stop-color="#c73ab1" stop-opacity="0.93"/>
+    <stop offset="1.00" stop-color="#b1e585" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg82" x1="0.07" y1="0.06" x2="0.95" y2="0.79">
+    <stop offset="0.00" stop-color="#b9c141" stop-opacity="0.51"/>
+    <stop offset="1.00" stop-color="#1de6d6" stop-opacity="0.53"/>
+  </linearGradient>
+  <linearGradient id="lg84" x1="0.28" y1="0.04" x2="0.82" y2="0.88">
+    <stop offset="0.00" stop-color="#25301d" stop-opacity="0.61"/>
+    <stop offset="1.00" stop-color="#a1a40e" stop-opacity="0.92"/>
+  </linearGradient>
+  <linearGradient id="lg86" x1="0.06" y1="0.07" x2="0.97" y2="0.71">
+    <stop offset="0.00" stop-color="#39b421" stop-opacity="0.70"/>
+    <stop offset="1.00" stop-color="#e9c0d2" stop-opacity="0.65"/>
+  </linearGradient>
+  <linearGradient id="lg88" x1="0.17" y1="0.09" x2="1.00" y2="0.64">
+    <stop offset="0.00" stop-color="#d204b0" stop-opacity="0.83"/>
+    <stop offset="1.00" stop-color="#664af2" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg90" x1="0.26" y1="0.18" x2="0.79" y2="0.67">
+    <stop offset="0.00" stop-color="#958bc4" stop-opacity="0.99"/>
+    <stop offset="1.00" stop-color="#d18ea0" stop-opacity="0.98"/>
+  </linearGradient>
+  <linearGradient id="lg92" x1="0.09" y1="0.10" x2="0.69" y2="0.81">
+    <stop offset="0.00" stop-color="#464403" stop-opacity="0.68"/>
+    <stop offset="1.00" stop-color="#95262f" stop-opacity="0.77"/>
+  </linearGradient>
+  <linearGradient id="lg94" x1="0.05" y1="0.04" x2="0.99" y2="0.68">
+    <stop offset="0.00" stop-color="#9f2f95" stop-opacity="0.66"/>
+    <stop offset="1.00" stop-color="#fb833f" stop-opacity="0.92"/>
+  </linearGradient>
+  <linearGradient id="lg96" x1="0.24" y1="0.06" x2="0.65" y2="0.73">
+    <stop offset="0.00" stop-color="#af69ff" stop-opacity="0.54"/>
+    <stop offset="1.00" stop-color="#641989" stop-opacity="0.66"/>
+  </linearGradient>
+  <linearGradient id="lg98" x1="0.21" y1="0.24" x2="0.88" y2="0.89">
+    <stop offset="0.00" stop-color="#648800" stop-opacity="0.91"/>
+    <stop offset="1.00" stop-color="#ec4b99" stop-opacity="0.51"/>
+  </linearGradient>
+  <linearGradient id="lg100" x1="0.15" y1="0.19" x2="0.87" y2="0.93">
+    <stop offset="0.00" stop-color="#e91b97" stop-opacity="0.54"/>
+    <stop offset="1.00" stop-color="#97938d" stop-opacity="0.91"/>
+  </linearGradient>
+  <linearGradient id="lg102" x1="0.22" y1="0.17" x2="0.65" y2="0.92">
+    <stop offset="0.00" stop-color="#96f3f1" stop-opacity="0.52"/>
+    <stop offset="1.00" stop-color="#f3e03d" stop-opacity="0.73"/>
+  </linearGradient>
+  <linearGradient id="lg104" x1="0.01" y1="0.03" x2="0.97" y2="0.74">
+    <stop offset="0.00" stop-color="#f12a3b" stop-opacity="0.73"/>
+    <stop offset="1.00" stop-color="#a5a0b3" stop-opacity="0.75"/>
+  </linearGradient>
+  <linearGradient id="lg106" x1="0.22" y1="0.23" x2="0.80" y2="0.72">
+    <stop offset="0.00" stop-color="#2ea8cc" stop-opacity="0.55"/>
+    <stop offset="1.00" stop-color="#d62ed9" stop-opacity="0.67"/>
+  </linearGradient>
+  <linearGradient id="lg108" x1="0.27" y1="0.26" x2="0.61" y2="0.85">
+    <stop offset="0.00" stop-color="#059e89" stop-opacity="0.95"/>
+    <stop offset="1.00" stop-color="#9a84a1" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg110" x1="0.01" y1="0.19" x2="0.89" y2="0.87">
+    <stop offset="0.00" stop-color="#21e876" stop-opacity="0.77"/>
+    <stop offset="1.00" stop-color="#1e66ae" stop-opacity="0.78"/>
+  </linearGradient>
+  <linearGradient id="lg112" x1="0.02" y1="0.05" x2="0.97" y2="0.84">
+    <stop offset="0.00" stop-color="#478a15" stop-opacity="0.91"/>
+    <stop offset="1.00" stop-color="#466a7e" stop-opacity="0.93"/>
+  </linearGradient>
+  <linearGradient id="lg114" x1="0.18" y1="0.16" x2="0.63" y2="1.00">
+    <stop offset="0.00" stop-color="#e37f59" stop-opacity="0.89"/>
+    <stop offset="1.00" stop-color="#ad6317" stop-opacity="0.54"/>
+  </linearGradient>
+  <linearGradient id="lg116" x1="0.13" y1="0.02" x2="0.65" y2="0.61">
+    <stop offset="0.00" stop-color="#2db24b" stop-opacity="0.54"/>
+    <stop offset="1.00" stop-color="#207aca" stop-opacity="0.94"/>
+  </linearGradient>
+  <linearGradient id="lg118" x1="0.27" y1="0.15" x2="0.77" y2="0.72">
+    <stop offset="0.00" stop-color="#37bb57" stop-opacity="0.65"/>
+    <stop offset="1.00" stop-color="#6003ac" stop-opacity="0.51"/>
+  </linearGradient>
+  <linearGradient id="lg120" x1="0.20" y1="0.04" x2="0.63" y2="0.79">
+    <stop offset="0.00" stop-color="#b5e79c" stop-opacity="0.98"/>
+    <stop offset="1.00" stop-color="#1fffdb" stop-opacity="0.64"/>
+  </linearGradient>
+  <linearGradient id="lg122" x1="0.16" y1="0.05" x2="0.77" y2="0.63">
+    <stop offset="0.00" stop-color="#e5b066" stop-opacity="0.65"/>
+    <stop offset="1.00" stop-color="#11a9f2" stop-opacity="0.72"/>
+  </linearGradient>
+  <linearGradient id="lg124" x1="0.01" y1="0.25" x2="0.98" y2="0.92">
+    <stop offset="0.00" stop-color="#18b46c" stop-opacity="0.58"/>
+    <stop offset="1.00" stop-color="#a11668" stop-opacity="0.76"/>
+  </linearGradient>
+  <linearGradient id="lg126" x1="0.06" y1="0.08" x2="0.97" y2="0.71">
+    <stop offset="0.00" stop-color="#9960f1" stop-opacity="0.65"/>
+    <stop offset="1.00" stop-color="#d794f3" stop-opacity="0.88"/>
+  </linearGradient>
+  <linearGradient id="lg128" x1="0.29" y1="0.23" x2="0.80" y2="0.75">
+    <stop offset="0.00" stop-color="#848182" stop-opacity="0.59"/>
+    <stop offset="1.00" stop-color="#415e18" stop-opacity="0.82"/>
+  </linearGradient>
+  <linearGradient id="lg130" x1="0.21" y1="0.22" x2="0.70" y2="0.60">
+    <stop offset="0.00" stop-color="#b266a8" stop-opacity="0.64"/>
+    <stop offset="1.00" stop-color="#1d0500" stop-opacity="0.95"/>
+  </linearGradient>
+  <linearGradient id="lg132" x1="0.18" y1="0.01" x2="1.00" y2="0.62">
+    <stop offset="0.00" stop-color="#a8c059" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#841080" stop-opacity="0.69"/>
+  </linearGradient>
+  <linearGradient id="lg134" x1="0.29" y1="0.25" x2="0.75" y2="0.71">
+    <stop offset="0.00" stop-color="#91e55f" stop-opacity="0.90"/>
+    <stop offset="1.00" stop-color="#d0d89b" stop-opacity="0.53"/>
+  </linearGradient>
+  <linearGradient id="lg136" x1="0.24" y1="0.02" x2="0.79" y2="0.81">
+    <stop offset="0.00" stop-color="#462672" stop-opacity="0.96"/>
+    <stop offset="1.00" stop-color="#7dd989" stop-opacity="0.55"/>
+  </linearGradient>
+  <linearGradient id="lg138" x1="0.25" y1="0.02" x2="0.98" y2="0.80">
+    <stop offset="0.00" stop-color="#4b2531" stop-opacity="0.57"/>
+    <stop offset="1.00" stop-color="#d5cd4f" stop-opacity="0.66"/>
+  </linearGradient>
+  <linearGradient id="lg140" x1="0.08" y1="0.23" x2="0.99" y2="0.82">
+    <stop offset="0.00" stop-color="#d22dbf" stop-opacity="0.61"/>
+    <stop offset="1.00" stop-color="#ca380d" stop-opacity="0.73"/>
+  </linearGradient>
+  <linearGradient id="lg142" x1="0.18" y1="0.15" x2="0.63" y2="0.65">
+    <stop offset="0.00" stop-color="#b1f5d6" stop-opacity="1.00"/>
+    <stop offset="1.00" stop-color="#e3e660" stop-opacity="0.91"/>
+  </linearGradient>
+  <linearGradient id="lg144" x1="0.17" y1="0.16" x2="0.70" y2="0.97">
+    <stop offset="0.00" stop-color="#6701f4" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#2c2390" stop-opacity="0.69"/>
+  </linearGradient>
+  <linearGradient id="lg146" x1="0.27" y1="0.21" x2="0.94" y2="0.75">
+    <stop offset="0.00" stop-color="#f98107" stop-opacity="0.57"/>
+    <stop offset="1.00" stop-color="#853d2d" stop-opacity="0.62"/>
+  </linearGradient>
+  <linearGradient id="lg148" x1="0.02" y1="0.17" x2="0.65" y2="0.86">
+    <stop offset="0.00" stop-color="#200720" stop-opacity="0.64"/>
+    <stop offset="1.00" stop-color="#e9ed25" stop-opacity="0.79"/>
+  </linearGradient>
+  <linearGradient id="lg150" x1="0.04" y1="0.23" x2="0.76" y2="0.67">
+    <stop offset="0.00" stop-color="#f9c690" stop-opacity="0.66"/>
+    <stop offset="1.00" stop-color="#49a701" stop-opacity="0.57"/>
+  </linearGradient>
+  <linearGradient id="lg152" x1="0.27" y1="0.12" x2="0.95" y2="0.63">
+    <stop offset="0.00" stop-color="#24d184" stop-opacity="0.65"/>
+    <stop offset="1.00" stop-color="#ceb56d" stop-opacity="0.92"/>
+  </linearGradient>
+  <linearGradient id="lg154" x1="0.06" y1="0.19" x2="0.70" y2="1.00">
+    <stop offset="0.00" stop-color="#85872d" stop-opacity="0.63"/>
+    <stop offset="1.00" stop-color="#c44255" stop-opacity="0.93"/>
+  </linearGradient>
+  <linearGradient id="lg156" x1="0.26" y1="0.05" x2="0.68" y2="0.97">
+    <stop offset="0.00" stop-color="#ae8278" stop-opacity="0.57"/>
+    <stop offset="1.00" stop-color="#77daa8" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg158" x1="0.16" y1="0.13" x2="0.71" y2="0.87">
+    <stop offset="0.00" stop-color="#f64c3c" stop-opacity="0.99"/>
+    <stop offset="1.00" stop-color="#e6e464" stop-opacity="0.79"/>
+  </linearGradient>
+</defs>
+  <rect width="1600" height="1200" fill="url(#pt39)"/>
+  <path d="M158,107 H652 V220 H1307" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr36)"/>
+  <path d="M1433,148 H1111 V986 H843" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr36)"/>
+  <path d="M894,91 H5 V478 H821" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr34)"/>
+  <path d="M1334,698 H582 V1048 H710" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr34)"/>
+  <path d="M1511,854 H526 V8 H30" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr32)"/>
+  <path d="M1438,1154 H1280 V64 H1489" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr36)"/>
+  <path d="M977,959 H260 V613 H1021" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr35)"/>
+  <path d="M1326,930 H1169 V1123 H1535" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr38)"/>
+  <path d="M1409,237 H814 V984 H745" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr32)"/>
+  <path d="M370,443 H420 V638 H1123" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr35)"/>
+  <path d="M1365,461 H1450 V376 H327" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr33)"/>
+  <path d="M643,590 H313 V423 H552" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr38)"/>
+  <path d="M349,20 H1189 V1084 H1563" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr31)"/>
+  <path d="M207,1022 H535 V572 H1439" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr32)"/>
+  <path d="M114,597 H909 V113 H214" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr37)"/>
+  <path d="M826,819 H1281 V725 H19" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr36)"/>
+  <path d="M1154,638 H648 V61 H118" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr37)"/>
+  <path d="M1253,365 H553 V150 H1254" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr35)"/>
+  <path d="M810,833 H99 V788 H81" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr33)"/>
+  <path d="M139,825 H1064 V218 H918" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr34)"/>
+  <path d="M969,1189 H715 V690 H1577" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr38)"/>
+  <path d="M532,16 H1130 V876 H1311" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr37)"/>
+  <path d="M1362,504 H1406 V380 H451" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr36)"/>
+  <path d="M1574,286 H1580 V718 H1352" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr38)"/>
+  <path d="M865,644 H639 V360 H1023" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr33)"/>
+  <path d="M1400,788 H1445 V669 H1079" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr36)"/>
+  <path d="M401,15 H139 V1094 H1376" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr34)"/>
+  <path d="M43,550 H67 V453 H1352" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr31)"/>
+  <path d="M1039,243 H590 V684 H1069" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr31)"/>
+  <path d="M732,360 H799 V1071 H350" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr37)"/>
+  <path d="M490,841 H534 V947 H828" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr33)"/>
+  <path d="M1590,1032 H296 V72 H1275" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr38)"/>
+  <path d="M812,1093 H68 V288 H651" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr32)"/>
+  <path d="M132,483 H225 V38 H845" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr34)"/>
+  <path d="M109,721 H1351 V978 H1107" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr32)"/>
+  <path d="M976,414 H1358 V246 H200" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr32)"/>
+  <path d="M230,569 H1096 V822 H1434" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr35)"/>
+  <path d="M1128,976 H875 V351 H1404" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr36)"/>
+  <path d="M69,868 H676 V444 H839" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr32)"/>
+  <path d="M893,251 H867 V459 H735" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr33)"/>
+  <path d="M65,718 H220 V952 H1402" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr38)"/>
+  <path d="M370,926 H829 V3 H1196" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr32)"/>
+  <path d="M303,1160 H718 V421 H1371" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr31)"/>
+  <path d="M756,164 H1366 V218 H1009" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr34)"/>
+  <path d="M213,1053 H1315 V1164 H1267" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr34)"/>
+  <path d="M839,1088 H1490 V612 H1316" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr38)"/>
+  <path d="M1470,145 H1414 V204 H379" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr33)"/>
+  <path d="M1505,244 H721 V246 H1078" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr37)"/>
+  <path d="M1295,956 H1177 V159 H1268" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr33)"/>
+  <path d="M635,287 H1188 V209 H1580" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr38)"/>
+  <path d="M153,1042 H423 V908 H1462" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr31)"/>
+  <path d="M805,1050 H125 V88 H1323" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr38)"/>
+  <path d="M1458,879 H730 V865 H1164" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr34)"/>
+  <path d="M986,217 H1578 V449 H531" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr36)"/>
+  <path d="M62,934 H1132 V662 H1345" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr34)"/>
+  <path d="M1046,8 H894 V505 H848" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr34)"/>
+  <path d="M1172,1142 H221 V819 H244" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr34)"/>
+  <path d="M1446,642 H1236 V601 H238" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr37)"/>
+  <path d="M831,377 H1449 V618 H1076" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr32)"/>
+  <path d="M1343,1018 H1270 V1078 H686" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr35)"/>
+  <path d="M33,734 H824 V583 H520" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr37)"/>
+  <path d="M1490,589 H469 V1157 H1496" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr32)"/>
+  <path d="M1218,995 H211 V147 H1231" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr38)"/>
+  <path d="M735,41 H1218 V205 H591" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr34)"/>
+  <path d="M1566,912 H1436 V135 H328" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr36)"/>
+  <path d="M522,762 H1306 V223 H619" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr31)"/>
+  <path d="M706,678 H378 V436 H307" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr38)"/>
+  <path d="M1390,716 H830 V1107 H645" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr37)"/>
+  <path d="M412,403 H279 V75 H731" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr31)"/>
+  <path d="M1070,1126 H1099 V729 H654" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr37)"/>
+  <path d="M1105,788 H1036 V894 H1132" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr32)"/>
+  <path d="M594,1143 H324 V1017 H1253" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr34)"/>
+  <path d="M1547,201 H1303 V419 H715" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr35)"/>
+  <path d="M786,920 H528 V821 H167" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr33)"/>
+  <path d="M148,153 H594 V344 H1253" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr37)"/>
+  <path d="M365,1093 H41 V793 H1546" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr34)"/>
+  <path d="M1064,1172 H1380 V601 H391" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr36)"/>
+  <path d="M448,1050 H399 V1063 H1253" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr33)"/>
+  <path d="M1095,1074 H1588 V633 H945" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr32)"/>
+  <path d="M1043,808 H447 V108 H978" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr32)"/>
+  <path d="M585,446 H1507 V675 H998" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr37)"/>
+  <path d="M757,490 H38 V838 H1528" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr33)"/>
+  <path d="M1528,915 H1079 V624 H6" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr36)"/>
+  <path d="M1292,997 H534 V1058 H931" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr32)"/>
+  <path d="M858,1026 H407 V115 H96" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr38)"/>
+  <path d="M743,1085 H502 V751 H536" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr37)"/>
+  <path d="M1358,513 H251 V999 H964" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr36)"/>
+  <path d="M1302,437 H1019 V952 H1512" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr35)"/>
+  <path d="M152,981 H929 V212 H1174" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr36)"/>
+  <path d="M956,345 H1369 V221 H1346" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr33)"/>
+  <path d="M1217,572 H1216 V659 H1065" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr37)"/>
+  <path d="M1188,776 H1143 V721 H1550" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr34)"/>
+  <path d="M666,650 H444 V477 H842" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr36)"/>
+  <path d="M275,1053 H742 V1090 H951" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr32)"/>
+  <path d="M864,466 H607 V322 H284" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr38)"/>
+  <path d="M991,528 H273 V115 H199" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr32)"/>
+  <path d="M518,241 H452 V1038 H38" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr33)"/>
+  <path d="M702,458 H51 V415 H1468" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr36)"/>
+  <path d="M783,637 H787 V129 H1322" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr38)" marker-end="url(#mr35)"/>
+  <path d="M675,1078 H1101 V103 H143" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr34)"/>
+  <path d="M156,1031 H175 V243 H824" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr35)"/>
+  <path d="M966,1079 H851 V73 H540" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr32)"/>
+  <path d="M583,194 H239 V837 H1" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr36)"/>
+  <path d="M130,678 H41 V470 H1188" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr32)"/>
+  <path d="M753,564 H1361 V659 H1586" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr33)"/>
+  <path d="M1317,1102 H19 V763 H937" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr37)"/>
+  <path d="M599,518 H1577 V220 H1274" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr34)"/>
+  <path d="M772,450 H38 V1024 H260" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr37)" marker-end="url(#mr37)"/>
+  <path d="M1002,1054 H281 V671 H235" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr33)" marker-end="url(#mr32)"/>
+  <path d="M334,383 H961 V798 H951" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr35)"/>
+  <path d="M287,457 H331 V274 H11" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr34)"/>
+  <path d="M740,786 H958 V386 H1020" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr36)"/>
+  <path d="M326,983 H536 V483 H611" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr34)"/>
+  <path d="M1321,449 H806 V912 H800" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr36)" marker-end="url(#mr36)"/>
+  <path d="M1434,1128 H966 V12 H215" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr33)"/>
+  <path d="M1301,142 H1191 V802 H1045" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr35)"/>
+  <path d="M471,1104 H246 V918 H1275" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr34)" marker-end="url(#mr34)"/>
+  <path d="M1102,891 H6 V657 H1028" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr32)" marker-end="url(#mr31)"/>
+  <path d="M145,1116 H865 V267 H609" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr31)" marker-end="url(#mr33)"/>
+  <path d="M442,1049 H854 V932 H1443" fill="none" stroke="#b87333" stroke-width="3" stroke-linejoin="round" marker-start="url(#mr35)" marker-end="url(#mr35)"/>
+  <use xlink:href="#sy14" x="1086" y="44" width="40" height="40" transform="rotate(270 311 65)"/>
+  <use xlink:href="#sy15" x="1451" y="894" width="40" height="40" transform="rotate(90 743 805)"/>
+  <use xlink:href="#sy17" x="623" y="493" width="40" height="40" transform="rotate(90 1258 75)"/>
+  <use xlink:href="#sy29" x="116" y="756" width="40" height="40" transform="rotate(90 1395 565)"/>
+  <use xlink:href="#sy17" x="652" y="137" width="40" height="40" transform="rotate(180 442 299)"/>
+  <use xlink:href="#sy26" x="1344" y="750" width="40" height="40" transform="rotate(180 1554 442)"/>
+  <use xlink:href="#sy3" x="578" y="986" width="40" height="40" transform="rotate(180 1589 25)"/>
+  <use xlink:href="#sy10" x="1230" y="11" width="40" height="40" transform="rotate(270 1593 28)"/>
+  <use xlink:href="#sy14" x="1470" y="451" width="40" height="40" transform="rotate(90 889 877)"/>
+  <use xlink:href="#sy20" x="869" y="330" width="40" height="40" transform="rotate(180 1164 1079)"/>
+  <use xlink:href="#sy27" x="581" y="280" width="40" height="40" transform="rotate(0 571 955)"/>
+  <use xlink:href="#sy16" x="871" y="783" width="40" height="40" transform="rotate(270 681 1158)"/>
+  <use xlink:href="#sy7" x="321" y="118" width="40" height="40" transform="rotate(180 1489 1141)"/>
+  <use xlink:href="#sy18" x="454" y="30" width="40" height="40" transform="rotate(0 1478 132)"/>
+  <use xlink:href="#sy13" x="1097" y="655" width="40" height="40" transform="rotate(0 131 976)"/>
+  <use xlink:href="#sy21" x="1186" y="1158" width="40" height="40" transform="rotate(0 1400 49)"/>
+  <use xlink:href="#sy15" x="946" y="931" width="40" height="40" transform="rotate(0 1412 231)"/>
+  <use xlink:href="#sy1" x="225" y="372" width="40" height="40" transform="rotate(90 632 860)"/>
+  <use xlink:href="#sy15" x="260" y="260" width="40" height="40" transform="rotate(270 1406 962)"/>
+  <use xlink:href="#sy8" x="454" y="252" width="40" height="40" transform="rotate(270 907 753)"/>
+  <use xlink:href="#sy15" x="954" y="376" width="40" height="40" transform="rotate(0 238 346)"/>
+  <use xlink:href="#sy7" x="1287" y="423" width="40" height="40" transform="rotate(0 894 548)"/>
+  <use xlink:href="#sy10" x="735" y="254" width="40" height="40" transform="rotate(0 63 945)"/>
+  <use xlink:href="#sy27" x="1439" y="3" width="40" height="40" transform="rotate(180 527 1100)"/>
+  <use xlink:href="#sy26" x="687" y="700" width="40" height="40" transform="rotate(0 1133 453)"/>
+  <use xlink:href="#sy14" x="77" y="54" width="40" height="40" transform="rotate(0 258 984)"/>
+  <use xlink:href="#sy2" x="1074" y="125" width="40" height="40" transform="rotate(270 1327 173)"/>
+  <use xlink:href="#sy3" x="324" y="362" width="40" height="40" transform="rotate(90 800 808)"/>
+  <use xlink:href="#sy4" x="1252" y="346" width="40" height="40" transform="rotate(270 109 902)"/>
+  <use xlink:href="#sy19" x="757" y="253" width="40" height="40" transform="rotate(0 1344 403)"/>
+  <use xlink:href="#sy9" x="1206" y="918" width="40" height="40" transform="rotate(90 296 852)"/>
+  <use xlink:href="#sy22" x="1499" y="655" width="40" height="40" transform="rotate(180 1022 669)"/>
+  <use xlink:href="#sy5" x="1095" y="265" width="40" height="40" transform="rotate(180 1408 895)"/>
+  <use xlink:href="#sy4" x="400" y="307" width="40" height="40" transform="rotate(180 789 505)"/>
+  <use xlink:href="#sy14" x="234" y="115" width="40" height="40" transform="rotate(0 1170 1155)"/>
+  <use xlink:href="#sy11" x="453" y="136" width="40" height="40" transform="rotate(0 97 2)"/>
+  <use xlink:href="#sy10" x="469" y="721" width="40" height="40" transform="rotate(90 1363 837)"/>
+  <use xlink:href="#sy9" x="22" y="1158" width="40" height="40" transform="rotate(90 750 948)"/>
+  <use xlink:href="#sy23" x="557" y="232" width="40" height="40" transform="rotate(0 164 313)"/>
+  <use xlink:href="#sy12" x="314" y="75" width="40" height="40" transform="rotate(180 285 787)"/>
+  <use xlink:href="#sy18" x="1322" y="197" width="40" height="40" transform="rotate(270 1581 1164)"/>
+  <use xlink:href="#sy16" x="880" y="991" width="40" height="40" transform="rotate(0 899 520)"/>
+  <use xlink:href="#sy7" x="1181" y="947" width="40" height="40" transform="rotate(90 939 180)"/>
+  <use xlink:href="#sy25" x="1182" y="403" width="40" height="40" transform="rotate(90 1045 470)"/>
+  <use xlink:href="#sy8" x="1041" y="1057" width="40" height="40" transform="rotate(0 206 42)"/>
+  <use xlink:href="#sy17" x="97" y="475" width="40" height="40" transform="rotate(180 1319 186)"/>
+  <use xlink:href="#sy14" x="480" y="288" width="40" height="40" transform="rotate(0 118 869)"/>
+  <use xlink:href="#sy10" x="1251" y="191" width="40" height="40" transform="rotate(270 580 1047)"/>
+  <use xlink:href="#sy16" x="335" y="1052" width="40" height="40" transform="rotate(90 1297 747)"/>
+  <use xlink:href="#sy8" x="1203" y="238" width="40" height="40" transform="rotate(90 299 800)"/>
+  <use xlink:href="#sy30" x="618" y="262" width="40" height="40" transform="rotate(180 511 61)"/>
+  <use xlink:href="#sy15" x="388" y="831" width="40" height="40" transform="rotate(180 293 819)"/>
+  <use xlink:href="#sy9" x="297" y="862" width="40" height="40" transform="rotate(180 692 1107)"/>
+  <use xlink:href="#sy11" x="584" y="1032" width="40" height="40" transform="rotate(0 1438 307)"/>
+  <use xlink:href="#sy30" x="1147" y="642" width="40" height="40" transform="rotate(270 834 805)"/>
+  <use xlink:href="#sy11" x="1456" y="277" width="40" height="40" transform="rotate(180 925 28)"/>
+  <use xlink:href="#sy26" x="1117" y="979" width="40" height="40" transform="rotate(90 1192 1036)"/>
+  <use xlink:href="#sy3" x="1347" y="769" width="40" height="40" transform="rotate(270 1233 7)"/>
+  <use xlink:href="#sy29" x="502" y="675" width="40" height="40" transform="rotate(270 332 168)"/>
+  <use xlink:href="#sy17" x="26" y="430" width="40" height="40" transform="rotate(0 3 1160)"/>
+  <use xlink:href="#sy20" x="898" y="682" width="40" height="40" transform="rotate(180 1019 530)"/>
+  <use xlink:href="#sy9" x="1523" y="52" width="40" height="40" transform="rotate(0 380 706)"/>
+  <use xlink:href="#sy6" x="718" y="564" width="40" height="40" transform="rotate(0 703 784)"/>
+  <use xlink:href="#sy13" x="1517" y="948" width="40" height="40" transform="rotate(0 195 327)"/>
+  <use xlink:href="#sy14" x="810" y="292" width="40" height="40" transform="rotate(0 399 149)"/>
+  <use xlink:href="#sy25" x="320" y="1106" width="40" height="40" transform="rotate(270 374 726)"/>
+  <use xlink:href="#sy6" x="1317" y="417" width="40" height="40" transform="rotate(180 518 859)"/>
+  <use xlink:href="#sy17" x="172" y="385" width="40" height="40" transform="rotate(90 1345 929)"/>
+  <use xlink:href="#sy23" x="980" y="871" width="40" height="40" transform="rotate(180 630 359)"/>
+  <use xlink:href="#sy13" x="569" y="101" width="40" height="40" transform="rotate(90 1401 610)"/>
+  <use xlink:href="#sy17" x="1098" y="131" width="40" height="40" transform="rotate(90 1342 1065)"/>
+  <use xlink:href="#sy20" x="1072" y="20" width="40" height="40" transform="rotate(180 226 378)"/>
+  <use xlink:href="#sy19" x="1155" y="236" width="40" height="40" transform="rotate(270 449 964)"/>
+  <use xlink:href="#sy12" x="1128" y="734" width="40" height="40" transform="rotate(90 1534 84)"/>
+  <use xlink:href="#sy7" x="24" y="229" width="40" height="40" transform="rotate(270 1556 699)"/>
+  <use xlink:href="#sy29" x="878" y="1078" width="40" height="40" transform="rotate(180 1192 313)"/>
+  <use xlink:href="#sy19" x="1473" y="353" width="40" height="40" transform="rotate(180 914 604)"/>
+  <use xlink:href="#sy10" x="1083" y="317" width="40" height="40" transform="rotate(90 435 506)"/>
+  <use xlink:href="#sy23" x="1207" y="149" width="40" height="40" transform="rotate(270 282 1127)"/>
+  <use xlink:href="#sy9" x="665" y="1150" width="40" height="40" transform="rotate(90 912 678)"/>
+  <g id="w41" transform="translate(679.0,144.0)">
+    <rect width="120.0" height="80.0" rx="10" fill="url(#lg40)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC00</text>
+  </g>
+  <g id="w43" transform="translate(962.0,141.0)">
+    <rect width="120.0" height="80.0" rx="0" fill="url(#lg42)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC01</text>
+  </g>
+  <g id="w45" transform="translate(1386.0,1078.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg44)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC02</text>
+  </g>
+  <g id="w47" transform="translate(1342.0,69.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg46)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC03</text>
+  </g>
+  <g id="w49" transform="translate(662.0,406.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg48)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC04</text>
+  </g>
+  <g id="w51" transform="translate(897.0,406.0)">
+    <rect width="120.0" height="80.0" rx="8" fill="url(#lg50)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC05</text>
+  </g>
+  <g id="w53" transform="translate(786.0,430.0)">
+    <rect width="120.0" height="80.0" rx="1" fill="url(#lg52)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC06</text>
+  </g>
+  <g id="w55" transform="translate(501.0,60.0)">
+    <rect width="120.0" height="80.0" rx="8" fill="url(#lg54)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC07</text>
+  </g>
+  <g id="w57" transform="translate(1443.0,818.0)">
+    <rect width="120.0" height="80.0" rx="7" fill="url(#lg56)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC08</text>
+  </g>
+  <g id="w59" transform="translate(64.0,398.0)">
+    <rect width="120.0" height="80.0" rx="9" fill="url(#lg58)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC09</text>
+  </g>
+  <g id="w61" transform="translate(961.0,346.0)">
+    <rect width="120.0" height="80.0" rx="7" fill="url(#lg60)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC10</text>
+  </g>
+  <g id="w63" transform="translate(1242.0,653.0)">
+    <rect width="120.0" height="80.0" rx="3" fill="url(#lg62)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC11</text>
+  </g>
+  <g id="w65" transform="translate(711.0,9.0)">
+    <rect width="120.0" height="80.0" rx="11" fill="url(#lg64)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC12</text>
+  </g>
+  <g id="w67" transform="translate(776.0,763.0)">
+    <rect width="120.0" height="80.0" rx="9" fill="url(#lg66)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC13</text>
+  </g>
+  <g id="w69" transform="translate(903.0,21.0)">
+    <rect width="120.0" height="80.0" rx="6" fill="url(#lg68)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC14</text>
+  </g>
+  <g id="w71" transform="translate(33.0,860.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg70)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC15</text>
+  </g>
+  <g id="w73" transform="translate(495.0,888.0)">
+    <rect width="120.0" height="80.0" rx="9" fill="url(#lg72)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC16</text>
+  </g>
+  <g id="w75" transform="translate(452.0,548.0)">
+    <rect width="120.0" height="80.0" rx="3" fill="url(#lg74)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC17</text>
+  </g>
+  <g id="w77" transform="translate(603.0,98.0)">
+    <rect width="120.0" height="80.0" rx="1" fill="url(#lg76)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC18</text>
+  </g>
+  <g id="w79" transform="translate(1191.0,277.0)">
+    <rect width="120.0" height="80.0" rx="7" fill="url(#lg78)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC19</text>
+  </g>
+  <g id="w81" transform="translate(54.0,644.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg80)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC20</text>
+  </g>
+  <g id="w83" transform="translate(709.0,1048.0)">
+    <rect width="120.0" height="80.0" rx="8" fill="url(#lg82)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC21</text>
+  </g>
+  <g id="w85" transform="translate(250.0,748.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg84)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC22</text>
+  </g>
+  <g id="w87" transform="translate(905.0,451.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg86)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC23</text>
+  </g>
+  <g id="w89" transform="translate(1227.0,864.0)">
+    <rect width="120.0" height="80.0" rx="0" fill="url(#lg88)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC24</text>
+  </g>
+  <g id="w91" transform="translate(1039.0,932.0)">
+    <rect width="120.0" height="80.0" rx="11" fill="url(#lg90)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC25</text>
+  </g>
+  <g id="w93" transform="translate(143.0,491.0)">
+    <rect width="120.0" height="80.0" rx="6" fill="url(#lg92)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC26</text>
+  </g>
+  <g id="w95" transform="translate(698.0,412.0)">
+    <rect width="120.0" height="80.0" rx="0" fill="url(#lg94)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC27</text>
+  </g>
+  <g id="w97" transform="translate(225.0,197.0)">
+    <rect width="120.0" height="80.0" rx="7" fill="url(#lg96)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC28</text>
+  </g>
+  <g id="w99" transform="translate(934.0,1081.0)">
+    <rect width="120.0" height="80.0" rx="9" fill="url(#lg98)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC29</text>
+  </g>
+  <g id="w101" transform="translate(621.0,355.0)">
+    <rect width="120.0" height="80.0" rx="9" fill="url(#lg100)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC30</text>
+  </g>
+  <g id="w103" transform="translate(1036.0,418.0)">
+    <rect width="120.0" height="80.0" rx="8" fill="url(#lg102)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC31</text>
+  </g>
+  <g id="w105" transform="translate(911.0,657.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg104)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC32</text>
+  </g>
+  <g id="w107" transform="translate(622.0,815.0)">
+    <rect width="120.0" height="80.0" rx="10" fill="url(#lg106)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC33</text>
+  </g>
+  <g id="w109" transform="translate(248.0,335.0)">
+    <rect width="120.0" height="80.0" rx="2" fill="url(#lg108)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC34</text>
+  </g>
+  <g id="w111" transform="translate(253.0,242.0)">
+    <rect width="120.0" height="80.0" rx="0" fill="url(#lg110)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC35</text>
+  </g>
+  <g id="w113" transform="translate(585.0,633.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg112)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC36</text>
+  </g>
+  <g id="w115" transform="translate(1325.0,5.0)">
+    <rect width="120.0" height="80.0" rx="6" fill="url(#lg114)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC37</text>
+  </g>
+  <g id="w117" transform="translate(1201.0,31.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg116)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC38</text>
+  </g>
+  <g id="w119" transform="translate(620.0,1024.0)">
+    <rect width="120.0" height="80.0" rx="0" fill="url(#lg118)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC39</text>
+  </g>
+  <g id="w121" transform="translate(372.0,677.0)">
+    <rect width="120.0" height="80.0" rx="7" fill="url(#lg120)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC40</text>
+  </g>
+  <g id="w123" transform="translate(372.0,531.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg122)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC41</text>
+  </g>
+  <g id="w125" transform="translate(88.0,1083.0)">
+    <rect width="120.0" height="80.0" rx="9" fill="url(#lg124)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC42</text>
+  </g>
+  <g id="w127" transform="translate(50.0,923.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg126)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC43</text>
+  </g>
+  <g id="w129" transform="translate(828.0,158.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg128)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC44</text>
+  </g>
+  <g id="w131" transform="translate(601.0,842.0)">
+    <rect width="120.0" height="80.0" rx="10" fill="url(#lg130)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC45</text>
+  </g>
+  <g id="w133" transform="translate(544.0,302.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg132)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC46</text>
+  </g>
+  <g id="w135" transform="translate(159.0,885.0)">
+    <rect width="120.0" height="80.0" rx="8" fill="url(#lg134)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC47</text>
+  </g>
+  <g id="w137" transform="translate(72.0,207.0)">
+    <rect width="120.0" height="80.0" rx="10" fill="url(#lg136)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC48</text>
+  </g>
+  <g id="w139" transform="translate(502.0,51.0)">
+    <rect width="120.0" height="80.0" rx="3" fill="url(#lg138)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC49</text>
+  </g>
+  <g id="w141" transform="translate(1402.0,806.0)">
+    <rect width="120.0" height="80.0" rx="2" fill="url(#lg140)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC50</text>
+  </g>
+  <g id="w143" transform="translate(1030.0,112.0)">
+    <rect width="120.0" height="80.0" rx="5" fill="url(#lg142)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC51</text>
+  </g>
+  <g id="w145" transform="translate(249.0,594.0)">
+    <rect width="120.0" height="80.0" rx="3" fill="url(#lg144)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC52</text>
+  </g>
+  <g id="w147" transform="translate(75.0,278.0)">
+    <rect width="120.0" height="80.0" rx="8" fill="url(#lg146)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC53</text>
+  </g>
+  <g id="w149" transform="translate(490.0,372.0)">
+    <rect width="120.0" height="80.0" rx="7" fill="url(#lg148)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC54</text>
+  </g>
+  <g id="w151" transform="translate(806.0,354.0)">
+    <rect width="120.0" height="80.0" rx="4" fill="url(#lg150)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC55</text>
+  </g>
+  <g id="w153" transform="translate(343.0,882.0)">
+    <rect width="120.0" height="80.0" rx="1" fill="url(#lg152)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC56</text>
+  </g>
+  <g id="w155" transform="translate(1466.0,709.0)">
+    <rect width="120.0" height="80.0" rx="1" fill="url(#lg154)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC57</text>
+  </g>
+  <g id="w157" transform="translate(1164.0,564.0)">
+    <rect width="120.0" height="80.0" rx="12" fill="url(#lg156)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC58</text>
+  </g>
+  <g id="w159" transform="translate(824.0,288.0)">
+    <rect width="120.0" height="80.0" rx="6" fill="url(#lg158)"/>
+    <rect x="-6" y="10" width="6" height="8" fill="#ccc"/>
+    <rect x="120" y="10" width="6" height="8" fill="#ccc"/>
+    <text x="10" y="45" font-size="14" fill="#eee" letter-spacing="2">IC59</text>
+  </g>
+</svg>

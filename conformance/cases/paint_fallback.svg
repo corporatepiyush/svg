@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="50" viewBox="0 0 100 50">
+  <style>.s { stroke: url(#missing) #0000ff }</style>
+  <circle id="notpaint" r="1" fill="none"/>
+  <rect width="25" height="25" fill="url(#missing) #008000"/>
+  <rect x="25" width="25" height="25" fill="url(#notpaint) #008000"/>
+  <rect x="50" width="25" height="25" fill="url(#missing) none"/>
+  <rect x="75" width="25" height="25" fill="url(#missing)"/>
+  <g color="#008000"><rect y="25" width="50" height="25" fill="url(#missing) currentColor"/></g>
+  <line class="s" x1="50" y1="37" x2="100" y2="37" stroke-width="10"/>
+</svg>

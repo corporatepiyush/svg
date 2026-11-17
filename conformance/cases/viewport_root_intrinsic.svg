@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <!-- No width/height: SVG 1.1 §7.12 derives the intrinsic size from the
+       viewBox aspect ratio, so the output is 200x100. -->
+  <rect x="0" y="0" width="200" height="100" fill="#ff0000"/>
+</svg>

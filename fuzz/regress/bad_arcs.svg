@@ -1,0 +1,1 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><path d="M10,10 ANaN,NaN 0 1 0 90,90 A0,0 0 1 0 10,10 Z" fill="red"/><path d="M10,10 A1e400,1e400 0 1 0 90,90 Z" fill="blue"/><path d="M1e400,1e400 A10,10 0 1 0 1e400,1e400 Z" fill="green"/></svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40">
+  <rect x="0" y="0" width="40" height="40" fill="#000000" transform="rotate(10 20 20)"/>
+  <rect x="40" y="0" width="40" height="40" fill="#000000" transform="rotate(10 60 20)"
+        shape-rendering="crispEdges"/>
+</svg>

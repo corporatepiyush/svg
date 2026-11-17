@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="100" viewBox="0 0 120 100">
+  <style>
+    .inh { fill: inherit; }
+    .bad { fill: not-a-colour; }
+  </style>
+  <g fill="#00ff00">
+    <!-- inherit wins over the presentation attribute -->
+    <rect class="inh" x="0"  y="0" width="40" height="40" fill="#ff0000"/>
+    <!-- an invalid declaration is ignored, so the inherited green remains -->
+    <rect class="bad" x="40" y="0" width="40" height="40"/>
+    <!-- a later inline display declaration re-enables an earlier none -->
+    <rect x="80" y="0" width="40" height="40" fill="#ff0000"
+          display="none" style="display:inline"/>
+  </g>
+</svg>

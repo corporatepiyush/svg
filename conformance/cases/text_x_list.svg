@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
+  <!-- SVG 1.1 §10.4: a list of x coordinates positions successive glyphs -->
+  <text x="10 70 130" y="70" font-size="30" fill="#ff0000">ABCD</text>
+</svg>

@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1500" viewBox="0 0 1600 1500">
+<title>Operations dashboard</title>
+<style>
+  .c4 { fill: #5cc608; stroke: #36dc2d; stroke-width: 1.2; }
+  .c7 { fill: #b3d808; stroke: #a56129; stroke-width: 1.5; }
+  .c10 { fill: #5f2453; stroke: #848069; stroke-width: 2.1; }
+  .c13 { fill: #263446; stroke: #5521ac; stroke-width: 2.1; }
+  .c16 { fill: #627775; stroke: #bf9047; stroke-width: 2.1; }
+  .c19 { fill: #0ae3fc; stroke: #ed79b0; stroke-width: 2.1; }
+  .c22 { fill: #78464b; stroke: #814eaa; stroke-width: 1.1; }
+  .c25 { fill: #d13d41; stroke: #9ca7e5; stroke-width: 2.9; }
+  .c28 { fill: #ab739b; stroke: #d9c452; stroke-width: 2.9; }
+  .c31 { fill: #513758; stroke: #87f012; stroke-width: 3.0; }
+  .c34 { fill: #5e12f1; stroke: #1b15f1; stroke-width: 1.9; }
+  .c37 { fill: #368568; stroke: #cc5c42; stroke-width: 1.1; }
+  .c40 { fill: #22d25b; stroke: #e18762; stroke-width: 2.6; }
+  .c43 { fill: #58c8a0; stroke: #0621f9; stroke-width: 1.8; }
+  .c46 { fill: #2a465f; stroke: #9e694e; stroke-width: 2.0; }
+  .c49 { fill: #17005e; stroke: #480939; stroke-width: 0.9; }
+  .c52 { fill: #4e9d7f; stroke: #864e91; stroke-width: 2.1; }
+  .c55 { fill: #e7a9e4; stroke: #83f5f7; stroke-width: 2.0; }
+  .c58 { fill: #9ada93; stroke: #5f3fb1; stroke-width: 1.2; }
+  .c61 { fill: #eb806f; stroke: #d9320f; stroke-width: 2.0; }
+  .c64 { fill: #a88e72; stroke: #7115a4; stroke-width: 0.7; }
+  .c67 { fill: #a38562; stroke: #0903ce; stroke-width: 1.3; }
+  .c70 { fill: #416a7f; stroke: #0bd774; stroke-width: 2.4; }
+  .c73 { fill: #2e9f61; stroke: #4fd2a4; stroke-width: 1.1; }
+  .c76 { fill: #bb9abf; stroke: #8924d2; stroke-width: 1.4; }
+  .c79 { fill: #3a652a; stroke: #b783ab; stroke-width: 2.6; }
+  .c82 { fill: #ca79ef; stroke: #91635a; stroke-width: 0.6; }
+  .c85 { fill: #3c0f38; stroke: #f503cc; stroke-width: 2.3; }
+  .c88 { fill: #d18606; stroke: #238d3e; stroke-width: 2.3; }
+  .c91 { fill: #e249b1; stroke: #99d8b8; stroke-width: 0.5; }
+  .c94 { fill: #6b807f; stroke: #4cc3d3; stroke-width: 2.5; }
+  .c97 { fill: #5c1275; stroke: #e6fe96; stroke-width: 0.5; }
+  .c100 { fill: #ac9393; stroke: #40baff; stroke-width: 0.6; }
+  .c103 { fill: #818c85; stroke: #6bc1a2; stroke-width: 1.1; }
+  .c106 { fill: #bdf231; stroke: #91c610; stroke-width: 0.7; }
+  .c109 { fill: #f116a4; stroke: #b61f50; stroke-width: 2.9; }
+  .c112 { fill: #f496d4; stroke: #742d61; stroke-width: 2.7; }
+  .c115 { fill: #fc1886; stroke: #cb7beb; stroke-width: 2.2; }
+  .c118 { fill: #9e7e9d; stroke: #5b03e6; stroke-width: 1.8; }
+  .c121 { fill: #f0ac3c; stroke: #eadd3b; stroke-width: 0.6; }
+  .c124 { fill: #43ea36; stroke: #03ad42; stroke-width: 0.7; }
+  .c127 { fill: #86d54f; stroke: #8f6421; stroke-width: 1.8; }
+</style>
+<defs>
+  <filter id="fx1" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="1.7" result="b"/>
+    <feOffset in="b" dx="2" dy="2" result="o"/>
+    <feFlood flood-color="#13b7d8" flood-opacity="0.5"/>
+    <feComposite in2="o" operator="in" result="s"/>
+    <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="lg2" x1="0.03" y1="0.22" x2="0.64" y2="0.69">
+    <stop offset="0.00" stop-color="#c9455b" stop-opacity="0.68"/>
+    <stop offset="0.50" stop-color="#84a464" stop-opacity="0.74"/>
+    <stop offset="1.00" stop-color="#ab6620" stop-opacity="0.87"/>
+  </linearGradient>
+  <radialGradient id="rg3" cx="0.61" cy="0.31" r="0.42">
+    <stop offset="0.00" stop-color="#20930c"/>
+    <stop offset="0.50" stop-color="#5cecce"/>
+    <stop offset="1.00" stop-color="#baf70c"/>
+  </radialGradient>
+  <linearGradient id="lg6" x1="0.16" y1="0.06" x2="0.85" y2="0.75">
+    <stop offset="0.00" stop-color="#2611b2" stop-opacity="0.99"/>
+    <stop offset="0.50" stop-color="#06415e" stop-opacity="0.90"/>
+    <stop offset="1.00" stop-color="#5751f9" stop-opacity="0.78"/>
+  </linearGradient>
+  <radialGradient id="rg9" cx="0.53" cy="0.67" r="0.47">
+    <stop offset="0.00" stop-color="#62ed6b"/>
+    <stop offset="0.50" stop-color="#e7c366"/>
+    <stop offset="1.00" stop-color="#26a67c"/>
+  </radialGradient>
+  <linearGradient id="lg12" x1="0.15" y1="0.05" x2="0.86" y2="0.96">
+    <stop offset="0.00" stop-color="#9816c9" stop-opacity="0.53"/>
+    <stop offset="0.50" stop-color="#02fe88" stop-opacity="0.57"/>
+    <stop offset="1.00" stop-color="#6a0526" stop-opacity="0.78"/>
+  </linearGradient>
+  <radialGradient id="rg15" cx="0.65" cy="0.44" r="0.31">
+    <stop offset="0.00" stop-color="#acfff0"/>
+    <stop offset="0.50" stop-color="#f06f3f"/>
+    <stop offset="1.00" stop-color="#527ca9"/>
+  </radialGradient>
+  <linearGradient id="lg18" x1="0.24" y1="0.13" x2="0.92" y2="0.84">
+    <stop offset="0.00" stop-color="#0e89d6" stop-opacity="0.88"/>
+    <stop offset="0.50" stop-color="#7744d0" stop-opacity="0.56"/>
+    <stop offset="1.00" stop-color="#eece67" stop-opacity="0.83"/>
+  </linearGradient>
+  <linearGradient id="lg21" x1="0.03" y1="0.00" x2="0.78" y2="0.85">
+    <stop offset="0.00" stop-color="#16fe79" stop-opacity="0.70"/>
+    <stop offset="0.50" stop-color="#d6afca" stop-opacity="0.52"/>
+    <stop offset="1.00" stop-color="#b5e260" stop-opacity="0.74"/>
+  </linearGradient>
+  <radialGradient id="rg24" cx="0.61" cy="0.53" r="0.62">
+    <stop offset="0.00" stop-color="#c56401"/>
+    <stop offset="0.50" stop-color="#2c957d"/>
+    <stop offset="1.00" stop-color="#6b0888"/>
+  </radialGradient>
+  <linearGradient id="lg27" x1="0.15" y1="0.11" x2="0.60" y2="0.69">
+    <stop offset="0.00" stop-color="#926488" stop-opacity="0.56"/>
+    <stop offset="0.50" stop-color="#811621" stop-opacity="0.64"/>
+    <stop offset="1.00" stop-color="#530c09" stop-opacity="0.79"/>
+  </linearGradient>
+  <radialGradient id="rg30" cx="0.62" cy="0.51" r="0.68">
+    <stop offset="0.00" stop-color="#a7a40a"/>
+    <stop offset="0.50" stop-color="#067097"/>
+    <stop offset="1.00" stop-color="#7e0b6f"/>
+  </radialGradient>
+  <linearGradient id="lg33" x1="0.27" y1="0.20" x2="0.77" y2="0.99">
+    <stop offset="0.00" stop-color="#0480ac" stop-opacity="1.00"/>
+    <stop offset="0.50" stop-color="#ad773f" stop-opacity="0.86"/>
+    <stop offset="1.00" stop-color="#da3b71" stop-opacity="0.94"/>
+  </linearGradient>
+  <radialGradient id="rg36" cx="0.65" cy="0.42" r="0.68">
+    <stop offset="0.00" stop-color="#83c848"/>
+    <stop offset="0.50" stop-color="#d07764"/>
+    <stop offset="1.00" stop-color="#306f7e"/>
+  </radialGradient>
+  <radialGradient id="rg39" cx="0.57" cy="0.69" r="0.54">
+    <stop offset="0.00" stop-color="#1ec3ef"/>
+    <stop offset="0.50" stop-color="#c2ecb2"/>
+    <stop offset="1.00" stop-color="#b0319a"/>
+  </radialGradient>
+  <linearGradient id="lg42" x1="0.15" y1="0.20" x2="0.79" y2="0.96">
+    <stop offset="0.00" stop-color="#c69dd2" stop-opacity="0.54"/>
+    <stop offset="0.50" stop-color="#bdb59c" stop-opacity="0.92"/>
+    <stop offset="1.00" stop-color="#32ff50" stop-opacity="0.66"/>
+  </linearGradient>
+  <radialGradient id="rg45" cx="0.52" cy="0.57" r="0.53">
+    <stop offset="0.00" stop-color="#de4072"/>
+    <stop offset="0.50" stop-color="#3f7a7d"/>
+    <stop offset="1.00" stop-color="#d6e085"/>
+  </radialGradient>
+  <linearGradient id="lg48" x1="0.09" y1="0.16" x2="0.90" y2="0.76">
+    <stop offset="0.00" stop-color="#df8ada" stop-opacity="0.78"/>
+    <stop offset="0.50" stop-color="#aea5af" stop-opacity="0.70"/>
+    <stop offset="1.00" stop-color="#748228" stop-opacity="0.96"/>
+  </linearGradient>
+  <radialGradient id="rg51" cx="0.43" cy="0.69" r="0.44">
+    <stop offset="0.00" stop-color="#d34338"/>
+    <stop offset="0.50" stop-color="#29a3b7"/>
+    <stop offset="1.00" stop-color="#53f60d"/>
+  </radialGradient>
+  <linearGradient id="lg54" x1="0.05" y1="0.25" x2="0.87" y2="0.78">
+    <stop offset="0.00" stop-color="#49c57f" stop-opacity="0.67"/>
+    <stop offset="0.50" stop-color="#dfb293" stop-opacity="0.64"/>
+    <stop offset="1.00" stop-color="#5d0b0f" stop-opacity="0.55"/>
+  </linearGradient>
+  <linearGradient id="lg57" x1="0.20" y1="0.18" x2="0.87" y2="0.97">
+    <stop offset="0.00" stop-color="#82f5ea" stop-opacity="0.94"/>
+    <stop offset="0.50" stop-color="#680c48" stop-opacity="0.97"/>
+    <stop offset="1.00" stop-color="#901851" stop-opacity="0.55"/>
+  </linearGradient>
+  <radialGradient id="rg60" cx="0.33" cy="0.42" r="0.55">
+    <stop offset="0.00" stop-color="#06c016"/>
+    <stop offset="0.50" stop-color="#82196f"/>
+    <stop offset="1.00" stop-color="#de2b50"/>
+  </radialGradient>
+  <linearGradient id="lg63" x1="0.19" y1="0.13" x2="0.89" y2="0.99">
+    <stop offset="0.00" stop-color="#49c0fa" stop-opacity="0.97"/>
+    <stop offset="0.50" stop-color="#fc9d42" stop-opacity="0.67"/>
+    <stop offset="1.00" stop-color="#354ed6" stop-opacity="0.77"/>
+  </linearGradient>
+  <radialGradient id="rg66" cx="0.40" cy="0.43" r="0.45">
+    <stop offset="0.00" stop-color="#a77cd6"/>
+    <stop offset="0.50" stop-color="#1c16fe"/>
+    <stop offset="1.00" stop-color="#213973"/>
+  </radialGradient>
+  <linearGradient id="lg69" x1="0.03" y1="0.29" x2="0.98" y2="0.85">
+    <stop offset="0.00" stop-color="#1e7b95" stop-opacity="0.84"/>
+    <stop offset="0.50" stop-color="#67e915" stop-opacity="0.64"/>
+    <stop offset="1.00" stop-color="#f26aa4" stop-opacity="0.68"/>
+  </linearGradient>
+  <radialGradient id="rg72" cx="0.52" cy="0.35" r="0.65">
+    <stop offset="0.00" stop-color="#823266"/>
+    <stop offset="0.50" stop-color="#e56ffd"/>
+    <stop offset="1.00" stop-color="#2c5ba2"/>
+  </radialGradient>
+  <radialGradient id="rg75" cx="0.33" cy="0.58" r="0.67">
+    <stop offset="0.00" stop-color="#415d22"/>
+    <stop offset="0.50" stop-color="#a86b7d"/>
+    <stop offset="1.00" stop-color="#cdad62"/>
+  </radialGradient>
+  <linearGradient id="lg78" x1="0.28" y1="0.06" x2="0.82" y2="0.61">
+    <stop offset="0.00" stop-color="#ffac8e" stop-opacity="0.98"/>
+    <stop offset="0.50" stop-color="#bc15d8" stop-opacity="0.50"/>
+    <stop offset="1.00" stop-color="#d60daa" stop-opacity="0.83"/>
+  </linearGradient>
+  <radialGradient id="rg81" cx="0.45" cy="0.49" r="0.47">
+    <stop offset="0.00" stop-color="#a7f421"/>
+    <stop offset="0.50" stop-color="#c9cf5b"/>
+    <stop offset="1.00" stop-color="#c5b5e2"/>
+  </radialGradient>
+  <linearGradient id="lg84" x1="0.05" y1="0.03" x2="0.88" y2="0.69">
+    <stop offset="0.00" stop-color="#3f8204" stop-opacity="0.73"/>
+    <stop offset="0.50" stop-color="#a0d464" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#7d6978" stop-opacity="0.86"/>
+  </linearGradient>
+  <radialGradient id="rg87" cx="0.56" cy="0.67" r="0.41">
+    <stop offset="0.00" stop-color="#e292b4"/>
+    <stop offset="0.50" stop-color="#6e18d8"/>
+    <stop offset="1.00" stop-color="#d59a01"/>
+  </radialGradient>
+  <linearGradient id="lg90" x1="0.06" y1="0.07" x2="0.91" y2="0.76">
+    <stop offset="0.00" stop-color="#55f9c4" stop-opacity="0.53"/>
+    <stop offset="0.50" stop-color="#75f503" stop-opacity="0.88"/>
+    <stop offset="1.00" stop-color="#6b0a3d" stop-opacity="0.89"/>
+  </linearGradient>
+  <linearGradient id="lg93" x1="0.10" y1="0.07" x2="0.98" y2="0.81">
+    <stop offset="0.00" stop-color="#1229e2" stop-opacity="0.93"/>
+    <stop offset="0.50" stop-color="#aff204" stop-opacity="0.71"/>
+    <stop offset="1.00" stop-color="#9a032f" stop-opacity="0.99"/>
+  </linearGradient>
+  <radialGradient id="rg96" cx="0.53" cy="0.55" r="0.42">
+    <stop offset="0.00" stop-color="#0ca0f7"/>
+    <stop offset="0.50" stop-color="#40882d"/>
+    <stop offset="1.00" stop-color="#e410c1"/>
+  </radialGradient>
+  <linearGradient id="lg99" x1="0.24" y1="0.23" x2="0.62" y2="0.63">
+    <stop offset="0.00" stop-color="#6d8c9c" stop-opacity="0.75"/>
+    <stop offset="0.50" stop-color="#63195e" stop-opacity="0.94"/>
+    <stop offset="1.00" stop-color="#930528" stop-opacity="0.54"/>
+  </linearGradient>
+  <radialGradient id="rg102" cx="0.48" cy="0.49" r="0.38">
+    <stop offset="0.00" stop-color="#527715"/>
+    <stop offset="0.50" stop-color="#388fc2"/>
+    <stop offset="1.00" stop-color="#baa687"/>
+  </radialGradient>
+  <linearGradient id="lg105" x1="0.10" y1="0.00" x2="0.71" y2="0.64">
+    <stop offset="0.00" stop-color="#572bb6" stop-opacity="0.83"/>
+    <stop offset="0.50" stop-color="#be183a" stop-opacity="0.71"/>
+    <stop offset="1.00" stop-color="#ff9252" stop-opacity="0.54"/>
+  </linearGradient>
+  <radialGradient id="rg108" cx="0.61" cy="0.62" r="0.32">
+    <stop offset="0.00" stop-color="#bb5c5d"/>
+    <stop offset="0.50" stop-color="#3499d1"/>
+    <stop offset="1.00" stop-color="#556db8"/>
+  </radialGradient>
+  <radialGradient id="rg111" cx="0.52" cy="0.64" r="0.32">
+    <stop offset="0.00" stop-color="#9ffc35"/>
+    <stop offset="0.50" stop-color="#6a6d82"/>
+    <stop offset="1.00" stop-color="#e02de5"/>
+  </radialGradient>
+  <linearGradient id="lg114" x1="0.22" y1="0.09" x2="0.99" y2="0.82">
+    <stop offset="0.00" stop-color="#695dfc" stop-opacity="0.51"/>
+    <stop offset="0.50" stop-color="#4562ab" stop-opacity="0.78"/>
+    <stop offset="1.00" stop-color="#d93fa1" stop-opacity="0.94"/>
+  </linearGradient>
+  <radialGradient id="rg117" cx="0.56" cy="0.38" r="0.32">
+    <stop offset="0.00" stop-color="#6eb602"/>
+    <stop offset="0.50" stop-color="#b03947"/>
+    <stop offset="1.00" stop-color="#22dbbd"/>
+  </radialGradient>
+  <linearGradient id="lg120" x1="0.19" y1="0.23" x2="0.73" y2="0.64">
+    <stop offset="0.00" stop-color="#3b0011" stop-opacity="0.92"/>
+    <stop offset="0.50" stop-color="#07a1ca" stop-opacity="0.91"/>
+    <stop offset="1.00" stop-color="#3a30dd" stop-opacity="0.68"/>
+  </linearGradient>
+  <radialGradient id="rg123" cx="0.33" cy="0.48" r="0.68">
+    <stop offset="0.00" stop-color="#a8d4a8"/>
+    <stop offset="0.50" stop-color="#77b8b6"/>
+    <stop offset="1.00" stop-color="#d0a205"/>
+  </radialGradient>
+  <linearGradient id="lg126" x1="0.12" y1="0.02" x2="0.73" y2="0.63">
+    <stop offset="0.00" stop-color="#6c232f" stop-opacity="0.92"/>
+    <stop offset="0.50" stop-color="#79df19" stop-opacity="0.86"/>
+    <stop offset="1.00" stop-color="#bf1a7c" stop-opacity="0.60"/>
+  </linearGradient>
+  <linearGradient id="lg129" x1="0.23" y1="0.20" x2="0.90" y2="0.99">
+    <stop offset="0.00" stop-color="#929641" stop-opacity="0.79"/>
+    <stop offset="1.00" stop-color="#b0adb5" stop-opacity="0.57"/>
+  </linearGradient>
+  <linearGradient id="lg131" x1="0.13" y1="0.10" x2="0.65" y2="0.89">
+    <stop offset="0.00" stop-color="#ffcfe2" stop-opacity="0.86"/>
+    <stop offset="1.00" stop-color="#beedb6" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg133" x1="0.29" y1="0.01" x2="0.80" y2="0.75">
+    <stop offset="0.00" stop-color="#21bfee" stop-opacity="0.57"/>
+    <stop offset="1.00" stop-color="#1b6fbc" stop-opacity="0.99"/>
+  </linearGradient>
+  <linearGradient id="lg135" x1="0.23" y1="0.12" x2="0.95" y2="0.91">
+    <stop offset="0.00" stop-color="#eca82e" stop-opacity="0.76"/>
+    <stop offset="1.00" stop-color="#5a20f1" stop-opacity="0.69"/>
+  </linearGradient>
+  <linearGradient id="lg137" x1="0.28" y1="0.30" x2="0.62" y2="0.93">
+    <stop offset="0.00" stop-color="#650cd5" stop-opacity="0.54"/>
+    <stop offset="1.00" stop-color="#176425" stop-opacity="0.62"/>
+  </linearGradient>
+  <linearGradient id="lg139" x1="0.29" y1="0.08" x2="0.76" y2="0.71">
+    <stop offset="0.00" stop-color="#35aae9" stop-opacity="0.78"/>
+    <stop offset="1.00" stop-color="#e658b5" stop-opacity="0.75"/>
+  </linearGradient>
+  <linearGradient id="lg141" x1="0.15" y1="0.24" x2="0.82" y2="0.62">
+    <stop offset="0.00" stop-color="#488d7a" stop-opacity="1.00"/>
+    <stop offset="1.00" stop-color="#62f453" stop-opacity="0.87"/>
+  </linearGradient>
+  <linearGradient id="lg143" x1="0.02" y1="0.06" x2="0.81" y2="0.87">
+    <stop offset="0.00" stop-color="#665607" stop-opacity="0.96"/>
+    <stop offset="1.00" stop-color="#4a4be8" stop-opacity="0.56"/>
+  </linearGradient>
+  <linearGradient id="lg145" x1="0.29" y1="0.29" x2="0.93" y2="0.98">
+    <stop offset="0.00" stop-color="#e7246e" stop-opacity="0.82"/>
+    <stop offset="1.00" stop-color="#01075d" stop-opacity="0.59"/>
+  </linearGradient>
+  <linearGradient id="lg147" x1="0.06" y1="0.04" x2="0.80" y2="0.80">
+    <stop offset="0.00" stop-color="#5d379a" stop-opacity="0.92"/>
+    <stop offset="1.00" stop-color="#bc9b12" stop-opacity="0.75"/>
+  </linearGradient>
+  <linearGradient id="lg149" x1="0.15" y1="0.13" x2="0.74" y2="0.68">
+    <stop offset="0.00" stop-color="#a34ad1" stop-opacity="0.64"/>
+    <stop offset="1.00" stop-color="#22daad" stop-opacity="0.95"/>
+  </linearGradient>
+  <linearGradient id="lg151" x1="0.29" y1="0.01" x2="0.79" y2="0.75">
+    <stop offset="0.00" stop-color="#6715cb" stop-opacity="0.62"/>
+    <stop offset="1.00" stop-color="#c29c1c" stop-opacity="0.56"/>
+  </linearGradient>
+  <linearGradient id="lg153" x1="0.24" y1="0.08" x2="0.96" y2="0.75">
+    <stop offset="0.00" stop-color="#774940" stop-opacity="0.71"/>
+    <stop offset="1.00" stop-color="#c6f644" stop-opacity="0.86"/>
+  </linearGradient>
+  <linearGradient id="lg155" x1="0.19" y1="0.19" x2="0.88" y2="0.66">
+    <stop offset="0.00" stop-color="#0dcea5" stop-opacity="0.98"/>
+    <stop offset="1.00" stop-color="#b14b59" stop-opacity="0.54"/>
+  </linearGradient>
+  <linearGradient id="lg157" x1="0.22" y1="0.07" x2="0.71" y2="0.80">
+    <stop offset="0.00" stop-color="#5a167d" stop-opacity="0.98"/>
+    <stop offset="1.00" stop-color="#ba4484" stop-opacity="0.57"/>
+  </linearGradient>
+  <linearGradient id="lg159" x1="0.04" y1="0.07" x2="0.68" y2="0.97">
+    <stop offset="0.00" stop-color="#ed1f83" stop-opacity="0.97"/>
+    <stop offset="1.00" stop-color="#ee937d" stop-opacity="0.77"/>
+  </linearGradient>
+  <linearGradient id="lg161" x1="0.17" y1="0.25" x2="0.89" y2="1.00">
+    <stop offset="0.00" stop-color="#d83938" stop-opacity="0.57"/>
+    <stop offset="1.00" stop-color="#d158d4" stop-opacity="0.60"/>
+  </linearGradient>
+  <linearGradient id="lg163" x1="0.23" y1="0.23" x2="0.85" y2="0.82">
+    <stop offset="0.00" stop-color="#73e739" stop-opacity="0.95"/>
+    <stop offset="1.00" stop-color="#701255" stop-opacity="1.00"/>
+  </linearGradient>
+  <linearGradient id="lg165" x1="0.27" y1="0.07" x2="0.71" y2="0.70">
+    <stop offset="0.00" stop-color="#3c6fcd" stop-opacity="0.85"/>
+    <stop offset="1.00" stop-color="#62748e" stop-opacity="0.52"/>
+  </linearGradient>
+  <linearGradient id="lg167" x1="0.22" y1="0.26" x2="0.80" y2="0.68">
+    <stop offset="0.00" stop-color="#68af6a" stop-opacity="0.90"/>
+    <stop offset="1.00" stop-color="#300d68" stop-opacity="0.71"/>
+  </linearGradient>
+  <linearGradient id="lg169" x1="0.24" y1="0.10" x2="0.92" y2="0.87">
+    <stop offset="0.00" stop-color="#ddf0d9" stop-opacity="0.61"/>
+    <stop offset="1.00" stop-color="#86dbf0" stop-opacity="0.63"/>
+  </linearGradient>
+  <linearGradient id="lg171" x1="0.09" y1="0.25" x2="0.65" y2="0.89">
+    <stop offset="0.00" stop-color="#908b8c" stop-opacity="0.77"/>
+    <stop offset="1.00" stop-color="#9a34d1" stop-opacity="0.51"/>
+  </linearGradient>
+  <linearGradient id="lg173" x1="0.28" y1="0.18" x2="1.00" y2="0.80">
+    <stop offset="0.00" stop-color="#7885fa" stop-opacity="0.77"/>
+    <stop offset="1.00" stop-color="#92731a" stop-opacity="0.98"/>
+  </linearGradient>
+  <linearGradient id="lg175" x1="0.28" y1="0.01" x2="0.95" y2="0.91">
+    <stop offset="0.00" stop-color="#cc9585" stop-opacity="0.79"/>
+    <stop offset="1.00" stop-color="#2371f6" stop-opacity="0.86"/>
+  </linearGradient>
+</defs>
+  <rect width="1600" height="1500" fill="url(#lg2)"/>
+  <g id="w5" transform="translate(30.0,30.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="2" fill="url(#rg3)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 0-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">51.2%</text>
+    <polyline class="c4" points="12.0,119.1 21.6,123.1 31.1,126.4 40.7,125.8 50.3,126.5 59.8,120.2 69.4,108.7 79.0,98.8 88.5,92.8 98.1,86.8 107.7,68.9 117.2,66.1 126.8,66.8 136.3,68.9 145.9,65.1 155.5,68.5 165.0,95.3 174.6,97.1 184.2,112.8 193.7,114.0 203.3,126.2 212.9,124.5 222.4,126.5 232.0,125.6" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#52bb83" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w8" transform="translate(290.0,30.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="1" fill="url(#lg6)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 0-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">43.3%</text>
+    <polyline class="c7" points="12.0,119.6 21.6,118.4 31.1,126.4 40.7,126.4 50.3,118.2 59.8,123.9 69.4,108.3 79.0,102.4 88.5,102.3 98.1,74.9 107.7,75.0 117.2,69.5 126.8,63.5 136.3,67.4 145.9,70.2 155.5,82.1 165.0,101.9 174.6,104.1 184.2,112.0 193.7,109.1 203.3,126.4 212.9,125.8 222.4,121.3 232.0,124.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#11000f" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w11" transform="translate(550.0,30.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="1" fill="url(#rg9)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 0-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">84.2%</text>
+    <polyline class="c10" points="12.0,112.7 21.6,113.1 31.1,124.3 40.7,126.5 50.3,123.1 59.8,115.7 69.4,105.3 79.0,92.6 88.5,82.4 98.1,86.9 107.7,81.5 117.2,63.8 126.8,63.7 136.3,65.9 145.9,67.3 155.5,84.5 165.0,77.0 174.6,110.5 184.2,99.9 193.7,123.0 203.3,126.3 212.9,125.1 222.4,126.4 232.0,107.1" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#6747fd" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w14" transform="translate(810.0,30.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#lg12)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 0-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">50.9%</text>
+    <polyline class="c13" points="12.0,109.6 21.6,110.9 31.1,122.0 40.7,126.0 50.3,116.7 59.8,114.6 69.4,118.3 79.0,96.2 88.5,80.3 98.1,88.7 107.7,83.3 117.2,73.9 126.8,63.8 136.3,66.2 145.9,70.9 155.5,81.8 165.0,97.5 174.6,112.2 184.2,114.0 193.7,116.5 203.3,126.0 212.9,125.4 222.4,121.9 232.0,124.9" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#103ab1" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w17" transform="translate(1070.0,30.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#rg15)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 0-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">98.9%</text>
+    <polyline class="c16" points="12.0,113.8 21.6,113.4 31.1,126.3 40.7,122.8 50.3,124.1 59.8,112.2 69.4,117.8 79.0,91.5 88.5,103.3 98.1,69.2 107.7,67.7 117.2,63.6 126.8,66.7 136.3,63.7 145.9,69.9 155.5,93.6 165.0,82.0 174.6,96.3 184.2,111.8 193.7,121.1 203.3,124.9 212.9,124.3 222.4,126.4 232.0,119.8" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#3ced91" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w20" transform="translate(1330.0,30.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="9" fill="url(#lg18)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 0-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">65.9%</text>
+    <polyline class="c19" points="12.0,119.7 21.6,114.5 31.1,125.2 40.7,124.3 50.3,126.2 59.8,125.1 69.4,114.3 79.0,96.8 88.5,79.8 98.1,70.6 107.7,65.2 117.2,66.4 126.8,63.9 136.3,63.8 145.9,76.7 155.5,73.8 165.0,81.3 174.6,86.4 184.2,101.4 193.7,115.1 203.3,123.4 212.9,125.6 222.4,122.0 232.0,110.9" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#2f4e30" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w23" transform="translate(30.0,190.0)">
+    <rect width="240.0" height="140.0" rx="10" fill="url(#lg21)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 1-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">31.6%</text>
+    <polyline class="c22" points="12.0,107.9 21.6,123.0 31.1,123.7 40.7,126.1 50.3,118.9 59.8,123.0 69.4,121.1 79.0,91.9 88.5,99.0 98.1,69.5 107.7,70.2 117.2,63.6 126.8,65.6 136.3,68.1 145.9,66.9 155.5,86.4 165.0,101.9 174.6,85.4 184.2,113.2 193.7,124.0 203.3,124.7 212.9,126.5 222.4,116.6 232.0,117.7" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#be4e96" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w26" transform="translate(290.0,190.0)">
+    <rect width="240.0" height="140.0" rx="8" fill="url(#rg24)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 1-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">39.9%</text>
+    <polyline class="c25" points="12.0,106.4 21.6,116.2 31.1,126.4 40.7,126.2 50.3,117.2 59.8,111.0 69.4,98.7 79.0,98.2 88.5,93.7 98.1,84.6 107.7,64.4 117.2,67.8 126.8,63.9 136.3,65.4 145.9,64.1 155.5,71.4 165.0,83.7 174.6,85.8 184.2,116.4 193.7,106.6 203.3,123.0 212.9,125.1 222.4,119.0 232.0,124.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#652b6a" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w29" transform="translate(550.0,190.0)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#lg27)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 1-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">60.3%</text>
+    <polyline class="c28" points="12.0,101.9 21.6,125.4 31.1,126.0 40.7,125.4 50.3,118.3 59.8,110.6 69.4,116.4 79.0,109.9 88.5,85.0 98.1,73.1 107.7,70.4 117.2,63.6 126.8,63.7 136.3,67.5 145.9,65.2 155.5,86.2 165.0,95.9 174.6,98.7 184.2,113.3 193.7,117.6 203.3,124.4 212.9,125.8 222.4,126.2 232.0,121.0" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#f59574" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w32" transform="translate(810.0,190.0)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#rg30)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 1-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">87.1%</text>
+    <polyline class="c31" points="12.0,121.3 21.6,125.4 31.1,116.9 40.7,126.5 50.3,119.9 59.8,109.5 69.4,112.2 79.0,112.4 88.5,99.4 98.1,77.5 107.7,65.2 117.2,64.4 126.8,63.7 136.3,72.0 145.9,66.9 155.5,71.0 165.0,103.4 174.6,87.2 184.2,119.5 193.7,118.0 203.3,119.9 212.9,125.6 222.4,126.3 232.0,107.2" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#90a861" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w35" transform="translate(1070.0,190.0)">
+    <rect width="240.0" height="140.0" rx="2" fill="url(#lg33)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 1-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">70.8%</text>
+    <polyline class="c34" points="12.0,117.7 21.6,125.7 31.1,125.0 40.7,123.1 50.3,120.5 59.8,113.5 69.4,121.3 79.0,107.0 88.5,79.8 98.1,76.8 107.7,65.0 117.2,72.0 126.8,63.5 136.3,64.9 145.9,67.2 155.5,81.6 165.0,101.6 174.6,113.3 184.2,121.6 193.7,125.1 203.3,121.6 212.9,126.5 222.4,125.9 232.0,118.2" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#3ccbd3" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w38" transform="translate(1330.0,190.0)">
+    <rect width="240.0" height="140.0" rx="10" fill="url(#rg36)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 1-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">83.4%</text>
+    <polyline class="c37" points="12.0,114.2 21.6,124.4 31.1,119.8 40.7,125.9 50.3,122.4 59.8,125.0 69.4,96.4 79.0,111.8 88.5,80.9 98.1,76.2 107.7,66.8 117.2,67.5 126.8,67.0 136.3,63.8 145.9,70.3 155.5,85.3 165.0,80.3 174.6,100.8 184.2,118.7 193.7,109.1 203.3,116.2 212.9,126.0 222.4,120.6 232.0,125.6" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#318f99" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w41" transform="translate(30.0,350.0)">
+    <rect width="240.0" height="140.0" rx="2" fill="url(#rg39)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 2-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">90.3%</text>
+    <polyline class="c40" points="12.0,111.0 21.6,114.0 31.1,117.5 40.7,126.5 50.3,126.3 59.8,117.2 69.4,101.2 79.0,90.0 88.5,103.5 98.1,73.7 107.7,65.5 117.2,64.1 126.8,64.2 136.3,63.5 145.9,65.7 155.5,69.2 165.0,97.4 174.6,108.6 184.2,108.2 193.7,125.1 203.3,119.7 212.9,126.2 222.4,122.5 232.0,107.4" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#6277eb" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w44" transform="translate(290.0,350.0)">
+    <rect width="240.0" height="140.0" rx="7" fill="url(#lg42)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 2-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">21.1%</text>
+    <polyline class="c43" points="12.0,110.9 21.6,109.3 31.1,116.2 40.7,126.1 50.3,119.2 59.8,124.1 69.4,106.7 79.0,104.8 88.5,90.2 98.1,71.3 107.7,73.7 117.2,63.5 126.8,63.5 136.3,66.7 145.9,79.5 155.5,75.9 165.0,85.9 174.6,97.9 184.2,111.8 193.7,112.2 203.3,121.0 212.9,126.5 222.4,120.3 232.0,111.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#e975d8" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w47" transform="translate(550.0,350.0)">
+    <rect width="240.0" height="140.0" rx="1" fill="url(#rg45)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 2-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">86.6%</text>
+    <polyline class="c46" points="12.0,105.9 21.6,117.1 31.1,122.2 40.7,124.8 50.3,121.3 59.8,120.6 69.4,110.7 79.0,112.4 88.5,89.9 98.1,91.9 107.7,65.1 117.2,70.8 126.8,64.3 136.3,71.1 145.9,70.9 155.5,85.7 165.0,89.3 174.6,97.5 184.2,99.6 193.7,110.0 203.3,123.1 212.9,125.8 222.4,124.1 232.0,125.6" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#e3964d" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w50" transform="translate(810.0,350.0)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#lg48)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 2-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">38.5%</text>
+    <polyline class="c49" points="12.0,103.6 21.6,115.7 31.1,116.3 40.7,126.5 50.3,121.1 59.8,107.9 69.4,106.7 79.0,95.1 88.5,88.9 98.1,87.7 107.7,64.7 117.2,64.7 126.8,63.6 136.3,63.7 145.9,67.7 155.5,87.6 165.0,103.5 174.6,92.9 184.2,118.0 193.7,110.9 203.3,123.1 212.9,126.5 222.4,117.2 232.0,110.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#419593" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w53" transform="translate(1070.0,350.0)">
+    <rect width="240.0" height="140.0" rx="8" fill="url(#rg51)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 2-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">91.0%</text>
+    <polyline class="c52" points="12.0,118.7 21.6,124.5 31.1,126.0 40.7,122.7 50.3,124.8 59.8,124.9 69.4,113.5 79.0,97.4 88.5,98.0 98.1,89.2 107.7,82.9 117.2,63.6 126.8,64.1 136.3,63.8 145.9,65.3 155.5,73.6 165.0,76.8 174.6,97.3 184.2,103.3 193.7,123.4 203.3,126.5 212.9,126.5 222.4,126.3 232.0,121.7" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#5d7355" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w56" transform="translate(1330.0,350.0)">
+    <rect width="240.0" height="140.0" rx="0" fill="url(#lg54)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 2-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">75.5%</text>
+    <polyline class="c55" points="12.0,99.9 21.6,108.9 31.1,123.3 40.7,123.5 50.3,126.5 59.8,125.2 69.4,119.4 79.0,88.4 88.5,89.9 98.1,76.7 107.7,64.8 117.2,64.7 126.8,63.5 136.3,63.6 145.9,70.9 155.5,82.4 165.0,84.6 174.6,109.9 184.2,108.2 193.7,110.5 203.3,126.4 212.9,122.8 222.4,125.5 232.0,112.8" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#3dbcf1" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w59" transform="translate(30.0,510.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="5" fill="url(#lg57)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 3-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">68.8%</text>
+    <polyline class="c58" points="12.0,98.2 21.6,120.2 31.1,118.0 40.7,126.1 50.3,126.3 59.8,107.2 69.4,106.1 79.0,104.4 88.5,94.7 98.1,88.7 107.7,70.9 117.2,66.1 126.8,64.1 136.3,68.3 145.9,64.8 155.5,93.3 165.0,89.9 174.6,113.4 184.2,121.4 193.7,115.6 203.3,119.8 212.9,126.4 222.4,125.8 232.0,119.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#0fff21" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w62" transform="translate(290.0,510.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="1" fill="url(#rg60)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 3-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">26.2%</text>
+    <polyline class="c61" points="12.0,110.3 21.6,113.9 31.1,118.9 40.7,126.4 50.3,117.1 59.8,124.6 69.4,97.5 79.0,113.2 88.5,90.2 98.1,94.6 107.7,79.2 117.2,69.7 126.8,64.2 136.3,63.8 145.9,80.1 155.5,73.6 165.0,80.0 174.6,106.7 184.2,102.4 193.7,119.3 203.3,126.4 212.9,126.2 222.4,121.3 232.0,108.4" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#6ae461" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w65" transform="translate(550.0,510.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="1" fill="url(#lg63)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 3-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">8.0%</text>
+    <polyline class="c64" points="12.0,109.3 21.6,121.7 31.1,122.7 40.7,125.9 50.3,117.8 59.8,122.0 69.4,100.8 79.0,100.7 88.5,83.4 98.1,92.9 107.7,79.6 117.2,70.1 126.8,63.6 136.3,64.0 145.9,66.4 155.5,68.8 165.0,97.2 174.6,89.6 184.2,120.4 193.7,114.4 203.3,125.4 212.9,124.8 222.4,124.2 232.0,125.6" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#ad23c2" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w68" transform="translate(810.0,510.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="2" fill="url(#rg66)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 3-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">79.5%</text>
+    <polyline class="c67" points="12.0,107.3 21.6,124.6 31.1,120.2 40.7,124.8 50.3,126.0 59.8,117.5 69.4,115.6 79.0,105.7 88.5,89.2 98.1,75.5 107.7,70.0 117.2,63.5 126.8,64.5 136.3,67.7 145.9,74.0 155.5,76.2 165.0,76.3 174.6,101.3 184.2,101.6 193.7,125.5 203.3,126.4 212.9,126.5 222.4,119.1 232.0,110.7" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#320926" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w71" transform="translate(1070.0,510.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="3" fill="url(#lg69)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 3-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">64.5%</text>
+    <polyline class="c70" points="12.0,96.4 21.6,125.6 31.1,115.3 40.7,124.2 50.3,126.5 59.8,115.3 69.4,98.7 79.0,99.4 88.5,77.8 98.1,69.1 107.7,67.3 117.2,66.9 126.8,63.5 136.3,65.2 145.9,74.1 155.5,68.1 165.0,88.6 174.6,105.5 184.2,110.3 193.7,123.2 203.3,117.1 212.9,126.5 222.4,125.8 232.0,121.2" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#03ffcf" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w74" transform="translate(1330.0,510.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="12" fill="url(#rg72)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 3-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">58.6%</text>
+    <polyline class="c73" points="12.0,102.6 21.6,125.3 31.1,121.4 40.7,125.9 50.3,125.9 59.8,125.3 69.4,104.4 79.0,85.8 88.5,103.4 98.1,82.8 107.7,65.4 117.2,63.5 126.8,63.6 136.3,63.9 145.9,64.3 155.5,85.3 165.0,79.3 174.6,88.2 184.2,117.0 193.7,118.7 203.3,126.5 212.9,126.4 222.4,126.3 232.0,115.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#df0404" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w77" transform="translate(30.0,670.0)">
+    <rect width="240.0" height="140.0" rx="8" fill="url(#rg75)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 4-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">48.5%</text>
+    <polyline class="c76" points="12.0,112.2 21.6,112.9 31.1,126.0 40.7,124.0 50.3,125.8 59.8,123.7 69.4,121.1 79.0,102.7 88.5,105.1 98.1,74.3 107.7,67.9 117.2,65.7 126.8,67.2 136.3,65.3 145.9,64.8 155.5,72.5 165.0,91.5 174.6,97.5 184.2,105.8 193.7,117.3 203.3,124.4 212.9,126.5 222.4,124.2 232.0,121.8" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#8c0eb6" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w80" transform="translate(290.0,670.0)">
+    <rect width="240.0" height="140.0" rx="0" fill="url(#lg78)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 4-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">90.3%</text>
+    <polyline class="c79" points="12.0,118.3 21.6,121.8 31.1,121.7 40.7,125.2 50.3,121.7 59.8,117.9 69.4,106.4 79.0,115.0 88.5,93.4 98.1,83.5 107.7,71.3 117.2,72.4 126.8,66.9 136.3,66.7 145.9,75.1 155.5,81.2 165.0,87.6 174.6,112.1 184.2,112.0 193.7,115.2 203.3,126.2 212.9,125.4 222.4,124.6 232.0,116.1" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#537463" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w83" transform="translate(550.0,670.0)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#rg81)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 4-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">81.3%</text>
+    <polyline class="c82" points="12.0,117.8 21.6,109.1 31.1,121.6 40.7,124.9 50.3,119.1 59.8,125.5 69.4,111.8 79.0,111.8 88.5,95.9 98.1,75.8 107.7,64.2 117.2,67.3 126.8,66.6 136.3,64.6 145.9,74.9 155.5,77.3 165.0,75.2 174.6,111.9 184.2,119.0 193.7,122.8 203.3,125.7 212.9,126.0 222.4,126.3 232.0,117.9" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#11789a" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w86" transform="translate(810.0,670.0)">
+    <rect width="240.0" height="140.0" rx="4" fill="url(#lg84)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 4-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">5.2%</text>
+    <polyline class="c85" points="12.0,103.1 21.6,121.1 31.1,124.1 40.7,123.3 50.3,116.7 59.8,121.6 69.4,121.8 79.0,108.2 88.5,97.4 98.1,74.6 107.7,78.7 117.2,63.5 126.8,63.6 136.3,63.7 145.9,65.0 155.5,71.9 165.0,98.9 174.6,97.9 184.2,98.2 193.7,117.7 203.3,124.4 212.9,125.4 222.4,126.5 232.0,108.8" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#93d526" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w89" transform="translate(1070.0,670.0)">
+    <rect width="240.0" height="140.0" rx="8" fill="url(#rg87)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 4-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">55.6%</text>
+    <polyline class="c88" points="12.0,98.2 21.6,119.3 31.1,126.4 40.7,125.5 50.3,120.0 59.8,109.2 69.4,100.9 79.0,109.0 88.5,99.7 98.1,84.5 107.7,73.8 117.2,63.9 126.8,66.6 136.3,63.6 145.9,70.9 155.5,92.0 165.0,104.0 174.6,101.0 184.2,119.5 193.7,125.8 203.3,126.2 212.9,123.0 222.4,125.6 232.0,109.8" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#0ba33d" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w92" transform="translate(1330.0,670.0)">
+    <rect width="240.0" height="140.0" rx="6" fill="url(#lg90)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 4-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">91.7%</text>
+    <polyline class="c91" points="12.0,109.7 21.6,123.1 31.1,117.0 40.7,124.8 50.3,125.6 59.8,114.7 69.4,105.6 79.0,97.3 88.5,85.3 98.1,82.9 107.7,65.2 117.2,66.3 126.8,63.5 136.3,64.6 145.9,66.4 155.5,89.5 165.0,93.0 174.6,106.2 184.2,120.5 193.7,125.8 203.3,123.1 212.9,126.5 222.4,120.4 232.0,120.0" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#cec1a5" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w95" transform="translate(30.0,830.0)">
+    <rect width="240.0" height="140.0" rx="0" fill="url(#lg93)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 5-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">41.0%</text>
+    <polyline class="c94" points="12.0,103.6 21.6,123.5 31.1,126.4 40.7,126.5 50.3,126.5 59.8,120.9 69.4,103.8 79.0,113.2 88.5,97.0 98.1,85.4 107.7,64.9 117.2,74.0 126.8,66.9 136.3,68.7 145.9,64.7 155.5,92.7 165.0,100.1 174.6,93.4 184.2,112.0 193.7,120.9 203.3,119.3 212.9,125.0 222.4,126.2 232.0,120.2" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#3e70c0" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w98" transform="translate(290.0,830.0)">
+    <rect width="240.0" height="140.0" rx="3" fill="url(#rg96)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 5-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">54.1%</text>
+    <polyline class="c97" points="12.0,106.6 21.6,116.3 31.1,125.1 40.7,125.7 50.3,125.8 59.8,109.3 69.4,102.3 79.0,96.8 88.5,93.8 98.1,73.1 107.7,64.2 117.2,68.0 126.8,63.8 136.3,68.1 145.9,73.7 155.5,71.2 165.0,99.7 174.6,84.7 184.2,116.2 193.7,121.1 203.3,126.3 212.9,126.3 222.4,122.3 232.0,122.6" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#56a74f" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w101" transform="translate(550.0,830.0)">
+    <rect width="240.0" height="140.0" rx="3" fill="url(#lg99)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 5-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">95.6%</text>
+    <polyline class="c100" points="12.0,114.9 21.6,120.1 31.1,126.4 40.7,125.3 50.3,120.4 59.8,110.6 69.4,116.8 79.0,94.9 88.5,81.7 98.1,74.0 107.7,72.4 117.2,64.5 126.8,64.9 136.3,73.8 145.9,66.4 155.5,73.7 165.0,89.1 174.6,111.4 184.2,117.1 193.7,122.1 203.3,125.1 212.9,126.3 222.4,122.8 232.0,109.5" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#22ea30" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w104" transform="translate(810.0,830.0)">
+    <rect width="240.0" height="140.0" rx="3" fill="url(#rg102)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 5-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">49.3%</text>
+    <polyline class="c103" points="12.0,111.7 21.6,108.7 31.1,125.7 40.7,124.2 50.3,125.1 59.8,113.8 69.4,97.2 79.0,87.1 88.5,91.6 98.1,79.0 107.7,67.4 117.2,69.0 126.8,64.8 136.3,63.7 145.9,70.6 155.5,92.8 165.0,81.3 174.6,110.3 184.2,96.8 193.7,114.1 203.3,118.2 212.9,125.8 222.4,126.3 232.0,119.3" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#8db531" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w107" transform="translate(1070.0,830.0)">
+    <rect width="240.0" height="140.0" rx="8" fill="url(#lg105)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 5-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">65.3%</text>
+    <polyline class="c106" points="12.0,117.8 21.6,111.2 31.1,121.1 40.7,123.4 50.3,125.4 59.8,118.8 69.4,110.1 79.0,112.1 88.5,97.7 98.1,79.8 107.7,65.1 117.2,66.2 126.8,64.4 136.3,65.8 145.9,76.0 155.5,88.3 165.0,87.6 174.6,100.7 184.2,118.4 193.7,108.9 203.3,124.8 212.9,123.2 222.4,119.2 232.0,125.7" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#f8acaa" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w110" transform="translate(1330.0,830.0)">
+    <rect width="240.0" height="140.0" rx="0" fill="url(#rg108)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 5-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">4.0%</text>
+    <polyline class="c109" points="12.0,111.4 21.6,125.2 31.1,120.5 40.7,126.5 50.3,126.3 59.8,120.3 69.4,112.2 79.0,111.7 88.5,81.2 98.1,73.4 107.7,67.2 117.2,64.2 126.8,64.4 136.3,68.5 145.9,70.5 155.5,78.7 165.0,79.0 174.6,100.6 184.2,101.6 193.7,110.0 203.3,116.9 212.9,122.8 222.4,126.1 232.0,112.8" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#c8bd05" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w113" transform="translate(30.0,990.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="9" fill="url(#rg111)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 6-0</text>
+    <text x="12" y="48" font-size="22" fill="#222">91.5%</text>
+    <polyline class="c112" points="12.0,119.1 21.6,106.9 31.1,126.0 40.7,126.3 50.3,126.5 59.8,111.9 69.4,109.9 79.0,87.0 88.5,103.1 98.1,74.6 107.7,68.9 117.2,67.7 126.8,65.1 136.3,68.7 145.9,70.2 155.5,71.6 165.0,89.1 174.6,106.0 184.2,103.9 193.7,113.7 203.3,123.4 212.9,126.2 222.4,124.3 232.0,108.4" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#06608f" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w116" transform="translate(290.0,990.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="8" fill="url(#lg114)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 6-1</text>
+    <text x="12" y="48" font-size="22" fill="#222">82.2%</text>
+    <polyline class="c115" points="12.0,112.8 21.6,125.7 31.1,126.3 40.7,124.8 50.3,125.9 59.8,125.7 69.4,109.5 79.0,91.1 88.5,82.0 98.1,84.2 107.7,66.3 117.2,63.7 126.8,63.5 136.3,69.4 145.9,79.4 155.5,91.0 165.0,84.0 174.6,107.2 184.2,116.7 193.7,117.4 203.3,126.2 212.9,126.5 222.4,126.3 232.0,121.0" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#d214d4" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w119" transform="translate(550.0,990.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="1" fill="url(#rg117)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 6-2</text>
+    <text x="12" y="48" font-size="22" fill="#222">24.0%</text>
+    <polyline class="c118" points="12.0,121.1 21.6,124.7 31.1,126.5 40.7,122.8 50.3,126.5 59.8,115.9 69.4,104.1 79.0,108.6 88.5,103.2 98.1,82.3 107.7,64.7 117.2,66.8 126.8,63.5 136.3,71.6 145.9,71.8 155.5,90.5 165.0,82.6 174.6,112.7 184.2,111.9 193.7,118.4 203.3,126.1 212.9,124.0 222.4,123.9 232.0,122.5" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#f1e0ac" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w122" transform="translate(810.0,990.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#lg120)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 6-3</text>
+    <text x="12" y="48" font-size="22" fill="#222">93.2%</text>
+    <polyline class="c121" points="12.0,105.1 21.6,113.9 31.1,121.6 40.7,123.8 50.3,126.3 59.8,124.4 69.4,117.9 79.0,107.0 88.5,81.9 98.1,84.0 107.7,73.2 117.2,67.5 126.8,65.8 136.3,72.0 145.9,74.5 155.5,84.7 165.0,103.5 174.6,108.1 184.2,105.5 193.7,121.7 203.3,126.2 212.9,126.5 222.4,117.0 232.0,117.1" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#3c4569" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w125" transform="translate(1070.0,990.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="2" fill="url(#rg123)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 6-4</text>
+    <text x="12" y="48" font-size="22" fill="#222">20.4%</text>
+    <polyline class="c124" points="12.0,112.6 21.6,118.1 31.1,125.4 40.7,125.0 50.3,121.8 59.8,118.8 69.4,110.8 79.0,95.5 88.5,78.5 98.1,73.3 107.7,69.1 117.2,64.6 126.8,63.5 136.3,67.0 145.9,71.9 155.5,83.1 165.0,78.3 174.6,106.2 184.2,96.1 193.7,123.0 203.3,123.5 212.9,126.5 222.4,119.8 232.0,115.5" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#1fff93" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w128" transform="translate(1330.0,990.0)" filter="url(#fx1)">
+    <rect width="240.0" height="140.0" rx="11" fill="url(#lg126)"/>
+    <text x="12" y="24" font-size="14" font-weight="bold" fill="#123">Metric 6-5</text>
+    <text x="12" y="48" font-size="22" fill="#222">57.0%</text>
+    <polyline class="c127" points="12.0,114.8 21.6,125.1 31.1,115.4 40.7,123.8 50.3,126.3 59.8,122.1 69.4,108.4 79.0,100.2 88.5,102.4 98.1,84.5 107.7,74.8 117.2,63.5 126.8,66.0 136.3,66.6 145.9,75.7 155.5,82.2 165.0,101.5 174.6,95.2 184.2,96.2 193.7,121.4 203.3,126.2 212.9,126.5 222.4,126.3 232.0,121.6" fill="none"/>
+    <circle cx="210" cy="28" r="10" fill="#9bf6e6" opacity=".8"/>
+    <path d="M12,132 h216" stroke="#888" stroke-dasharray="4 3"/>
+  </g>
+  <g id="w130" transform="translate(50.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="4" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 12.6,56.5" fill="none" stroke="url(#lg129)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">66</text>
+  </g>
+  <g id="w132" transform="translate(240.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="3" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 15.0,59.9" fill="none" stroke="url(#lg131)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">64</text>
+  </g>
+  <g id="w134" transform="translate(430.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="10" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 8.0,41.7" fill="none" stroke="url(#lg133)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">74</text>
+  </g>
+  <g id="w136" transform="translate(620.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="12" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 15.0,20.0" fill="none" stroke="url(#lg135)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">86</text>
+  </g>
+  <g id="w138" transform="translate(810.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="10" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 8.0,39.2" fill="none" stroke="url(#lg137)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">75</text>
+  </g>
+  <g id="w140" transform="translate(1000.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="4" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 71.8,36.2" fill="none" stroke="url(#lg139)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">23</text>
+  </g>
+  <g id="w142" transform="translate(1190.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="6" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 59.4,14.6" fill="none" stroke="url(#lg141)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">10</text>
+  </g>
+  <g id="w144" transform="translate(1380.0,1190.0)">
+    <rect width="80.0" height="80.0" rx="12" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 64.2,19.1" fill="none" stroke="url(#lg143)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">13</text>
+  </g>
+  <g id="w146" transform="translate(50.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="3" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 47.7,8.9" fill="none" stroke="url(#lg145)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">3</text>
+  </g>
+  <g id="w148" transform="translate(240.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="9" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 36.8,71.8" fill="none" stroke="url(#lg147)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">51</text>
+  </g>
+  <g id="w150" transform="translate(430.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="1" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 70.3,50.4" fill="none" stroke="url(#lg149)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">30</text>
+  </g>
+  <g id="w152" transform="translate(620.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="12" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 65.7,21.0" fill="none" stroke="url(#lg151)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">14</text>
+  </g>
+  <g id="w154" transform="translate(810.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="10" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 15.7,19.2" fill="none" stroke="url(#lg153)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">86</text>
+  </g>
+  <g id="w156" transform="translate(1000.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="12" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 8.8,47.1" fill="none" stroke="url(#lg155)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">71</text>
+  </g>
+  <g id="w158" transform="translate(1190.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="10" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 22.4,13.3" fill="none" stroke="url(#lg157)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">91</text>
+  </g>
+  <g id="w160" transform="translate(1380.0,1280.0)">
+    <rect width="80.0" height="80.0" rx="7" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 39.2,72.0" fill="none" stroke="url(#lg159)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">50</text>
+  </g>
+  <g id="w162" transform="translate(50.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="4" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 46.8,71.3" fill="none" stroke="url(#lg161)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">46</text>
+  </g>
+  <g id="w164" transform="translate(240.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="5" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 8.9,32.6" fill="none" stroke="url(#lg163)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">79</text>
+  </g>
+  <g id="w166" transform="translate(430.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="1" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 55.3,11.9" fill="none" stroke="url(#lg165)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">7</text>
+  </g>
+  <g id="w168" transform="translate(620.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="4" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 53.0,10.7" fill="none" stroke="url(#lg167)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">6</text>
+  </g>
+  <g id="w170" transform="translate(810.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="12" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 15.3,60.4" fill="none" stroke="url(#lg169)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">64</text>
+  </g>
+  <g id="w172" transform="translate(1000.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="5" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 1 1 19.7,64.7" fill="none" stroke="url(#lg171)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">61</text>
+  </g>
+  <g id="w174" transform="translate(1190.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="0" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 71.2,33.1" fill="none" stroke="url(#lg173)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">21</text>
+  </g>
+  <g id="w176" transform="translate(1380.0,1370.0)">
+    <rect width="80.0" height="80.0" rx="3" fill="none"/>
+    <circle cx="40" cy="40" r="32" fill="none" stroke="#ddd" stroke-width="10"/>
+    <path d="M40,8 A32,32 0 0 1 69.8,28.3" fill="none" stroke="url(#lg175)" stroke-width="10" stroke-linecap="round"/>
+    <text x="40" y="45" text-anchor="middle" font-size="14">19</text>
+  </g>
+</svg>
